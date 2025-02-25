@@ -1,0 +1,73 @@
+<%- include('../partials/navbar', { user }) %>
+
+<!-- Main Content -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1 class="text-center mb-4">Cadastro de Detento</h1>
+      <form action="/detentos/cadastro" method="POST" enctype="multipart/form-data" class="border p-4 rounded bg-dark text-white">
+        <div class="row justify-content-center">
+          <!-- Nome -->
+          <div class="col-md-6 mb-3">
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" class="form-control form-control-sm" id="nome" name="nome" required>
+          </div>
+
+          <!-- Idade -->
+          <div class="col-md-6 mb-3">
+            <label for="idade" class="form-label">Idade</label>
+            <input type="number" class="form-control form-control-sm" id="idade" name="idade" required>
+          </div>
+
+          <!-- Filiação -->
+          <div class="col-md-6 mb-3">
+            <label for="filiacao" class="form-label">Filiação</label>
+            <input type="text" class="form-control form-control-sm" id="filiacao" name="filiacao" required>
+          </div>
+
+          <!-- Estado Civil -->
+          <div class="col-md-6 mb-3">
+            <label for="estadoCivil" class="form-label">Estado Civil</label>
+            <select class="form-select form-select-sm" id="estadoCivil" name="estadoCivil" required>
+              <option value="solteiro">Solteiro(a)</option>
+              <option value="casado">Casado(a)</option>
+              <option value="divorciado">Divorciado(a)</option>
+              <option value="viuvo">Viúvo(a)</option>
+            </select>
+          </div>
+
+          <!-- Foto -->
+          <div class="col-md-6 mb-3">
+            <label for="foto" class="form-label">Foto</label>
+            <input type="file" class="form-control form-control-sm" id="foto" name="foto">
+          </div>
+
+          <!-- Reincidência -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Reincidência</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="reincidencia" name="reincidencia" value="true">
+              <label class="form-check-label" for="reincidencia">Sim</label>
+            </div>
+          </div>
+
+          <!-- Crimes -->
+          <div class="col-md-12 mb-3">
+            <label for="crimes" class="form-label">Crimes Cometidos</label>
+            <textarea class="form-control form-control-sm" id="crimes" name="crimes" rows="3" placeholder="Descreva os crimes cometidos"></textarea>
+          </div>
+        </div>
+
+        <!-- Botão de Envio -->
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <button type="submit" class="btn btn-danger w-100">Cadastrar Detento</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+

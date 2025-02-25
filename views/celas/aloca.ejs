@@ -1,0 +1,13 @@
+<%- include('../layouts/main') %>
+<h1>Alocação de Detento</h1>
+<form action="/celas/alocar" method="POST">
+  <div class="mb-3">
+    <label for="codigoCela">Código da Cela:</label>
+    <input type="text" id="codigoCela" name="codigoCela" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="idDetento">ID do Detento:</label>
+    <input type="text" id="idDetento" name="idDetento" class="form-control" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Alocar</button>
+</form>
