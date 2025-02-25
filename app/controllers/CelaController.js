@@ -1,30 +1,25 @@
-const DetentoService = require('../services/DetentoService');
+const CelaService = require('../services/CelaService');
 
-class DetentoController {
-  static async cadastrar(req, res) {
+class CelaController {
+  static async alocaDetento(req, res) {
     try {
-      const { nome, idade, filiacao, estadoCivil, reincidencia, crimes } = req.body;
-      const file = req.file; // Arquivo enviado pelo formulário
-
-      const novoDetento = await DetentoService.cadastrar(
-        { nome, idade, filiacao, estadoCivil, reincidencia, crimes },
-        file
-      );
-
-      res.status(201).render('detentos/detalhes', { detento: novoDetento });
+      const { codigoCela, idDetento } = req.body;
+      await CelaService.alocarDetento(codigoCela, idDetento);
+      res.status(200).send('Detento alocado com sucesso.');
     } catch (error) {
       res.status(400).send(error.message);
     }
   }
 
-  static async listar(req, res) {
+  static async transferirDetento(req, res) {
     try {
-      const detentos = await DetentoService.listar();
-      res.render('detentos/lista', { detentos });
+      const { idDetento, novoCodigoCela } = req.body;
+      await CelaService.transferirDetento(idDetento, novoCodigoCela);
+      res.status(200).send('Detento transferido com sucesso.');
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(400).send(error.message);
     }
   }
 }
 
-module.exports = DetentoController;
+module.exports = CelaController;
