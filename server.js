@@ -8,7 +8,7 @@ const authRoutes = require('./app/routes/authRoutes');
 const authMiddleware = require('./app/middlewares/authMiddleware');
 // Carregar variáveis de ambiente
 dotenv.config();
-
+// Ola mundo
 // Conectar ao MongoDB
 const dbConfig = require('./app/config/db');
 dbConfig.connect();
