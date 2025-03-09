@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const session = require('express-session'); // Importe o middleware de sessão
 const authRoutes = require('./app/routes/authRoutes');
 const authMiddleware = require('./app/middlewares/authMiddleware');
+const flash = require('connect-flash');
 // Carregar variáveis de ambiente
 dotenv.config();
 // Ola mundo
@@ -31,6 +32,15 @@ app.use(session({
   }
 }));
 
+app.use(flash());
+
+
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success');
+  res.locals.error_msg = req.flash('error');
+  next();
+});
+
 // Middleware para servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -47,13 +57,21 @@ app.set('views', path.join(__dirname, 'views'));
 // Rotas
 const detentoRoutes = require('./app/routes/detentoRoutes');
 const celaRoutes = require('./app/routes/celaRoutes');
-const visitaRoutes = require('./app/routes/visitaRoutes');
 const relatorioRoutes = require('./app/routes/relatorioRoutes');
+const visitaFamiliarRoutes = require('./app/routes/visitaFamiliarRoutes');
+const visitaAdvogadoRoutes = require('./app/routes/visitaAdvogadoRoutes');
+const alocacaoRoutes = require('./app/routes/alocacaoRoutes');
+const pesquisaRoutes = require('./app/routes/pesquisaRoutes');
 
-app.use('/detentos', authMiddleware, upload.single('foto'), detentoRoutes);
+
+
+app.use('/detentos', authMiddleware, detentoRoutes);
 app.use('/celas', authMiddleware, celaRoutes);
-app.use('/visitas', authMiddleware, visitaRoutes);
 app.use('/relatorios', authMiddleware, relatorioRoutes);
+app.use('/visitas', visitaFamiliarRoutes);
+app.use('/visitasAdvogado', visitaAdvogadoRoutes);
+app.use('/alocacao', alocacaoRoutes);
+app.use('/', pesquisaRoutes )
 app.use('/', authRoutes);
 
 // Rota Padrão

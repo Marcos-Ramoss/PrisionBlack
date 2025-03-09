@@ -6,8 +6,27 @@
   <title>Lista de Detentos</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Estilo Personalizado -->
+  <style>
+    /* Animação para o botão */
+    .animated-button {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .animated-button:hover {
+      transform: scale(1.1); 
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3); 
+    }
+
+    /* Animação para a foto */
+    .foto-detento {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      cursor: pointer; /* Indica que é clicável */
+    }
+    .foto-detento:hover {
+      transform: scale(1.1); /* Amplia a imagem */
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); /* Adiciona sombra */
+    }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
@@ -16,6 +35,15 @@
   <!-- Main Content -->
   <div class="container mt-5">
     <h1 class="mb-4">Lista de Detentos</h1>
+
+    <!-- Botão Cadastrar Detento -->
+    <div class="text-end mb-4">
+      <a href="/detentos/cadastro" class="btn btn-danger animated-button">
+        <i class="fa-solid fa-plus"></i> Cadastrar Detento
+      </a>
+    </div>
+
+    <!-- Tabela de Detentos -->
     <table class="table table-dark table-striped">
       <thead>
         <tr>
@@ -35,7 +63,7 @@
             <tr>
               <td>
                 <% if (detento.foto) { %>
-                  <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle" style="width: 50px; height: 50px;">
+                  <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento" style="width: 50px; height: 50px;" onclick="location.href='/detentos/<%= detento._id %>/'">
                 <% } else { %>
                   <span>N/A</span>
                 <% } %>
@@ -48,7 +76,7 @@
               <td><%= detento.crimes.join(', ') %></td>
               <td>
                 <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary btn-sm">Editar</a>
-                <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm">Excluir</a>
+                <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este Detento?');">Excluir</a>
               </td>
             </tr>
           <% }) %>
@@ -61,7 +89,8 @@
     </table>
   </div>
 
- 
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

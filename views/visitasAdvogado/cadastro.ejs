@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Visita de Advogado</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Estilo Personalizado -->
+  <style>
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .animated-button {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .animated-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10 form-container">
+        <!-- Título Centralizado -->
+        <h1 class="text-center mb-4">Cadastrar Visita de Advogado</h1>
+
+        <!-- Formulário -->
+        <form action="/visitasAdvogado/cadastrar" method="POST">
+          <div class="row">
+            <!-- Detento -->
+            <div class="col-md-6 mb-3">
+              <label for="detentoId" class="form-label"><i class="fa-solid fa-user me-2"></i> Detento</label>
+              <select class="form-select" id="detentoId" name="detentoId" required>
+                <% detentos.forEach(detento => { %>
+                  <option value="<%= detento._id %>"><%= detento.nome %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <!-- Nome do Advogado -->
+            <div class="col-md-6 mb-3">
+              <label for="nomeAdvogado" class="form-label"><i class="fa-solid fa-briefcase me-2"></i> Nome do Advogado</label>
+              <input type="text" class="form-control" id="nomeAdvogado" name="nomeAdvogado" required>
+            </div>
+
+            <!-- Número da OAB -->
+            <div class="col-md-6 mb-3">
+              <label for="numeroOAB" class="form-label"><i class="fa-solid fa-id-card me-2"></i> Número da OAB</label>
+              <input type="text" class="form-control" id="numeroOAB" name="numeroOAB" required>
+            </div>
+
+            <!-- Data da Visita -->
+            <div class="col-md-6 mb-3">
+              <label for="dataVisita" class="form-label"><i class="fa-solid fa-calendar-day me-2"></i> Data da Visita</label>
+              <input type="date" class="form-control" id="dataVisita" name="dataVisita" required>
+            </div>
+
+            <!-- Observações -->
+            <div class="col-md-12 mb-3">
+              <label for="observacoes" class="form-label"><i class="fa-solid fa-comment me-2"></i> Observações</label>
+              <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+            </div>
+          </div>
+
+          <!-- Botão de Envio -->
+          <div class="text-center mt-4">
+            <button type="submit" class="animated-button btn btn-success w-50">
+              <i class="fa-solid fa-save me-2"></i> Cadastrar Visita
+            </button>
+          </div>
+        </form>
+
+        <!-- Botão Retornar -->
+        <div class="text-center mt-3">
+          <a href="/visitasAdvogado/lista" class="animated-button btn btn-danger w-50">
+            <i class="fa-solid fa-arrow-left me-2"></i> Retornar à Lista
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

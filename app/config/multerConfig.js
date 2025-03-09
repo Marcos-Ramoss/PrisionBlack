@@ -1,7 +1,6 @@
 const multer = require('multer');
 const path = require('path');
 
-// Configuração do multer para salvar arquivos na pasta 'public/uploads'
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'public/uploads/');
@@ -12,7 +11,6 @@ const storage = multer.diskStorage({
   }
 });
 
-// Função para filtrar tipos de arquivos permitidos
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -25,7 +23,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // Limite de 5MB
-});
+  limits: { fileSize: 5 * 1024 * 1024 },// Limite de 5MB
+}).single('foto');
 
 module.exports = upload;

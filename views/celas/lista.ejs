@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Celas</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Estilo Personalizado -->
+  <style>
+    .animated-button {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .animated-button:hover {
+      transform: scale(1.1); /* Aumenta o tamanho do botão */
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3); /* Adiciona sombra */
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Lista de Celas</h1>
+
+    <!-- Botão Cadastrar Cela -->
+    <div class="text-end mb-4">
+      <a href="/celas/cadastrar" class="btn btn-danger animated-button">
+        <i class="fa-solid fa-plus"></i> Cadastrar Cela
+      </a>
+    </div>
+
+    <!-- Tabela de Celas -->
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Pavilhão</th>
+          <th>Capacidade</th>
+          <th>Ocupantes</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (celas.length > 0) { %>
+          <% celas.forEach(cela => { %>
+            <tr>
+              <td><%= cela.codigo %></td>
+              <td><%= cela.pavilhao %></td>
+              <td><%= cela.capacidade %></td>
+              <td>
+                <ul>
+                  <% cela.ocupantes.forEach(ocupante => { %>
+                    <li><%= ocupante.nome %></li>
+                  <% }) %>
+                </ul>
+              </td>
+              <td>
+                <a href="/alocacao/detalhes" class="btn btn-primary btn-sm">Alocar</a>
+                <a href="/celas/<%= cela._id %>/editar" class="btn btn-primary btn-sm">Editar</a>
+                <a href="/celas/<%= cela._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta Cela?');">Excluir</a>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="text-center">Nenhuma cela cadastrada.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

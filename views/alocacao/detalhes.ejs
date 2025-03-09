@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes de Alocação</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Detalhes de Alocação</h1>
+
+    <!-- Botão Voltar -->
+    <div class="mb-4">
+      <a href="/" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+      </a>
+    </div>
+
+    <!-- Tabela de Alocações -->
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Cela</th>
+          <th>Pavilhão</th>
+          <th>Capacidade</th>
+          <th>Ocupantes Atuais</th>
+          <th>Disponibilidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% celas.forEach(cela => { %>
+          <tr>
+            <td><%= cela.codigo %></td>
+            <td><%= cela.pavilhao %></td>
+            <td><%= cela.capacidade %></td>
+            <td>
+              <ul>
+                <% cela.ocupantes.forEach(ocupante => { %>
+                  <li><%= ocupante.nome %> (ID: <%= ocupante._id %>)</li>
+                <% }); %>
+              </ul>
+            </td>
+            <td>
+              <% if (cela.ocupantes.length < cela.capacidade) { %>
+                <span class="badge bg-success">Disponível</span>
+              <% } else { %>
+                <span class="badge bg-danger">Cheia</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

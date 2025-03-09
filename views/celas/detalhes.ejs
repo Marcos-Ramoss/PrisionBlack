@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes da Cela</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Detalhes da Cela <%= cela.codigo %></h1>
+
+    <!-- Botão Voltar -->
+    <div class="mb-4">
+      <a href="/celas/lista" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+      </a>
+    </div>
+
+    <!-- Informações da Cela -->
+    <div class="card bg-dark text-white mb-4">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fa-solid fa-door-closed"></i> Código: <%= cela.codigo %></h5>
+        <p class="card-text"><i class="fa-solid fa-building"></i> Pavilhão: <%= cela.pavilhao %></p>
+        <p class="card-text"><i class="fa-solid fa-users"></i> Capacidade: <%= cela.capacidade %></p>
+        <p class="card-text"><i class="fa-solid fa-user-check"></i> Ocupantes Atuais: <%= cela.ocupantes.length %></p>
+      </div>
+    </div>
+
+    <!-- Lista de Ocupantes -->
+    <h2 class="mb-4">Ocupantes Atuais</h2>
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cela.ocupantes.forEach(ocupante => { %>
+          <tr>
+            <td><%= ocupante.nome %></td>
+            <td>
+              <form action="/alocacao/<%= cela._id %>/remover/<%= ocupante._id %>" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger btn-sm">
+                  <i class="fa-solid fa-user-minus"></i> Remover
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <!-- Formulário para Alocar Detento -->
+    <h2 class="mb-4">Alocar Novo Detento</h2>
+    <form action="/alocacao/alocar" method="POST">
+      <div class="row">
+        <!-- Detento -->
+        <div class="col-md-6 mb-3">
+          <label for="detentoId" class="form-label">Detento</label>
+          <select class="form-select" id="detentoId" name="detentoId" required>
+            <% detentosDisponiveis.forEach(detento => { %>
+              <option value="<%= detento._id %>"><%= detento.nome %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <!-- Cela -->
+        <input type="hidden" name="celaId" value="<%= cela._id %>">
+
+        <!-- Botão de Envio -->
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-success w-100">
+            <i class="fa-solid fa-user-plus"></i> Alocar Detento
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

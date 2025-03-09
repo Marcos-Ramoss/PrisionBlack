@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Saídas</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Relatório de Saídas de Detentos</h1>
+
+    <!-- Botão Voltar -->
+    <div class="mb-4">
+      <a href="/relatorios" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+      </a>
+    </div>
+
+    <!-- Tabela de Saídas -->
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Data de Saída</th>
+          <th>Crimes Cometidos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (detentosSaidos.length > 0) { %>
+          <% detentosSaidos.forEach(detento => { %>
+            <tr>
+              <td><%= detento.nome %></td>
+              <td><%= detento.saida.toLocaleDateString() %></td>
+              <td><%= detento.crimes.join(', ') %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="3" class="text-center">Nenhum detento com saída registrada.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

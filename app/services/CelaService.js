@@ -3,42 +3,54 @@ const DetentoModel = require('../models/DetentoModel');
 const LogService = require('./LogService');
 
 class CelaService {
-    static async alocarDetento(codigoCela, idDetento) {
-        const cela = await CelaModel.findOne({ codigo: codigoCela });
-        if (!cela || cela.ocupantes.length >= cela.capacidade) {
-            throw new Error('Cela cheia ou inexistente.');
-        }
+    static async listar() {
+        return await CelaModel.find().populate('ocupantes');
+    }
 
-        const detento = await DetentoModel.findById(idDetento);
-        if (!detento) {
-            throw new Error('Detento não encontrado.');
-        }
+    static async listar() {
+        return await CelaModel.find().populate('ocupantes');
+    }
 
+    static async buscarPorId(id) {
+        return await CelaModel.findById(id).populate('ocupantes');
+    }
+
+    static async cadastrar(dados) {
+        const { codigo, pavilhao, capacidade, ocupantes } = dados;
+        const novaCela = new CelaModel({codigo, pavilhao,capacidade,  ocupantes: ocupantes || []});
+        return await novaCela.save();
+    }
+
+    static async alocar(celaId, detentoId) {
+        const cela = await CelaModel.findById(celaId);
+        if (!cela) throw new Error('Cela não encontrada.');
+
+        const detento = await DetentoModel.findById(detentoId);
+        if (!detento) throw new Error('Detento não encontrado.');
+    
+        if (cela.ocupantes.length >= cela.capacidade) {
+          throw new Error('A cela está cheia.');
+        }
+    
+        // Aloca o detento na cela
         cela.ocupantes.push(detento._id);
+        await cela.save();
+    
+        // Atualiza o campo "cela" do detento
         detento.cela = cela._id;
+        await detento.save();
+    
+        return cela;
+      }
 
-        await Promise.all([cela.save(), detento.save()]);
-        LogService.registrarLog('Alocação de detento', `Detento ${detento.nome} alocado na cela ${codigoCela}`);
-    }
+      static async editar(id, dadosAtualizados) {
+        return await CelaModel.findByIdAndUpdate(id, dadosAtualizados, { new: true });
+      }
 
-    static async transferirDetento(idDetento, novoCodigoCela) {
-        const novaCela = await CelaModel.findOne({ codigo: novoCodigoCela });
-        const detento = await DetentoModel.findById(idDetento);
+      static async excluir(id) {
+        return await CelaModel.findByIdAndDelete(id);
+      }
 
-        if (!novaCela || !detento) {
-            throw new Error('Cela ou detento não encontrado.');
-        }
-
-        const antigaCela = await CelaModel.findById(detento.cela);
-        antigaCela.ocupantes = antigaCela.ocupantes.filter(ocupante => ocupante.toString() !== idDetento);
-        novaCela.ocupantes.push(detento._id);
-
-        detento.cela = novaCela._id;
-        detento.historicoTransferencias.push({ de: antigaCela.codigo, para: novaCela.codigo });
-
-        await Promise.all([antigaCela.save(), novaCela.save(), detento.save()]);
-        LogService.registrarLog('Transferência de detento', `Detento ${detento.nome} transferido para cela ${novoCodigoCela}`);
-    }
 }
 
 module.exports = CelaService;

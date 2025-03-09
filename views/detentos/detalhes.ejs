@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Detento</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Estilo Personalizado -->
+  <style>
+    .profile-image {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease-in-out;
+    }
+    .profile-image:hover {
+      transform: scale(1.1);
+    }
+    .card-profile {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .action-buttons .btn {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <!-- Foto do Detento -->
+        <div class="text-center mb-4">
+          <% if (detento.foto) { %>
+            <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="profile-image rounded-circle img-thumbnail" data-bs-toggle="modal" data-bs-target="#imagemModal">
+          <% } else { %>
+            <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+              <i class="fa-solid fa-user fa-3x"></i>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Informações do Detento -->
+        <div class="card card-profile bg-dark text-white shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title text-center"><i class="fa-solid fa-user me-2"></i> Nome: <%= detento.nome %></h5>
+            <hr class="border-light">
+            <p class="card-text"><i class="fa-solid fa-calendar-days me-2"></i> Idade: <%= detento.idade %></p>
+            <p class="card-text"><i class="fa-solid fa-users me-2"></i> Filiação: <%= detento.filiacao %></p>
+            <p class="card-text"><i class="fa-solid fa-heart me-2"></i> Estado Civil: <%= detento.estadoCivil %></p>
+            <p class="card-text"><i class="fa-solid fa-repeat me-2"></i> Reincidência: <%= detento.reincidencia ? 'Sim' : 'Não' %></p>
+            <p class="card-text"><i class="fa-solid fa-gavel me-2"></i> Crimes Cometidos:
+              <ul class="list-unstyled ms-3">
+                <% detento.crimes.forEach(crime => { %>
+                  <li><i class="fa-solid fa-angle-right me-2"></i><%= crime %></li>
+                <% }); %>
+              </ul>
+            </p>
+            <p class="card-text"><i class="fa-solid fa-door-closed me-2"></i> Cela: <%= detento.cela ? detento.cela.codigo : 'Nenhuma cela atribuída' %></p>
+            <p class="card-text"><i class="fa-solid fa-clock me-2"></i> Data de Saída: <%= detento.saida ? detento.saida.toLocaleDateString() : 'Ainda preso' %></p>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="mt-4 text-center action-buttons">
+          <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary">
+            <i class="fa-solid fa-edit me-2"></i> Editar
+          </a>
+          <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja excluir este detento?');">
+            <i class="fa-solid fa-trash me-2"></i> Excluir
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Ampliar Imagem -->
+  <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imagemModalLabel">Foto Ampliada</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <% if (detento.foto) { %>
+            <img src="/uploads/<%= detento.foto %>" alt="Foto ampliada de <%= detento.nome %>" class="img-fluid rounded">
+          <% } else { %>
+            <p class="text-muted">Sem foto disponível</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Ocupação</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('../partials/navbar', { user }) %>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4">Relatório de Ocupação de Celas</h1>
+
+    <!-- Botões de Ação -->
+    <div class="d-flex justify-content-between mb-4">
+      <!-- Botão Baixar XLSX -->
+      <button id="baixar-xlsx" class="btn btn-success">
+        <i class="fa-solid fa-file-excel"></i> Baixar XLSX
+      </button>
+
+      <!-- Botão Baixar PDF -->
+      <button id="baixar-pdf" class="btn btn-danger">
+        <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+      </button>
+
+      <!-- Botão Compartilhar -->
+      <button id="compartilhar" class="btn btn-primary">
+        <i class="fa-solid fa-share"></i> Compartilhar
+      </button>
+    </div>
+
+    <!-- Tabela de Ocupação -->
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Cela</th>
+          <th>Pavilhão</th>
+          <th>Capacidade</th>
+          <th>Ocupantes Atuais</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% celas.forEach(cela => { %>
+          <tr>
+            <td><%= cela.codigo %></td>
+            <td><%= cela.pavilhao %></td>
+            <td><%= cela.capacidade %></td>
+            <td>
+              <ul>
+                <% cela.ocupantes.forEach(ocupante => { %>
+                  <li><%= ocupante.nome %> (ID: <%= ocupante._id %>)</li>
+                <% }); %>
+              </ul>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Biblioteca XLSX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Biblioteca PDFMake -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <!-- Script Personalizado -->
+  <script>
+    // Função para baixar o relatório em XLSX
+    document.getElementById('baixar-xlsx').addEventListener('click', () => {
+      const data = [
+        ['Cela', 'Pavilhão', 'Capacidade', 'Ocupantes Atuais'],
+        <% celas.forEach(cela => { %>
+          [
+            '<%= cela.codigo %>',
+            '<%= cela.pavilhao %>',
+            '<%= cela.capacidade %>',
+            '<%= cela.ocupantes.map(o => o.nome + " (ID: " + o._id + ")").join(", ") %>'
+          ],
+        <% }); %>
+      ];
+
+      const worksheet = XLSX.utils.aoa_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório');
+      XLSX.writeFile(workbook, 'relatorio_ocupacao_celas.xlsx');
+    });
+
+    // Função para baixar o relatório em PDF
+    document.getElementById('baixar-pdf').addEventListener('click', () => {
+      const body = [];
+      <% celas.forEach(cela => { %>
+        body.push([
+          '<%= cela.codigo %>',
+          '<%= cela.pavilhao %>',
+          '<%= cela.capacidade %>',
+          '<%= cela.ocupantes.map(o => o.nome + " (ID: " + o._id + ")").join(", ") %>'
+        ]);
+      <% }); %>
+
+      const docDefinition = {
+        content: [
+          { text: 'Relatório de Ocupação de Celas', style: 'header' },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['auto', 'auto', 'auto', '*'],
+              body: [
+                ['Cela', 'Pavilhão', 'Capacidade', 'Ocupantes Atuais'],
+                ...body
+              ]
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            margin: [0, 0, 0, 10]
+          }
+        }
+      };
+
+      pdfMake.createPdf(docDefinition).download('relatorio_ocupacao_celas.pdf');
+    });
+
+    // Função para compartilhar o relatório
+    document.getElementById('compartilhar').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Relatório de Ocupação de Celas',
+          text: 'Confira o relatório de ocupação de celas.',
+          url: window.location.href
+        }).catch((error) => console.log('Erro ao compartilhar:', error));
+      } else {
+        alert('Compartilhamento não suportado neste navegador.');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -6,6 +6,11 @@
    <div>
      <h1>Bem-vindo ao Sistema Penitenciário</h1>
      <p>Gerencie detentos, celas, visitas e muito mais.</p>
+      <!-- Barra de Pesquisa -->
+     <center><form action="/pesquisar" method="GET" class="search-bar">
+        <input type="text" name="query" placeholder="Pesquise aqui..." required>
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </form> </center> 
    </div>
  </section>
 
@@ -20,6 +25,7 @@
           <a href="detentos/cadastro" class="btn btn-danger">Cadastrar Detentos</a>
         </div>
       </div>
+
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
          <i class="fa-solid fa-list-ul fa-3x mb-3"></i>
@@ -28,14 +34,16 @@
           <a href="detentos/lista" class="btn btn-danger">Ver Detentos</a>
         </div>
       </div>
+
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-door-closed fa-3x mb-3"></i>
           <h4>Celas</h4>
           <p>Aloque detentos em celas e pavilhões.</p>
-          <a href="/celas/aloca" class="btn btn-danger">Ver Celas</a>
+          <a href="/celas/lista" class="btn btn-danger">Ver Celas</a>
         </div>
       </div>
+
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-chart-line fa-3x mb-3"></i>
@@ -44,6 +52,25 @@
           <a href="/relatorios/ocupacao" class="btn btn-danger">Ver Relatórios</a>
         </div>
       </div>
+
+      <div class="col-md-4">
+        <div class="card card-custom text-center p-4">
+          <i class="fa-solid fa-gavel fa-3x mb-3"></i>
+          <h4>Advogados</h4>
+          <p>Gerencie</p>
+          <a href='/visitasAdvogado/lista' class="btn btn-danger">Ver Visitas Advogados</a>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card card-custom text-center p-4">
+          <i class="fa fa-users fa-3x mb-3"></i>
+          <h4>Familiares</h4>
+          <p>Gerencie</p>
+          <a href="/visitas/lista" class="btn btn-danger">Ver Visitas Familiares</a>
+        </div>
+      </div>
+
     </div>
   </div>
 

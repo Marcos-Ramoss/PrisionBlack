@@ -73,6 +73,35 @@ footer {
 }
         
     }
+
+/*LUPA DE PESQUISA STYLE*/
+.search-bar {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 40px 10px 15px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .search-bar i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      cursor: pointer;
+    }
+    .search-bar i:hover {
+      color: #fff;
+    }
+
+
+
   </style>
 </head>
 
@@ -87,8 +116,10 @@ footer {
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="nav-link" href="/detentos/lista"><i class="fa-solid fa-user"></i> Detentos</a></li>
-          <li class="nav-item"><a class="nav-link" href="/celas/aloca"><i class="fa-solid fa-door-closed"></i> Celas</a></li>
-          <li class="nav-item"><a class="nav-link" href="/visitas/familiares"><i class="fa-solid fa-users"></i> Visitas</a></li>
+          <li class="nav-item"><a class="nav-link" href="/celas/lista"><i class="fa-solid fa-door-closed"></i> Celas</a></li>
+          <li class="nav-item"><a class="nav-link" href="/visitas/lista"><i class="fa-solid fa-users"></i> Visitas Familiar</a></li>
+          <li class="nav-item"><a class="nav-link" href="/visitasAdvogado/lista"><i class="fa-solid fa-gavel"></i> Visitas Advogado</a></li>
+
           <li class="nav-item"><a class="nav-link" href="/relatorios/ocupacao"><i class="fa-solid fa-chart-line"></i> Relatórios</a></li>
         </ul>
         <% if (user) { %>
