@@ -1,37 +1,96 @@
- <!-- Navbar -->
- <%- include('partials/navbar', { user }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página Inicial</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Estilo Personalizado -->
+  <style>
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/hero-bg.jpg') no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+    .search-bar {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 40px 10px 15px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .search-bar i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      cursor: pointer;
+    }
+    .search-bar i:hover {
+      color: #fff;
+    }
+    .card-custom {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+    }
+    .card-custom:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('partials/navbar', { user }) %>
 
- <!-- Hero Section -->
- <section class="hero-section">
-   <div>
-     <h1>Bem-vindo ao Sistema Penitenciário</h1>
-     <p>Gerencie detentos, celas, visitas e muito mais.</p>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="display-4 mb-4">Bem-vindo ao Sistema Penitenciário</h1>
+      <p class="lead mb-5">Gerencie detentos, celas, visitas e muito mais.</p>
+
       <!-- Barra de Pesquisa -->
-     <center><form action="/pesquisar" method="GET" class="search-bar">
+     <center> <form action="/pesquisar" method="GET" class="search-bar">
         <input type="text" name="query" placeholder="Pesquise aqui..." required>
         <i class="fa-solid fa-magnifying-glass"></i>
-      </form> </center> 
-   </div>
- </section>
+      </form></center>
+    </div>
+  </section>
 
- <!-- Features Section -->
- <div class="container mt-5">
+  <!-- Features Section -->
+  <div class="container mt-5">
     <div class="row">
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-user fa-3x mb-3"></i>
           <h4>Detentos</h4>
           <p>Cadastre informações de detentos.</p>
-          <a href="detentos/cadastro" class="btn btn-danger">Cadastrar Detentos</a>
+          <a href="/detentos/cadastro" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Cadastrar Detentos</a>
         </div>
       </div>
 
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
-         <i class="fa-solid fa-list-ul fa-3x mb-3"></i>
+          <i class="fa-solid fa-list-ul fa-3x mb-3"></i>
           <h4>Detentos</h4>
-          <p>Lista de detentos cadastrado.</p>
-          <a href="detentos/lista" class="btn btn-danger">Ver Detentos</a>
+          <p>Lista de detentos cadastrados.</p>
+          <a href="/detentos/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Detentos</a>
         </div>
       </div>
 
@@ -40,7 +99,7 @@
           <i class="fa-solid fa-door-closed fa-3x mb-3"></i>
           <h4>Celas</h4>
           <p>Aloque detentos em celas e pavilhões.</p>
-          <a href="/celas/lista" class="btn btn-danger">Ver Celas</a>
+          <a href="/celas/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Celas</a>
         </div>
       </div>
 
@@ -49,7 +108,7 @@
           <i class="fa-solid fa-chart-line fa-3x mb-3"></i>
           <h4>Relatórios</h4>
           <p>Gerar relatórios de ocupação e atividades.</p>
-          <a href="/relatorios/ocupacao" class="btn btn-danger">Ver Relatórios</a>
+          <a href="/relatorios/ocupacao" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Relatórios</a>
         </div>
       </div>
 
@@ -57,8 +116,8 @@
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-gavel fa-3x mb-3"></i>
           <h4>Advogados</h4>
-          <p>Gerencie</p>
-          <a href='/visitasAdvogado/lista' class="btn btn-danger">Ver Visitas Advogados</a>
+          <p>Gerencie visitas de advogados.</p>
+          <a href="/visitasAdvogado/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Visitas Advogados</a>
         </div>
       </div>
 
@@ -66,13 +125,63 @@
         <div class="card card-custom text-center p-4">
           <i class="fa fa-users fa-3x mb-3"></i>
           <h4>Familiares</h4>
-          <p>Gerencie</p>
-          <a href="/visitas/lista" class="btn btn-danger">Ver Visitas Familiares</a>
+          <p>Gerencie visitas de familiares.</p>
+          <a href="/visitas/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Visitas Familiares</a>
         </div>
       </div>
-
     </div>
   </div>
 
- <!-- Footer -->
- <%- include('partials/footer') %>
+  <!-- Modal de Login -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Faça Login</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/login" method="POST">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="senha" class="form-label">Senha</label>
+              <input type="password" class="form-control" id="senha" name="senha" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Entrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <%- include('partials/footer') %>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Verifica se o usuário está logado antes de permitir a navegação
+    document.querySelectorAll('.open-login-modal').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isLoggedIn = <%= user ? 'true' : 'false' %>; // Passa o estado do usuário do backend
+        if (!isLoggedIn) {
+          const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+          modal.show();
+        } else {
+          window.location.href = link.getAttribute('href'); // Redireciona para o link original
+        }
+      });
+    });
+
+    // Redireciona para a página inicial ao fechar o modal
+    const loginModal = document.getElementById('loginModal');
+    loginModal.addEventListener('hidden.bs.modal', () => {
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

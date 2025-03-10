@@ -1,10 +1,19 @@
 {
   "name": "prisionblack",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "build": "pkg ."
+    
   },
+  "bin" : "server.js",
+  "pkg" : {
+    "scripts": ["**/*.js"],
+    "assets": ["views/**/*", "public/**/*", "uploads/**/*"],
+    "targets": ["node20-linux-x64", "node20-macos-x64", "node20-win-x64"]
+  },
+
   "keywords": [],
   "author": "Marcos",
   "license": "ISC",

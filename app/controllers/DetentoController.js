@@ -5,8 +5,7 @@ class DetentoController {
   static async cadastrar(req, res) {
     try {
       const { nome, idade, filiacao, estadoCivil, reincidencia, crimes } = req.body;
-      const foto = req.file ? req.file.filename : null; // Obtém o nome do arquivo da foto
-
+      const foto = req.file ? req.file.filename : null; 
       const novoDetento = await DetentoService.cadastrar({
         nome,
         idade,
@@ -16,7 +15,6 @@ class DetentoController {
         reincidencia: reincidencia === 'true',
         crimes: crimes.split(',').map((crime) => crime.trim()) // Divide crimes em array
       });
-      req.flash('success', 'Cadastro realizado com sucesso!');
       res.status(201).render('detentos/detalhes', { detento: novoDetento });
     } catch (error) {
       res.status(400).send(error.message);

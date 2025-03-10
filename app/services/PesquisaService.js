@@ -1,7 +1,7 @@
+
 class PesquisaService {
-    // Função para determinar a funcionalidade com base no termo de pesquisa
     static determinarFuncionalidade(query) {
-      const termos = query.toLowerCase().trim(); // Normaliza o termo de pesquisa
+      const termos = query.toLowerCase().trim(); 
   
       // Mapeamento de termos para rotas específicas
       if (termos.includes('detento') || termos.includes('preso')) {
