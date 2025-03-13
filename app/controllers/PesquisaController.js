@@ -17,7 +17,7 @@ class PesquisaController {
       }
       
       req.flash('error', resultado.mensagem);
-      res.redirect('/');
+      res.redirect('/'); 
     } catch (error) {
       res.status(500).send(error.message);
     }

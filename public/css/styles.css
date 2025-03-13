@@ -1,0 +1,116 @@
+body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.navbar-brand {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 1.5rem;
+  color: #ff4d4d !important;
+}
+
+.nav-link {
+  color: #ffffff !important;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ff4d4d !important;
+}
+
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/fundo1.jfif');
+  background-size: cover;
+  background-position: center;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px #000000;
+}
+
+.card-custom {
+  background-color: #1e1e1e;
+  border: 1px solid #ff4d4d;
+  color: #ffffff;
+  margin-bottom: 20px; /* Espaço entre os cards */
+}
+
+.card-custom:hover {
+  background-color: #ff4d4d;
+  color: #121212;
+}
+
+.Position-footer {
+  /* Estilo para garantir que o footer fique sempre no final */
+  html,
+  body {
+    height: 100%;
+    /* Define a altura total do documento */
+    margin: 0;
+    /* Remove margens padrão */
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    /* Coloca os elementos em coluna */
+  }
+
+  main {
+    flex: 1;
+    /* O conteúdo principal ocupa todo o espaço disponível */
+  }
+
+  footer {
+    flex-shrink: 0;
+    /* Garante que o footer não encolha */
+  }
+}
+
+/* LUPA DE PESQUISA STYLE */
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  cursor: pointer;
+}
+
+.search-bar i:hover {
+  color: #fff;
+}
+
+.card-custom {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  margin-bottom: 20px; /* Espaço entre os cards */
+}
+.card-custom:hover {
+  transform: scale(1.05);
+}
