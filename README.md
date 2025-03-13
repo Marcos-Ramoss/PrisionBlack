@@ -11,9 +11,12 @@
 
 ##TUTORIAL
 ### Clonar o Repositorio
-`git clone https://github.com/Marcos-Ramoss/PrisionBlack.git`
+```bash
+git clone https://github.com/Marcos-Ramoss/PrisionBlack.git`
+```
 ### Instalar as Dependências
-`npm install`
-
+```bash
+npm install
+```
 
 
