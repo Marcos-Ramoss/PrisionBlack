@@ -21,4 +21,8 @@ router.post('/register', AuthController.register);
 
 router.get('/logout', AuthController.logout);
 
+router.get('/sobre-nos', (req, res) => {
+  res.render('sobre-nos'); // Renderiza a view "sobre-nos.ejs"
+});
+
 module.exports = router;

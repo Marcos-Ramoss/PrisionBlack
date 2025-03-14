@@ -15,7 +15,7 @@ services:
     depends_on:
       - mongo # Garante que o MongoDB esteja disponível antes de iniciar a aplicação
     volumes:
-      - ./app:/app  # Sincroniza o código local com o container (opcional para desenvolvimento)
+      - ./app:/app 
     restart: always
 
   # Serviço do MongoDB

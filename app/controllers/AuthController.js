@@ -5,7 +5,7 @@ class AuthController {
     try {
       const { username, password } = req.body;
       await AuthService.register({ username, password });
-      res.status(201).send('Registro realizado com sucesso!');
+      res.redirect('/login');
     } catch (error) {
       res.status(400).send(error.message);
     }
