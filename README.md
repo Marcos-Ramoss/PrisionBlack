@@ -12,7 +12,7 @@
 ## TUTORIAL
 ### Clonar o Repositorio
 ```bash
-git clone https://github.com/Marcos-Ramoss/PrisionBlack.git`
+git clone https://github.com/Marcos-Ramoss/PrisionBlack.git
 ```
 ### Instalar as Dependências
 ```bash
