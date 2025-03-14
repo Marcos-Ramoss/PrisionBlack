@@ -18,5 +18,9 @@ git clone https://github.com/Marcos-Ramoss/PrisionBlack.git`
 ```bash
 npm install
 ```
+### Inicie o servidor da aplicação:
+```bash
+npm start
+```
 
 
