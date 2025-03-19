@@ -9,7 +9,6 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/footer.css">
-
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -22,44 +21,86 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="/detentos/lista"><i class="fa-solid fa-user"></i> Detentos</a>
+        <!-- Detentos -->
+        <li class="nav-item">
+          <a class="nav-link" href="/detentos/lista">
+            <i class="fa-solid fa-user"></i> Detentos
+          </a>
         </li>
-        <li class="nav-item"><a class="nav-link" href="/celas/lista"><i class="fa-solid fa-door-closed"></i> Celas</a>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="/visitas/lista"><i class="fa-solid fa-users"></i> Visitas
-            Familiar</a></li>
-        <li class="nav-item"><a class="nav-link" href="/visitasAdvogado/lista"><i class="fa-solid fa-gavel"></i> Visitas
-            Advogado</a></li>
 
-        <li class="nav-item"><a class="nav-link" href="/relatorios/ocupacao"><i class="fa-solid fa-chart-line"></i>
-            Relatórios</a></li>
+        <!-- Celas -->
+        <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/celas/lista">
+              <i class="fa-solid fa-door-closed"></i> Celas
+            </a>
+          </li>
+        <% } %>
+
+        <!-- Visitas Familiar -->
+        <li class="nav-item">
+          <a class="nav-link" href="/visitas/lista">
+            <i class="fa-solid fa-users"></i> Visitas Familiar
+          </a>
+        </li>
+
+        <!-- Visitas Advogado -->
+        <li class="nav-item">
+          <a class="nav-link" href="/visitasAdvogado/lista">
+            <i class="fa-solid fa-gavel"></i> Visitas Advogado
+          </a>
+        </li>
+
+        <!-- Relatórios -->
+        <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/relatorios/ocupacao">
+              <i class="fa-solid fa-chart-line"></i> Relatórios
+            </a>
+          </li>
+        <% } %>
+
+        <!-- Dashboard ADMIN -->
+        <% if (user && user.nivelAcesso === 'ADMIN') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/admin/dashboard">
+              <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+        <% } %>
       </ul>
+
+      <!-- Usuário Logado -->
       <% if (user) { %>
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><span class="nav-link"><i class="fa-solid fa-user-circle"></i> Olá, <%= user.username %>
-                !</span></li>
-          <li class="nav-item"><a class="nav-link" href="/logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+          <li class="nav-item">
+            <span class="nav-link">
+              <i class="fa-solid fa-user-circle"></i> Olá, <%= user.nome %>!
+            </span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">
+              <i class="fa-solid fa-sign-out-alt"></i> Logout
+            </a>
+          </li>
+      </ul>
+      <% } else { %>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+              <i class="fa-solid fa-sign-in-alt"></i> Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
+              <i class="fa-solid fa-user-plus"></i> Registrar
+            </a>
           </li>
         </ul>
-        <% } else { %>
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
-                <i class="fa-solid fa-sign-in-alt"></i> Login
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
-                <i class="fa-solid fa-user-plus"></i> Registrar
-              </a>
-            </li>
-          </ul>
-          <% } %>
+      <% } %>
     </div>
   </div>
 </nav>
-
-
 
 <!-- Login Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
@@ -70,14 +111,14 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="/login" method="POST">
+        <form action="/auth/login" method="POST">
           <div class="mb-3">
-            <label for="username" class="form-label">Usuário</label>
-            <input type="text" class="form-control bg-dark text-white" id="username" name="username" required>
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control bg-dark text-white" id="email" name="email" required>
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <input type="password" class="form-control bg-dark text-white" id="password" name="password" required>
+            <label for="senha" class="form-label">Senha</label>
+            <input type="password" class="form-control bg-dark text-white" id="senha" name="senha" required>
           </div>
           <button type="submit" class="btn btn-danger w-100">Entrar</button>
         </form>
@@ -85,6 +126,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Register Modal -->
 <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
@@ -96,47 +138,39 @@
       </div>
       <div class="modal-body">
         <form action="/register" method="POST">
+          <!-- Nome -->
           <div class="mb-3">
-            <label for="username" class="form-label">Usuário</label>
-            <input type="text" class="form-control bg-dark text-white" id="username" name="username" required>
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" class="form-control bg-dark text-white" id="nome" name="nome" required>
           </div>
+
+          <!-- Email -->
           <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <input type="password" class="form-control bg-dark text-white" id="password" name="password" required>
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control bg-dark text-white" id="email" name="email" required>
           </div>
+
+          <!-- Senha -->
+          <div class="mb-3">
+            <label for="senha" class="form-label">Senha</label>
+            <input type="password" class="form-control bg-dark text-white" id="senha" name="senha" required>
+          </div>
+
+          <!-- Nível de Acesso -->
+          <div class="mb-3">
+            <label for="nivelAcesso" class="form-label">Nível de Acesso</label>
+            <select class="form-select bg-dark text-white" id="nivelAcesso" name="nivelAcesso" required>
+              <option value="ADMIN">ADMIN</option>
+              <option value="DIRETOR">DIRETOR</option>
+              <option value="INSPETOR">INSPETOR</option>
+            </select>
+          </div>
+
           <button type="submit" class="btn btn-danger w-100">Registrar</button>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-
-<script src="/js/themeService.js"></script>
-
-<script>
-  // Configura o botão de alternância de tema
-  const themeService = window.themeService;
-  const toggleThemeButton = document.getElementById('toggleThemeButton');
-  const themeIcon = document.getElementById('themeIcon');
-
-  // Atualiza o ícone com base no tema atual
-  function updateThemeIcon() {
-    themeIcon.className = themeService.currentTheme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-    console.log(`Ícone atualizado para o tema: ${themeService.currentTheme}`); // Log do ícone
-  }
-
-  // Adiciona o evento de clique ao botão
-  toggleThemeButton.addEventListener('click', () => {
-    console.log('Botão de alternância de tema clicado'); // Log do clique
-    themeService.toggleTheme();
-    updateThemeIcon();
-  });
-
-  // Inicializa o ícone correto
-  updateThemeIcon();
-</script>
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

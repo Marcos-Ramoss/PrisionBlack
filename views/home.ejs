@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página Inicial</title>
 
-  
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <!-- Estilo Personalizado -->
- 
 </head>
 <body>
   <!-- Navbar -->
@@ -24,127 +22,130 @@
       <p class="lead mb-5">Gerencie detentos, celas, visitas e muito mais.</p>
 
       <!-- Barra de Pesquisa -->
-     <center> <form action="/pesquisar" method="GET" class="search-bar">
-        <input type="text" name="query" placeholder="Pesquise aqui..." required>
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </form></center>
+      <center>
+        <form action="/pesquisar" method="GET" class="search-bar">
+          <input type="text" name="query" placeholder="Pesquise aqui..." required>
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </form>
+      </center>
     </div>
   </section>
 
   <!-- Features Section -->
   <div class="container mt-5">
     <div class="row">
+      <!-- Detentos: Cadastro -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-user fa-3x mb-3"></i>
           <h4>Detentos</h4>
           <p>Cadastre informações de detentos.</p>
-          <a href="/detentos/cadastro" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Cadastrar Detentos</a>
+          <% if (user) { %>
+            <a href="/detentos/cadastro" class="btn btn-danger">Cadastrar Detentos</a>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Cadastrar
+            </button>
+          <% } %>
         </div>
       </div>
 
+      <!-- Detentos: Lista -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-list-ul fa-3x mb-3"></i>
           <h4>Detentos</h4>
           <p>Lista de detentos cadastrados.</p>
-          <a href="/detentos/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Detentos</a>
+          <% if (user) { %>
+            <a href="/detentos/lista" class="btn btn-danger">Ver Detentos</a>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Ver Detentos
+            </button>
+          <% } %>
         </div>
       </div>
 
+      <!-- Celas -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-door-closed fa-3x mb-3"></i>
           <h4>Celas</h4>
           <p>Aloque detentos em celas e pavilhões.</p>
-          <a href="/celas/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Celas</a>
+          <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
+            <a href="/celas/lista" class="btn btn-danger">Ver Celas</a>
+          <% } else if (user) { %>
+            <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
+              Acesso Negado
+            </button>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Ver Celas
+            </button>
+          <% } %>
         </div>
       </div>
 
+      <!-- Relatórios -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-chart-line fa-3x mb-3"></i>
           <h4>Relatórios</h4>
           <p>Gerar relatórios de ocupação e atividades.</p>
-          <a href="/relatorios/ocupacao" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Relatórios</a>
+          <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
+            <a href="/relatorios/ocupacao" class="btn btn-danger">Ver Relatórios</a>
+          <% } else if (user) { %>
+            <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
+              Acesso Negado
+            </button>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Ver Relatórios
+            </button>
+          <% } %>
         </div>
       </div>
 
+      <!-- Visitas Advogado -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
           <i class="fa-solid fa-gavel fa-3x mb-3"></i>
           <h4>Advogados</h4>
           <p>Gerencie visitas de advogados.</p>
-          <a href="/visitasAdvogado/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Visitas Advogados</a>
+          <% if (user) { %>
+            <a href="/visitasAdvogado/lista" class="btn btn-danger">Ver Visitas Advogados</a>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Ver Visitas Advogados
+            </button>
+          <% } %>
         </div>
       </div>
 
+      <!-- Visitas Familiares -->
       <div class="col-md-4">
         <div class="card card-custom text-center p-4">
-          <i class="fa fa-users fa-3x mb-3"></i>
+          <i class="fa-solid fa-users fa-3x mb-3"></i>
           <h4>Familiares</h4>
           <p>Gerencie visitas de familiares.</p>
-          <a href="/visitas/lista" class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">Ver Visitas Familiares</a>
+          <% if (user) { %>
+            <a href="/visitas/lista" class="btn btn-danger">Ver Visitas Familiares</a>
+          <% } else { %>
+            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Entrar para Ver Visitas Familiares
+            </button>
+          <% } %>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal de Login -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Faça Login</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form action="/login" method="POST">
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-              <label for="senha" class="form-label">Senha</label>
-              <input type="password" class="form-control" id="senha" name="senha" required>
-            </div>
-            <button type="submit" class="btn btn-success w-100">Entrar</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-<br><br><br>
+  <br><br><br>
+
   <!-- Footer -->
   <%- include('partials/footer') %>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Verifica se a página atual é a página inicial
-    const isHomePage = window.location.pathname === '/';
-
-    // Verifica se o usuário está logado antes de permitir a navegação
-    document.querySelectorAll('.open-login-modal').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const isLoggedIn = <%= user ? 'true' : 'false' %>; // Passa o estado do usuário do backend
-        if (!isLoggedIn && isHomePage) {
-          const modal = new bootstrap.Modal(document.getElementById('loginModal'));
-          modal.show();
-        } else if (isLoggedIn) {
-          window.location.href = link.getAttribute('href'); // Redireciona para o link original
-        } else {
-          window.location.href = '/'; // Redireciona para a página inicial se não estiver logado
-        }
-      });
-    });
-
-    // Redireciona para a página inicial ao fechar o modal
-    const loginModal = document.getElementById('loginModal');
-    loginModal.addEventListener('hidden.bs.modal', () => {
-      window.location.href = '/';
-    });
-  </script>
 </body>
 </html>

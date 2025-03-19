@@ -6,18 +6,9 @@ router.get('/', (req, res) => {
   res.render('home', { user: req.session.user }); // Renderiza a página principal
 });
 
+router.post('/auth/login', AuthController.login);
 
-router.get('/login', (req, res) => {
-  res.render('auth/login'); // Renderiza a página de login
-});
-
-router.post('/login', AuthController.login);
-
-router.get('/register', (req, res) => {
-  res.render('auth/register'); // Renderiza a página de registro
-});
-
-router.post('/register', AuthController.register);
+router.post('/register', AuthController.registrar);
 
 router.get('/logout', AuthController.logout);
 
