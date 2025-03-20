@@ -1,5 +1,6 @@
 const DetentoService = require('../services/DetentoService');
 const multerConfig = require('../config/multerConfig');
+const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
 class DetentoController {
   static async cadastrar(req, res) {

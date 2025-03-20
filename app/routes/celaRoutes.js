@@ -3,12 +3,12 @@ const router = express.Router();
 const CelaController = require('../controllers/CelaController');
 const CelaService = require("../services/CelaService")
 const DetentoService = require("../services/DetentoService")
-const authMiddleware = require('../middlewares/authMiddleware');
+const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
 
-router.get('/lista', authMiddleware, CelaController.listar);
+router.get('/lista', authenticate, authorize('DIRETOR', 'ADMIN','INSPETOR'), CelaController.listar);
 
-router.get('/cadastrar', async (req, res) => {
+router.get('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR'), async (req, res) => {
     try {
       const detentos = await DetentoService.listar(); // Obtém a lista de detentos
       res.render('celas/cadastro', { detentos, user: req.session.user });
@@ -17,9 +17,9 @@ router.get('/cadastrar', async (req, res) => {
     }
   });
 
-router.post('/cadastrar', CelaController.cadastrar);
+router.post('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR'), CelaController.cadastrar);
 
-router.get('/alocar', async (req, res) => {
+router.get('/alocar', authenticate, authorize('DIRETOR','INSPETOR'), async (req, res) => {
     try {
       const celas = await CelaService.listar();
       const detentos = await DetentoService.listar();
@@ -29,18 +29,16 @@ router.get('/alocar', async (req, res) => {
     }
   });
 
-router.post('/alocar', CelaController.alocar);
+router.post('/alocar', authenticate, authorize('DIRETOR','INSPETOR'), CelaController.alocar);
 
 
-router.get('/:id/editar', CelaController.editar);
+router.get('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR'), CelaController.editar);
 
 
-router.post('/:id/editar', CelaController.editar);
+router.post('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR'), CelaController.editar);
 
 
-router.get('/:id/excluir', CelaController.excluir);
-
-
+router.get('/:id/excluir',authenticate, authorize('DIRETOR','INSPETOR'), CelaController.excluir);
 
 
 

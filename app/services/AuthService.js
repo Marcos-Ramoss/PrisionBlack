@@ -1,20 +1,48 @@
-const UserModel = require('../models/UserModel');
+const bcrypt = require('bcrypt');
+const Usuario = require('../models/UserModel');
 
 class AuthService {
-  static async register(userData) {
-    const { username, password } = userData;
-    const userExists = await UserModel.findOne({ username });
-    if (userExists) throw new Error('Usuário já existe.');
-    const newUser = new UserModel({ username, password });
-    return await newUser.save();
+  // Validação dos dados do usuário
+  static validateUserData(data) {
+    const { nome, email, senha, nivelAcesso } = data;
+
+    if (!nome || !email || !senha || !nivelAcesso) {
+      throw new Error(
+        'Todos os campos são obrigatórios: nome, email, senha e nível de acesso.'
+      );
+    }
+
+    if (!['ADMIN', 'DIRETOR', 'INSPETOR'].includes(nivelAcesso)) {
+      throw new Error(
+        'Nível de acesso inválido. Escolha entre ADMIN, DIRETOR ou INSPETOR.'
+      );
+    }
   }
 
-  static async login(username, password) {
-    const user = await UserModel.findOne({ username });
-    if (!user) throw new Error('Usuário não encontrado.');
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) throw new Error('Senha incorreta.');
-    return user;
+  // Criação de um novo usuário
+  static async criarUsuario(data) {
+    this.validateUserData(data); // Valida os dados
+
+    const { nome, email, senha, nivelAcesso } = data;
+
+    // Verifica se o email já está cadastrado
+    const usuarioExistente = await Usuario.findOne({ email });
+    if (usuarioExistente) {
+      throw new Error('Este email já está cadastrado.');
+    }
+
+    // Criptografa a senha
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    // Cria o novo usuário
+    const novoUsuario = new Usuario({
+      nome,
+      email,
+      senha: senhaHash,
+      nivelAcesso,
+    });
+
+    return await novoUsuario.save();
   }
 }
 
