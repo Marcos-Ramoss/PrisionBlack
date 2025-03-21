@@ -72,5 +72,4 @@ router.get('/admin/gerenciar-usuarios', authenticate, authorize('ADMIN'), async 
     }
   });
 
-
 module.exports = router;
