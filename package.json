@@ -4,24 +4,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "pkg ."
+    "dev": "nodemon server.js"
   },
-  "bin": "server.js",
-  "pkg": {
-    "scripts": [
-      "**/*.js"
-    ],
-    "assets": [
-      "views/**/*",
-      "public/**/*",
-      "uploads/**/*"
-    ],
-    "targets": [
-      "node20-linux-x64",
-      "node20-macos-x64",
-      "node20-win-x64"
-    ]
-  },
+
   "keywords": [],
   "author": "Marcos",
   "license": "ISC",
