@@ -35,7 +35,14 @@ const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     if (!allowedRoles.includes(req.usuario.nivelAcesso)) {
       console.log('Nível de acesso do usuário:', req.usuario.nivelAcesso); 
-      return res.status(403).json({ error: 'Acesso negado. Permissão insuficiente.' });
+      return res.send(`
+        <script>
+          alert("Acesso negado. Você não tem permissão para acessar esta página.");
+          setTimeout(function() {
+            window.location.href = '/';
+          });
+        </script>
+      `);
     }
     next();
   };

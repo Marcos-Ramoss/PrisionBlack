@@ -18,7 +18,7 @@ class AuthController {
         nivelAcesso,
       });
 
-     res.redirect('/');
+     res.redirect('/home');
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }
@@ -26,10 +26,9 @@ class AuthController {
 
   static async login(req, res) {
     try {
-      // Verifica se o usuário já está logado
       if (req.session.user) {
         console.log('Usuário já está logado. Redirecionando para a página inicial.');
-        return res.redirect('/');
+        return res.redirect('/home');
       }
   
       const { email, senha } = req.body;
@@ -64,7 +63,7 @@ class AuthController {
       });
   
       console.log('Login realizado com sucesso. Redirecionando para a página inicial.');
-      res.redirect('/');
+      res.redirect('/home');
     } catch (error) {
       console.error('Erro durante o login:', error.message);
       res.redirect('/'); // Redireciona para a página inicial em caso de erro

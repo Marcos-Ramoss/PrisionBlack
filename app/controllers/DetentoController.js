@@ -2,6 +2,8 @@ const DetentoService = require('../services/DetentoService');
 const multerConfig = require('../config/multerConfig');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
+
+
 class DetentoController {
   static async cadastrar(req, res) {
     try {
@@ -16,9 +18,10 @@ class DetentoController {
         reincidencia: reincidencia === 'true',
         crimes: crimes.split(',').map((crime) => crime.trim()) // Divide crimes em array
       });
+      
       res.status(201).render('detentos/detalhes', { detento: novoDetento });
-    } catch (error) {
-      res.status(400).send(error.message);
+    } catch {
+     res.redirect('/');
     }
   }
 

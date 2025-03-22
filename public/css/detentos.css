@@ -1,0 +1,18 @@
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .btn-danger {
+    transition: transform 0.3s ease-in-out;
+  }
+  .btn-danger:hover {
+    transform: scale(1.05);
+  }
+  .error-message {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+  .is-invalid {
+    border-color: #dc3545;
+  }

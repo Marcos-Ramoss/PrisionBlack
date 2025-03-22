@@ -1,5 +1,6 @@
 const VisitaAdvogadoService = require('../services/VisitaAdvogadoService');
 const DetentoService = require('../services/DetentoService');
+const moment = require('moment-timezone');
 
 class VisitaAdvogadoController {
   static async listar(req, res) {
@@ -20,11 +21,12 @@ class VisitaAdvogadoController {
       } else if (req.method === 'POST') {
         // Cadastra uma nova visita
         const { detentoId, nomeAdvogado, numeroOAB, dataVisita, observacoes } = req.body;
+        const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
         const novaVisita = await VisitaAdvogadoService.cadastrar({
           detento: detentoId,
           nomeAdvogado,
           numeroOAB,
-          dataVisita: new Date(dataVisita),
+          dataVisita: dataVisitaAmazonas,
           observacoes
         });
         res.redirect('/visitasAdvogado/lista'); // Redireciona para a lista de visitas
@@ -47,11 +49,12 @@ class VisitaAdvogadoController {
       } else if (req.method === 'POST') {
         // Atualiza a visita com os novos dados
         const { detentoId, nomeAdvogado, numeroOAB, dataVisita, observacoes } = req.body;
+        const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
         const dadosAtualizados = {
           detento: detentoId,
           nomeAdvogado,
           numeroOAB,
-          dataVisita: new Date(dataVisita),
+          dataVisita: dataVisitaAmazonas,
           observacoes
         };
         const visitaAtualizada = await VisitaAdvogadoService.editar(id, dadosAtualizados);

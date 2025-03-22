@@ -1,18 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const VisitaAdvogadoController = require('../controllers/VisitaAdvogadoController');
-const  { authenticate, authorize } = require('../middlewares/authMiddleware');
+const { authenticate, authorize } = require('../middlewares/authMiddleware');
+const session = require('../middlewares/autenticate');
 
-router.get('/lista', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), VisitaAdvogadoController.listar);
+const validator = require('../middlewares/validator');
 
-router.get('/cadastrar', authenticate, authorize('DIRETOR', 'INSPETOR'), VisitaAdvogadoController.cadastrar);
 
-router.post('/cadastrar', authenticate, authorize('DIRETOR', 'INSPETOR'),  VisitaAdvogadoController.cadastrar);
 
-router.get('/:id/editar', authenticate, authorize('DIRETOR', 'INSPETOR'), VisitaAdvogadoController.editar);
+router.get('/lista', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), session, VisitaAdvogadoController.listar);
 
-router.post('/:id/editar',authenticate, authorize('DIRETOR', 'INSPETOR'), VisitaAdvogadoController.editar);
+router.get('/cadastrar', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, VisitaAdvogadoController.cadastrar);
 
-router.get('/:id/excluir',authenticate, authorize('DIRETOR', 'INSPETOR'), VisitaAdvogadoController.excluir);
+router.post('/cadastrar', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, VisitaAdvogadoController.cadastrar);
+
+router.get('/:id/editar', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, VisitaAdvogadoController.editar);
+
+router.post('/:id/editar', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, VisitaAdvogadoController.editar);
+
+router.get('/:id/excluir', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, VisitaAdvogadoController.excluir);
 
 module.exports = router;

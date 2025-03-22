@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
+const session = require('../middlewares/autenticate');
 const DetentoModel = require('../models/DetentoModel');
 const CelaModel = require('../models/CelaModel');
 const VisitaFamiliarModel = require('../models/VisitaFamiliarModel');
@@ -8,7 +9,7 @@ const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
 const UserModel = require('../models/UserModel');
 
 // Rota protegida para o Dashboard do Admin
-router.get('/admin/dashboard', authenticate, authorize('ADMIN'), async (req, res) => {
+router.get('/admin/dashboard', authenticate, authorize('ADMIN'), session, async (req, res) => {
   try {
     // Obter estatísticas do sistema
     const totalDetentos = await DetentoModel.countDocuments();
@@ -35,7 +36,7 @@ router.get('/admin/dashboard', authenticate, authorize('ADMIN'), async (req, res
 });
 
 // Rota para listar inspetores e diretores
-router.get('/admin/gerenciar-usuarios', authenticate, authorize('ADMIN'), async (req, res) => {
+router.get('/admin/gerenciar-usuarios', authenticate, authorize('ADMIN'), session, async (req, res) => {
     try {
       // Busca todos os usuários com nível de acesso INSPETOR ou DIRETOR
       const usuarios = await UserModel.find({
@@ -55,7 +56,7 @@ router.get('/admin/gerenciar-usuarios', authenticate, authorize('ADMIN'), async 
   });
   
   // Rota para excluir um usuário
-  router.post('/admin/excluir-usuario/:id', authenticate, authorize('ADMIN'), async (req, res) => {
+  router.post('/admin/excluir-usuario/:id', authenticate, authorize('ADMIN'), session, async (req, res) => {
     try {
       const { id } = req.params;
   

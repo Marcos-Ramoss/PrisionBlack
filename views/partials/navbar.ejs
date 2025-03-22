@@ -13,7 +13,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">
+    <a class="navbar-brand" href="/home">
       <i class="fa-solid fa-gavel"></i> PrisionBlack
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -22,11 +22,13 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <!-- Detentos -->
+        <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR'].includes(user.nivelAcesso)) { %>
         <li class="nav-item">
           <a class="nav-link" href="/detentos/lista">
             <i class="fa-solid fa-user"></i> Detentos
           </a>
         </li>
+        <% } %>
 
         <!-- Celas -->
         <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
@@ -37,19 +39,22 @@
           </li>
         <% } %>
 
+        <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR'].includes(user.nivelAcesso)) { %>
         <!-- Visitas Familiar -->
         <li class="nav-item">
           <a class="nav-link" href="/visitas/lista">
             <i class="fa-solid fa-users"></i> Visitas Familiar
           </a>
         </li>
+        <% } %>
 
-        <!-- Visitas Advogado -->
+        <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR'].includes(user.nivelAcesso)) { %>
         <li class="nav-item">
           <a class="nav-link" href="/visitasAdvogado/lista">
             <i class="fa-solid fa-gavel"></i> Visitas Advogado
           </a>
         </li>
+        <% } %>
 
         <!-- Relatórios -->
         <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>

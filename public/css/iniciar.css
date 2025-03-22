@@ -1,0 +1,57 @@
+body {
+    color: #ffffff;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Centralização Vertical e Horizontal */
+  .center-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+  }
+
+  /* Estilo do Botão Iniciar */
+  .btn-iniciar {
+    -webkit-text-fill-color: #ffffff;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background: linear-gradient(135deg, #ff4d4d, #ff7f7f);
+    border: none;
+  }
+  .btn-iniciar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(255, 77, 77, 0.5);
+  }
+
+  /* Modal de Boas-Vindas */
+  .modal-content {
+    border-radius: 15px;
+    border: none;
+  }
+  .modal-body img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+
+  /* Animação de Fade-In */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Navbar */
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }

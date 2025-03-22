@@ -56,6 +56,8 @@ app.use(cookieParser());
 app.use(flash());
 
 
+
+
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success');
   res.locals.error_msg = req.flash('error');
@@ -80,19 +82,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/', pesquisaRoutes)
 app.use('/', authRoutes);
 
-app.use('/detentos', detentoRoutes);
-app.use('/celas', celaRoutes);
-app.use('/relatorios', relatorioRoutes);
-app.use('/visitas', visitaFamiliarRoutes);
-app.use('/visitasAdvogado', visitaAdvogadoRoutes);
-app.use('/alocacao', alocacaoRoutes);
-app.use('/admin', adminRoutes);
-
-
-// Rota Padrão
-// app.get('/', (req, res) => {
-//   res.render('layouts/main', { title: 'Sistema de Gestão Penitenciária' });
-// });
+app.use('/detentos', authenticate, detentoRoutes);
+app.use('/celas', authenticate, celaRoutes);
+app.use('/relatorios', authenticate, relatorioRoutes);
+app.use('/visitas', authenticate, visitaFamiliarRoutes);
+app.use('/visitasAdvogado', authenticate, visitaAdvogadoRoutes);
+app.use('/alocacao', authenticate, alocacaoRoutes);
+app.use('/admin', authenticate, adminRoutes);
 
 
 const PORT = process.env.PORT || 3000;
