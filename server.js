@@ -17,7 +17,7 @@ const celaRoutes = require('./app/routes/celaRoutes');
 const relatorioRoutes = require('./app/routes/relatorioRoutes');
 const visitaFamiliarRoutes = require('./app/routes/visitaFamiliarRoutes');
 const visitaAdvogadoRoutes = require('./app/routes/visitaAdvogadoRoutes');
-const alocacaoRoutes = require('./app/routes/alocacaoRoutes');
+const alocacaoRoutes = require('./app/routes/alocacao');
 const pesquisaRoutes = require('./app/routes/pesquisaRoutes');
 const adminRoutes = require('./app/routes/adminRoutes');
 

@@ -1,4 +1,5 @@
 const DetentoService = require('../services/DetentoService');
+const CelaService = require('../services/CelaService');
 const multerConfig = require('../config/multerConfig');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
@@ -7,21 +8,41 @@ const { authenticate, authorize } = require('../middlewares/authMiddleware');
 class DetentoController {
   static async cadastrar(req, res) {
     try {
-      const { nome, idade, filiacao, estadoCivil, reincidencia, crimes } = req.body;
-      const foto = req.file ? req.file.filename : null; 
-      const novoDetento = await DetentoService.cadastrar({
-        nome,
-        idade,
-        filiacao,
-        estadoCivil,
-        foto,
-        reincidencia: reincidencia === 'true',
-        crimes: crimes.split(',').map((crime) => crime.trim()) // Divide crimes em array
+      if (req.method === 'GET') {
+        // Renderiza o formulário de cadastro com a lista de celas
+        const celas = await CelaService.listar();
+        res.render('detentos/cadastro', { 
+          celas, 
+          user: req.session.user,
+          error: null 
+        });
+      } else if (req.method === 'POST') {
+        const { nome, idade, filiacao, estadoCivil, reincidencia, crimes, cela } = req.body;
+        const foto = req.file ? req.file.filename : null;
+        
+        const novoDetento = await DetentoService.cadastrar({
+          nome,
+          idade,
+          filiacao,
+          estadoCivil,
+          foto,
+          reincidencia: reincidencia === 'true',
+          crimes: crimes.split(',').map((crime) => crime.trim()),
+          cela: cela || null
+        });
+        
+        // Redireciona para a lista de detentos após o cadastro bem-sucedido
+        res.redirect('/detentos/lista');
+      }
+    } catch (error) {
+      console.error('Erro no cadastro de detento:', error);
+      // Em caso de erro, renderiza a página de cadastro novamente com a mensagem de erro
+      const celas = await CelaService.listar();
+      res.render('detentos/cadastro', { 
+        celas, 
+        user: req.session.user,
+        error: error.message 
       });
-      
-      res.status(201).render('detentos/detalhes', { detento: novoDetento });
-    } catch {
-     res.redirect('/');
     }
   }
 

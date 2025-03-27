@@ -34,59 +34,85 @@
 
   <!-- Main Content -->
   <div class="container mt-5">
-    <h1 class="mb-4">Lista de Detentos</h1>
+    <div class="row">
+      <div class="col-12">
+        <h1 class="mb-4">Lista de Detentos</h1>
 
-    <!-- Botão Cadastrar Detento -->
-    <div class="text-end mb-4">
-      <a href="/detentos/cadastro" class="btn btn-danger animated-button">
-        <i class="fa-solid fa-plus"></i> Cadastrar Detento
-      </a>
+        <!-- Botão Cadastrar Detento -->
+        <div class="text-end mb-4">
+          <a href="/detentos/cadastro" class="btn btn-danger animated-button">
+            <i class="fa-solid fa-plus"></i> Cadastrar Detento
+          </a>
+        </div>
+
+        <!-- Tabela de Detentos -->
+        <div class="table-responsive">
+          <table class="table table-dark table-striped table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center" style="width: 80px;">Foto</th>
+                <th class="text-center" style="width: 200px;">Nome</th>
+                <th class="text-center" style="width: 100px;">Idade</th>
+                <th class="text-center" style="width: 200px;">Filiação</th>
+                <th class="text-center" style="width: 150px;">Estado Civil</th>
+                <th class="text-center" style="width: 200px;">Cela</th>
+                <th class="text-center" style="width: 120px;">Reincidência</th>
+                <th class="text-center">Crimes Cometidos</th>
+                <th class="text-center" style="width: 200px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (detentos.length > 0) { %>
+                <% detentos.forEach(detento => { %>
+                  <tr>
+                    <td class="text-center">
+                      <% if (detento.foto) { %>
+                        <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento" style="width: 50px; height: 50px;" onclick="location.href='/detentos/<%= detento._id %>/'">
+                      <% } else { %>
+                        <span>N/A</span>
+                      <% } %>
+                    </td>
+                    <td class="text-center"><%= detento.nome %></td>
+                    <td class="text-center"><%= detento.idade %></td>
+                    <td class="text-center"><%= detento.filiacao %></td>
+                    <td class="text-center"><%= detento.estadoCivil %></td>
+                    <td class="text-center">
+                      <% if (detento.cela) { %>
+                        <span class="badge bg-info">
+                          <i class="fa-solid fa-door-closed me-1"></i>
+                          <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
+                        </span>
+                      <% } else { %>
+                        <span class="badge bg-secondary">
+                          <i class="fa-solid fa-door-open me-1"></i>
+                          Sem cela
+                        </span>
+                      <% } %>
+                    </td>
+                    <td class="text-center"><%= detento.reincidencia ? 'Sim' : 'Não' %></td>
+                    <td class="text-center"><%= detento.crimes.join(', ') %></td>
+                    <td class="text-center">
+                      <div class="btn-group" role="group">
+                        <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary btn-sm me-1">
+                          <i class="fa-solid fa-pen-to-square"></i> Editar
+                        </a>
+                        <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este Detento?');">
+                          <i class="fa-solid fa-trash"></i> Excluir
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="9" class="text-center">Nenhum detento cadastrado.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-
-    <!-- Tabela de Detentos -->
-    <table class="table table-dark table-striped">
-      <thead>
-        <tr>
-          <th>Foto</th>
-          <th>Nome</th>
-          <th>Idade</th>
-          <th>Filiação</th>
-          <th>Estado Civil</th>
-          <th>Reincidência</th>
-          <th>Crimes Cometidos</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (detentos.length > 0) { %>
-          <% detentos.forEach(detento => { %>
-            <tr>
-              <td>
-                <% if (detento.foto) { %>
-                  <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento" style="width: 50px; height: 50px;" onclick="location.href='/detentos/<%= detento._id %>/'">
-                <% } else { %>
-                  <span>N/A</span>
-                <% } %>
-              </td>
-              <td><%= detento.nome %></td>
-              <td><%= detento.idade %></td>
-              <td><%= detento.filiacao %></td>
-              <td><%= detento.estadoCivil %></td>
-              <td><%= detento.reincidencia ? 'Sim' : 'Não' %></td>
-              <td><%= detento.crimes.join(', ') %></td>
-              <td>
-                <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary btn-sm">Editar</a>
-                <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este Detento?');">Excluir</a>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="8" class="text-center">Nenhum detento cadastrado.</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
   </div>
 
   <!-- Footer -->

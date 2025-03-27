@@ -13,10 +13,8 @@ class CelaController {
 
   static async cadastrar(req, res) {
     try {
-      const { codigo, pavilhao, capacidade, ocupantes } = req.body;
-      
-      const ocupantesArray = Array.isArray(ocupantes) ? ocupantes : [ocupantes];
-      const novaCela = await CelaService.cadastrar({ codigo, pavilhao, capacidade,  ocupantes: ocupantesArray });
+      const { codigo, pavilhao, capacidade } = req.body;
+      const novaCela = await CelaService.cadastrar({ codigo, pavilhao, capacidade });
       return res.status(201).json({
         success: true,
         message: 'Cela cadastrada com sucesso!',
@@ -25,7 +23,7 @@ class CelaController {
     } catch (error) {
       res.status(400).json({
         success: false,
-        error: error.message,
+        message: error.message,
       });
     }
   }

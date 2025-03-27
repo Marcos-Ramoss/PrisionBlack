@@ -34,6 +34,14 @@
         <!-- Título Centralizado -->
         <h1 class="text-center mb-4">Cadastro de Detento</h1>
 
+        <!-- Mensagem de Erro -->
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+
         <!-- Formulário -->
         <form action="/detentos/cadastro" method="POST" enctype="multipart/form-data" class="border p-4 rounded bg-dark text-white" onsubmit="return validateForm()">
           <div class="row">
@@ -85,6 +93,25 @@
             <div class="col-md-12 mb-3">
               <label for="crimes" class="form-label"><i class="fa-solid fa-gavel me-2"></i> Crimes Cometidos</label>
               <textarea class="form-control form-control-sm" id="crimes" name="crimes" rows="3" placeholder="Descreva os crimes cometidos" required minlength="10" maxlength="500" title="Descreva os crimes com pelo menos 10 caracteres e no máximo 500"></textarea>
+            </div>
+
+            <!-- Cela -->
+            <div class="col-md-12 mb-3">
+              <label for="cela" class="form-label"><i class="fa-solid fa-door-closed me-2"></i> Cela</label>
+              <select class="form-select form-select-sm" id="cela" name="cela">
+                <option value="">Selecione uma cela</option>
+                <% if (celas && celas.length > 0) { %>
+                  <% celas.forEach(cela => { %>
+                    <option value="<%= cela._id %>" <%= cela.ocupantes.length >= cela.capacidade ? 'disabled' : '' %>>
+                      <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %> 
+                      (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
+                    </option>
+                  <% }); %>
+                <% } else { %>
+                  <option disabled>Nenhuma cela disponível</option>
+                <% } %>
+              </select>
+              <small class="text-muted">Celas cheias não aparecem na lista</small>
             </div>
           </div>
         

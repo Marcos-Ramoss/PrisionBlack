@@ -62,21 +62,6 @@
               <label for="capacidade" class="form-label"><i class="fa-solid fa-users me-2"></i> Capacidade</label>
               <input type="number" class="form-control" id="capacidade" name="capacidade" required>
             </div>
-
-            <!-- Ocupantes (Detentos) -->
-            <div class="col-md-12 mb-3">
-              <label for="ocupantes" class="form-label"><i class="fa-solid fa-user-group me-2"></i> Escolha os Detentos (Ocupantes)</label>
-              <select class="form-select" id="ocupantes" name="ocupantes" multiple size="5" required>
-                <% if (detentos && detentos.length > 0) { %>
-                  <% detentos.forEach(detento => { %>
-                    <option value="<%= detento._id %>"><%= detento.nome %> (ID: <%= detento._id %>)</option>
-                  <% }); %>
-                <% } else { %>
-                  <option disabled>Nenhum detento cadastrado</option>
-                <% } %>
-              </select>
-              <small class="text-muted">Mantenha pressionada a tecla Ctrl (ou Command no Mac) para selecionar múltiplos detentos.</small>
-            </div>
           </div>
 
           <!-- Botão de Envio -->
@@ -95,10 +80,11 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="successModalLabel">Sucesso!</h5>
+          <h5 class="modal-title" id="successModalLabel"><i class="fa-solid fa-check-circle me-2"></i>Operação Realizada com Sucesso</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="successMessage">
+        <div class="modal-body text-center" id="successMessage">
+          <i class="fa-solid fa-door-open fa-3x text-success mb-3"></i>
           <!-- Mensagem de sucesso será exibida aqui -->
         </div>
         <div class="modal-footer">
@@ -113,10 +99,11 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="errorModalLabel">Erro ao Cadastrar Cela</h5>
+          <h5 class="modal-title" id="errorModalLabel"><i class="fa-solid fa-triangle-exclamation me-2"></i>Falha na Operação</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="errorMessage">
+        <div class="modal-body text-center" id="errorMessage">
+          <i class="fa-solid fa-circle-exclamation fa-3x text-danger mb-3"></i>
           <!-- Mensagem de erro será exibida aqui -->
         </div>
         <div class="modal-footer">
@@ -140,7 +127,6 @@
         codigo: document.getElementById('codigo').value,
         pavilhao: document.getElementById('pavilhao').value,
         capacidade: document.getElementById('capacidade').value,
-        ocupantes: Array.from(document.getElementById('ocupantes').selectedOptions).map(option => option.value),
       };
 
       try {
@@ -153,16 +139,26 @@
           body: JSON.stringify(formData),
         });
 
+        const result = await response.json();
+
         // Verifica se a resposta é válida
         if (!response.ok) {
-          throw new Error('Erro ao cadastrar cela.');
+          // Verifica o conteúdo da mensagem de erro
+          if (result.message && result.message.includes('cela já cadastrada')) {
+            throw new Error('Cela já cadastrada');
+          } else if (result.message && result.message.includes('detento já está em uma cela')) {
+            throw new Error('Detento já contém uma cela');
+          } else {
+            throw new Error('Erro ao cadastrar cela.');
+          }
         }
-
-        const result = await response.json();
 
         if (result.success) {
           // Exibe o modal de sucesso
-          document.getElementById('successMessage').textContent = result.message;
+          document.getElementById('successMessage').innerHTML = `
+            <p class="mb-0">${result.message}</p>
+            <p class="text-muted mt-2">Você será redirecionado para a lista de celas.</p>
+          `;
           const successModal = new bootstrap.Modal(document.getElementById('successModal'));
           successModal.show();
 
@@ -172,11 +168,21 @@
             window.location.href = '/celas/lista';
           });
         } else {
-          throw new Error(result.error); // Lança o erro para exibir no modal
+          // Verifica o conteúdo da mensagem de erro
+          if (result.message && result.message.includes('cela já cadastrada')) {
+            throw new Error('Cela já cadastrada');
+          } else if (result.message && result.message.includes('detento já está em uma cela')) {
+            throw new Error('Detento já contém uma cela');
+          } else {
+            throw new Error(result.message || 'Erro ao cadastrar cela.');
+          }
         }
       } catch (error) {
         // Exibe o modal de erro com a mensagem detalhada
-        document.getElementById('errorMessage').textContent = error.message;
+        document.getElementById('errorMessage').innerHTML = `
+          <p class="mb-0">${error.message}</p>
+          <p class="text-muted mt-2">Por favor, verifique as informações e tente novamente.</p>
+        `;
         const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
         errorModal.show();
       }

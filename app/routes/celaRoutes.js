@@ -10,7 +10,7 @@ const session = require('../middlewares/autenticate');
 
 router.get('/lista', authenticate, authorize('DIRETOR', 'ADMIN','INSPETOR'), session, CelaController.listar);
 
-router.get('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR'), session, async (req, res) => {
+router.get('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session, async (req, res) => {
     try {
       const detentos = await DetentoService.listar(); // Obtém a lista de detentos
       res.render('celas/cadastro', { detentos, user: req.session.user });
@@ -19,7 +19,7 @@ router.get('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR'), session,
     }
   });
 
-router.post('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR'), session, CelaController.cadastrar);
+router.post('/cadastrar', authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session, CelaController.cadastrar);
 
 router.get('/alocar', authenticate, authorize('DIRETOR','INSPETOR'), session, async (req, res) => {
     try {
@@ -31,16 +31,16 @@ router.get('/alocar', authenticate, authorize('DIRETOR','INSPETOR'), session, as
     }
   });
 
-router.post('/alocar', authenticate, authorize('DIRETOR','INSPETOR'), session, CelaController.alocar);
+router.post('/alocar', authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session, CelaController.alocar);
 
 
-router.get('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR'), session, CelaController.editar);
+router.get('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session, CelaController.editar);
 
 
-router.post('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR'), session, CelaController.editar);
+router.post('/:id/editar', authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session, CelaController.editar);
 
 
-router.get('/:id/excluir',authenticate, authorize('DIRETOR','INSPETOR'), session,  CelaController.excluir);
+router.get('/:id/excluir',authenticate, authorize('DIRETOR','INSPETOR', 'ADMIN'), session,  CelaController.excluir);
 
 
 

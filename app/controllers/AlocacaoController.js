@@ -1,52 +1,68 @@
 const AlocacaoService = require('../services/AlocacaoService');
+const Detento = require('../models/DetentoModel');
+const Cela = require('../models/CelaModel');
 
 class AlocacaoController {
+  // Exibir página de detalhes de alocação
+  async detalhes(req, res) {
+    try {
+      const detentos = await Detento.find().populate('cela');
+      const celas = await Cela.find();
+
+      res.render('alocacao/detalhes', {
+        detentos,
+        celas,
+        user: req.user
+      });
+    } catch (error) {
+      console.error('Erro ao carregar dados de alocação:', error);
+      res.status(500).send('Erro ao carregar dados de alocação');
+    }
+  }
+
   // Rota para alocar um detento em uma cela
-  static async alocar(req, res) {
+  async alocar(req, res) {
     try {
       const { celaId, detentoId } = req.body;
 
       // Chama o serviço para alocar o detento
       const resultado = await AlocacaoService.alocarDetento(celaId, detentoId);
 
-      // Redireciona para a página de detalhes da cela ou exibe uma mensagem de sucesso
-      req.flash('success', resultado.mensagem);
-      res.redirect(`/celas/${celaId}/detalhes`);
+      // Retorna resposta JSON
+      res.json({ 
+        success: true, 
+        message: resultado.mensagem 
+      });
     } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/celas/lista'); // Redireciona para a lista de celas em caso de erro
+      console.error('Erro ao alocar detento:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   }
 
   // Rota para remover um detento de uma cela
-  static async remover(req, res) {
+  async remover(req, res) {
     try {
       const { celaId, detentoId } = req.params;
 
       // Chama o serviço para remover o detento
       const resultado = await AlocacaoService.removerDetento(celaId, detentoId);
 
-      // Redireciona para a página de detalhes da cela ou exibe uma mensagem de sucesso
-      req.flash('success', resultado.mensagem);
-      res.redirect(`/celas/${celaId}/detalhes`);
+      // Retorna resposta JSON
+      res.json({ 
+        success: true, 
+        message: resultado.mensagem 
+      });
     } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/celas/lista'); // Redireciona para a lista de celas em caso de erro
-    }
-  }
-
-  static async detalhes(req, res) {
-    try {
-      // Chama o serviço para listar todas as alocações
-      const celas = await AlocacaoService.listarAlocacoes();
-  
-      // Renderiza a página de detalhes de alocação
-      res.render('alocacao/detalhes', { celas, user: req.session.user });
-    } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/'); // Redireciona para a página inicial em caso de erro
+      console.error('Erro ao remover detento:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   }
 }
 
-module.exports = AlocacaoController;
+module.exports = new AlocacaoController();

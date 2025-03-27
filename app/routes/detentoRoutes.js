@@ -6,13 +6,11 @@ const session = require('../middlewares/autenticate');
 const multerConfig = require('../config/multerConfig');
 const validator = require('../middlewares/validator');
 
+// Rota para renderizar o formulário de cadastro
+router.get('/cadastro', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), session, DetentoController.cadastrar);
 
-
-router.get('/cadastro', session, (req, res) => {
-  res.render('detentos/cadastro',  { user: req.session.user });
-});
-
-router.post('/cadastro',authenticate, authorize('ADMIN', 'DIRETOR','INSPETOR'), multerConfig, session, DetentoController.cadastrar);
+// Rota para cadastrar um novo detento
+router.post('/cadastro', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), multerConfig, session, DetentoController.cadastrar);
 
 router.get('/lista', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), session, DetentoController.listar);
 

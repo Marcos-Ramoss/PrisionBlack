@@ -4,7 +4,10 @@ const LogService = require('./LogService');
 
 class CelaService {
   static async listar() {
-    return await CelaModel.find().populate('ocupantes');
+    return await CelaModel.find().populate({
+      path: 'ocupantes',
+      select: 'nome idade estadoCivil'
+    });
   }
 
   static async listar() {
@@ -12,19 +15,22 @@ class CelaService {
   }
 
   static async buscarPorId(id) {
-    return await CelaModel.findById(id).populate('ocupantes');
+    return await CelaModel.findById(id).populate({
+      path: 'ocupantes',
+      select: 'nome idade estadoCivil'
+    });
   }
 
   static async cadastrar(dados) {
-    const { codigo, pavilhao, capacidade, ocupantes } = dados;
-     // Verifica se algum dos detentos já está em outra cela
-      for (const nomeId of ocupantes) {
-      const celaExistente = await CelaModel.findOne({ ocupantes: nomeId });
-      if (celaExistente) {
-        throw new Error(`O detento ${nomeId} já está cadastrado na cela ${celaExistente.codigo}.`);
-      }
+    const { codigo, pavilhao, capacidade } = dados;
+    
+    // Verifica se a cela já existe
+    const celaExistente = await CelaModel.findOne({ codigo });
+    if (celaExistente) {
+      throw new Error('cela já cadastrada');
     }
-    const novaCela = new CelaModel({ codigo, pavilhao, capacidade, ocupantes: ocupantes || [] });
+
+    const novaCela = new CelaModel({ codigo, pavilhao, capacidade, ocupantes: [] });
     return await novaCela.save();
   }
 
