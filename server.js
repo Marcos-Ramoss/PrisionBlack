@@ -9,6 +9,7 @@ const { authenticate, authorize } = require('./app/middlewares/authMiddleware');
 const flash = require('connect-flash');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
 
 
 // Rotas
@@ -20,6 +21,7 @@ const visitaAdvogadoRoutes = require('./app/routes/visitaAdvogadoRoutes');
 const alocacaoRoutes = require('./app/routes/alocacao');
 const pesquisaRoutes = require('./app/routes/pesquisaRoutes');
 const adminRoutes = require('./app/routes/adminRoutes');
+const userRoutes = require('./app/routes/userRoutes');
 
 
 dotenv.config();
@@ -28,6 +30,9 @@ const dbConfig = require('./app/config/db');
 dbConfig.connect();
 
 const app = express();
+
+// Configuração do middleware method-override
+app.use(methodOverride('_method'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,15 +46,14 @@ app.use(
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'q3LLITDQyH', // Use uma chave secreta forte
+    secret: process.env.SESSION_SECRET || 'q3LLITDQyH',
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      secure: false, // Use `true` em produção (HTTPS)
-      httpOnly: true, // Protege o cookie contra acesso via JavaScript
-      maxAge: 1000 * 60 * 60 * 24, // Define o tempo de vida da sessão (24 horas)
-    },
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    }
   })
 );
 app.use(cookieParser());
@@ -59,19 +63,14 @@ app.use(flash());
 
 
 app.use((req, res, next) => {
-  res.locals.success_msg = req.flash('success');
+  res.locals.user = req.session.user;
   res.locals.error_msg = req.flash('error');
+  res.locals.success_msg = req.flash('success');
   next();
 });
 
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use((req, res, next) => {
-  res.locals.user = req.session.user;
-  next();
-});
-
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -89,6 +88,7 @@ app.use('/visitas', authenticate, visitaFamiliarRoutes);
 app.use('/visitasAdvogado', authenticate, visitaAdvogadoRoutes);
 app.use('/alocacao', authenticate, alocacaoRoutes);
 app.use('/admin', authenticate, adminRoutes);
+app.use('/usuarios', authenticate, userRoutes);
 
 
 const PORT = process.env.PORT || 3000;

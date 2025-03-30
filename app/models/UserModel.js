@@ -9,6 +9,11 @@ const UsuarioSchema = new mongoose.Schema({
     enum: ['ADMIN', 'DIRETOR', 'INSPETOR'],
     required: true,
   },
+  criadoPor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: false
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

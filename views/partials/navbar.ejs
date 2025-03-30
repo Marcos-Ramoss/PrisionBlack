@@ -9,7 +9,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/footer.css">
-  <link rel="icon"  type="image/png" href="/img/Logo_PrisionBlack.png">
+  <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -66,10 +66,16 @@
           </li>
         <% } %>
 
-        <!-- Dashboard ADMIN -->
+        <!-- Dashboard -->
         <% if (user && user.nivelAcesso === 'ADMIN') { %>
           <li class="nav-item">
-            <a class="nav-link" href="/admin/admin/dashboard">
+            <a class="nav-link" href="/admin/dashboard">
+              <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+            </a>
+          </li>
+        <% } else if (user && user.nivelAcesso === 'DIRETOR') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/diretor/dashboard">
               <i class="fa-solid fa-tachometer-alt"></i> Dashboard
             </a>
           </li>

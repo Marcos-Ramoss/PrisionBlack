@@ -6,15 +6,17 @@ const DetentoModel = require('../models/DetentoModel');
 const CelaModel = require('../models/CelaModel');
 const VisitaFamiliarModel = require('../models/VisitaFamiliarModel');
 const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
-const UserModel = require('../models/UserModel');
+const UserController = require('../controllers/UserController');
+const DiretorController = require('../controllers/DiretorController');
 
 // Rota protegida para o Dashboard do Admin
-router.get('/admin/dashboard', authenticate, authorize('ADMIN'), session, async (req, res) => {
+router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, res) => {
   try {
     // Obter estatísticas do sistema
     const totalDetentos = await DetentoModel.countDocuments();
     const totalCelas = await CelaModel.countDocuments();
-    const totalCelasOcupadas = await CelaModel.countDocuments({ status: 'OCUPADA' });
+    const totalCelasOcupadas = await CelaModel.countDocuments({ ocupantes: { $ne: [] } });
+    const totalCelasAlocadas = await CelaModel.countDocuments({ 'ocupantes.0': { $exists: true } });
     const totalVisitasFamiliares = await VisitaFamiliarModel.countDocuments();
     const totalVisitasAdvogados = await VisitaAdvogadoModel.countDocuments();
 
@@ -25,6 +27,7 @@ router.get('/admin/dashboard', authenticate, authorize('ADMIN'), session, async 
       totalDetentos,
       totalCelas,
       totalCelasOcupadas,
+      totalCelasAlocadas,
       totalCelasDisponiveis: totalCelas - totalCelasOcupadas,
       totalVisitasFamiliares,
       totalVisitasAdvogados,
@@ -35,42 +38,12 @@ router.get('/admin/dashboard', authenticate, authorize('ADMIN'), session, async 
   }
 });
 
-// Rota para listar inspetores e diretores
-router.get('/admin/gerenciar-usuarios', authenticate, authorize('ADMIN'), session, async (req, res) => {
-    try {
-      // Busca todos os usuários com nível de acesso INSPETOR ou DIRETOR
-      const usuarios = await UserModel.find({
-        nivelAcesso: { $in: ['INSPETOR', 'DIRETOR'] },
-      });
-  
-      // Renderiza a view de gerenciamento de usuários
-      res.render('admin/gerenciar-usuarios', {
-        title: 'Gerenciar Usuários',
-        user: req.usuario,
-        usuarios,
-      });
-    } catch (error) {
-      console.error('Erro ao listar usuários:', error.message);
-      res.status(500).json({ success: false, error: 'Erro ao listar usuários.' });
-    }
-  });
-  
-  // Rota para excluir um usuário
-  router.post('/admin/excluir-usuario/:id', authenticate, authorize('ADMIN'), session, async (req, res) => {
-    try {
-      const { id } = req.params;
-  
-      // Exclui o usuário pelo ID
-      await UserModel.findByIdAndDelete(id);
-  
-      // Redireciona de volta para a página de gerenciamento de usuários
-      req.flash('success', 'Usuário excluído com sucesso.');
-      res.redirect('/admin/gerenciar-usuarios');
-    } catch (error) {
-      console.error('Erro ao excluir usuário:', error.message);
-      req.flash('error', 'Erro ao excluir usuário.');
-      res.redirect('/admin/gerenciar-usuarios');
-    }
-  });
+// Rota para o Dashboard do Diretor
+router.get('/diretor/dashboard', authenticate, authorize('DIRETOR'), session, DiretorController.dashboard);
+
+// Rotas de gerenciamento de usuários
+router.get('/gerenciar-usuarios', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.listarUsuarios);
+router.post('/cadastrar-usuario', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.cadastrarUsuario);
+router.post('/excluir-usuario/:id', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.excluirUsuario);
 
 module.exports = router;
