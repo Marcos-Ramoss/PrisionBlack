@@ -31,7 +31,7 @@
 
 
   <!-- Main Content -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <div class="row justify-content-center">
       <div class="col-lg-8 col-md-10 form-container">
         <!-- Título Centralizado -->
@@ -46,12 +46,20 @@
         <% } %>
 
         <!-- Formulário -->
-        <form action="/detentos/cadastro" method="POST" enctype="multipart/form-data" class="border p-4 rounded bg-dark text-white" onsubmit="return validateForm()">
+        <form action="/detentos/cadastro" method="POST" enctype="multipart/form-data" class="theme-form border p-4 rounded" onsubmit="return validateForm()">
           <div class="row">
             <!-- Nome -->
             <div class="col-md-6 mb-3">
-              <label for="nome" class="form-label"><i class="fa-solid fa-user me-2"></i> Nome</label>
-              <input type="text" class="form-control form-control-sm" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite um nome válido (3 a 50 caracteres) somente letras">
+              <label for="nome" class="form-label">
+                <i class="fa-solid fa-user me-2"></i> Nome
+              </label>
+              <input type="text" 
+                     class="form-control form-control-sm" 
+                     id="nome" 
+                     name="nome" 
+                     required 
+                     pattern="^[A-Za-zÀ-ú\s]{3,50}$" 
+                     title="Digite um nome válido (3 a 50 caracteres) somente letras">
             </div>
         
             <!-- Idade -->
@@ -100,12 +108,15 @@
 
             <!-- Cela -->
             <div class="col-md-12 mb-3">
-              <label for="cela" class="form-label"><i class="fa-solid fa-door-closed me-2"></i> Cela</label>
+              <label for="cela" class="form-label">
+                <i class="fa-solid fa-door-closed me-2"></i> Cela
+              </label>
               <select class="form-select form-select-sm" id="cela" name="cela">
                 <option value="">Selecione uma cela</option>
                 <% if (celas && celas.length > 0) { %>
                   <% celas.forEach(cela => { %>
-                    <option value="<%= cela._id %>" <%= cela.ocupantes.length >= cela.capacidade ? 'disabled' : '' %>>
+                    <option value="<%= cela._id %>" 
+                            <%= cela.ocupantes.length >= cela.capacidade ? 'disabled' : '' %>>
                       <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %> 
                       (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
                     </option>

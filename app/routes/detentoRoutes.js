@@ -7,7 +7,7 @@ const multerConfig = require('../config/multerConfig');
 const validator = require('../middlewares/validator');
 
 // Rota para renderizar o formulário de cadastro
-router.get('/cadastro', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), session, DetentoController.cadastrar);
+router.get('/cadastro', authenticate, authorize('DIRETOR', 'INSPETOR','ADMIN'), session, DetentoController.cadastrar);
 
 // Rota para cadastrar um novo detento
 router.post('/cadastro', authenticate, authorize('ADMIN', 'DIRETOR', 'INSPETOR'), multerConfig, session, DetentoController.cadastrar);

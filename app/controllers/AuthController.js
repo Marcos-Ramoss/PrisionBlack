@@ -109,7 +109,18 @@ class AuthController {
 
       console.log('Login realizado com sucesso para usuário:', email);
       req.flash('success', 'Login realizado com sucesso!');
-      res.redirect('/home');
+      if (usuario.nivelAcesso === 'ADMIN') {
+        return res.redirect('/admin/dashboard');  
+      } 
+      if (usuario.nivelAcesso === 'DIRETOR') {
+        return res.redirect('/admin/diretor/dashboard');  
+
+      }else {
+        return res.redirect('/home');
+      }
+      
+      
+
     } catch (error) {
       console.error('Erro durante o login:', error);
       req.flash('error', 'Erro ao realizar login. Tente novamente.');

@@ -6,6 +6,7 @@ const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
 class DiretorController {
   static async dashboard(req, res) {
     try {
+      const { pavilhao } = req.query;
       // Obter estatísticas do sistema
       const totalDetentos = await DetentoModel.countDocuments();
       const totalCelas = await CelaModel.countDocuments();
@@ -13,6 +14,21 @@ class DiretorController {
       const totalCelasAlocadas = await CelaModel.countDocuments({ 'ocupantes.0': { $exists: true } });
       const totalVisitasFamiliares = await VisitaFamiliarModel.countDocuments();
       const totalVisitasAdvogados = await VisitaAdvogadoModel.countDocuments();
+
+      const celasPorPavilhao = await CelaModel.aggregate([
+        { $group: { _id: "$pavilhao", total: { $sum: 1 } } }
+      ]);
+
+      let celasFiltradas = [];
+      if (pavilhao) {
+        celasFiltradas = await CelaModel.find({ pavilhao }).populate('ocupantes', 'nome');
+      }
+
+      // Verificar se a requisição é via fetch (AJAX)
+      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+        return res.json({ celasFiltradas });
+      }
+
 
       // Renderizar a view do dashboard com os dados
       res.render('diretor/dashboard', {
@@ -25,6 +41,9 @@ class DiretorController {
         totalCelasDisponiveis: totalCelas - totalCelasOcupadas,
         totalVisitasFamiliares,
         totalVisitasAdvogados,
+        celasPorPavilhao,
+        celasFiltradas,
+        pavilhaoSelecionado: pavilhao || null,
       });
     } catch (error) {
       console.error('Erro ao carregar o dashboard:', error.message);

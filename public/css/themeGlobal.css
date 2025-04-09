@@ -1,0 +1,240 @@
+:root[data-theme="dark"] {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --accent-color: #007bff;
+    --navbar-bg: rgba(26, 26, 26, 0.8);
+    --footer-bg: rgba(26, 26, 26, 0.8);
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --bg-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/fundo1.jfif');
+    --bg-image-size: cover;
+    --table-bg: #212529;
+    --table-header-bg: #1a1a1a;
+    --table-row-bg: #2c3034;
+    --table-hover-bg: #373b3e;
+    --table-border-color: #373b3e;
+    --table-text-color: #ffffff;
+    --table-header-text-color: #ffffff;
+    --badge-bg-cela: rgba(13, 202, 240, 0.9);
+    --badge-bg-sem-cela: rgba(50, 151, 89, 0.9);
+    --badge-text-color: #ffffff;
+    --btn-text-color: #ffffff;
+    --form-bg: #212529;
+    --form-text: #ffffff;
+    --form-border: #404040;
+    --form-input-bg: #2c3034;
+    --form-input-text: #ffffff;
+    --form-input-border: #373b3e;
+    --form-input-focus: #007bff;
+    --form-label-text: #e0e0e0;
+ 
+}
+
+:root[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #212529;
+    --accent-color: #0056b3;
+    --navbar-bg: rgba(248, 249, 250, 0.8);
+    --footer-bg: rgba(248, 249, 250, 0.8);
+    --footer-text: #212529;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --webkit-text-fill-color: #121212;
+    --bg-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/img/fundo_branco2.jfif');
+    --bg-image-size: cover;
+    --table-bg: #ffffff;
+    --table-header-bg: #f8f9fa;
+    --table-row-bg: #ffffff;
+    --table-hover-bg: rgba(0, 0, 0, 0.075);
+    --table-border-color: #dee2e6;
+    --table-text-color: #212529;
+    --table-header-text-color: #212529;
+    --badge-bg-cela: rgba(13, 202, 240, 0.9);
+    --badge-bg-sem-cela: rgba(50, 151, 89, 0.9);
+    --badge-text-color: #212529;
+    --btn-text-color: #f9f9fa;
+    --form-bg: #ffffff;
+    --form-text: #212529;
+    --form-border: #dee2e6;
+    --form-input-bg: #ffffff;
+    --form-input-text: #212529;
+    --form-input-border: #ced4da;
+    --form-input-focus: #0056b3;
+    --form-label-text: #212529;
+   
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    background-image: var(--bg-image);
+    background-size: var(--bg-image-size);
+    background-attachment: fixed;
+    background-position: center;
+}
+  
+.navbar {
+    background-color: var(--navbar-bg) !important;
+}
+  
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    -webkit-text-fill-color: var(--webkit-text-fill-color);
+}
+
+.footer {
+    background-color: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+}
+
+.nav-link {
+    color: var(--text-primary) !important;
+}
+  
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.p {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 20px;
+    text-shadow: #121212 1px 1px 2px;
+}
+
+.table-theme {
+    background-color: var(--table-bg);
+    color: var(--table-color);
+    border-color: var(--table-border);
+}
+
+.table-theme thead th {
+    background-color: var(--navbar-bg);
+    color: var(--text-primary);
+    border-color: var(--table-border);
+}
+
+.table-theme tbody tr:hover {
+    background-color: var(--table-hover);
+}
+
+.badge-cela {
+    background-color: var(--badge-bg-cela) !important;
+    color: var(--text-primary);
+}
+
+.badge-sem-cela {
+    background-color: var(--badge-bg-sem-cela) !important;
+    color: var(--text-primary);
+}
+
+/* Table Styles */
+.theme-table {
+    background-color: var(--table-bg) !important;
+    color: var(--table-text-color) !important;
+    border-color: var(--table-border-color) !important;
+}
+
+.theme-table thead {
+    background-color: var(--table-header-bg) !important;
+}
+
+.theme-table thead th {
+    color: var(--table-header-text-color) !important;
+    border-color: var(--table-border-color) !important;
+    background-color: var(--table-header-bg) !important;
+}
+
+.theme-table tbody tr {
+    background-color: var(--table-row-bg) !important;
+    color: var(--table-text-color) !important;
+    border-color: var(--table-border-color) !important;
+}
+
+.theme-table tbody tr:hover {
+    background-color: var(--table-hover-bg) !important;
+}
+
+.theme-table td {
+    border-color: var(--table-border-color) !important;
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-text-color) !important;
+}
+
+/* Badge Styles */
+.theme-badge {
+    color: var(--badge-text-color) !important;
+}
+
+.theme-badge-cela {
+    background-color: var(--badge-bg-cela) !important;
+}
+
+.theme-badge-sem-cela {
+    background-color: var(--badge-bg-sem-cela) !important;
+}
+
+
+
+
+/* Form Styles */
+.theme-form {
+    background-color: var(--form-bg) !important;
+    color: var(--form-text) !important;
+    border-color: var(--form-border) !important;
+    
+    
+}
+
+.theme-form .form-label {
+    color: var(--form-label-text) !important;
+}
+
+.theme-form .form-control,
+.theme-form .form-select {
+    background-color: var(--form-input-bg) !important;
+    color: var(--form-input-text) !important;
+    border-color: var(--form-input-border) !important;
+}
+
+.theme-form .form-control:focus,
+.theme-form .form-select:focus {
+    border-color: var(--form-input-focus) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.theme-form .form-check-input {
+    background-color: var(--form-input-bg) !important;
+    border-color: var(--form-input-border) !important;
+}
+
+.theme-form .form-check-label {
+    color: var(--form-text) !important;
+}
+
+.theme-form .text-muted {
+    color: var(--form-label-text) !important;
+    opacity: 0.8;
+}
+
+/* Form Container Styles */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.theme-form .btn-danger {
+    transition: transform 0.3s ease-in-out;
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--btn-text-color) !important;
+}
+
+.theme-form .btn-danger:hover {
+    transform: scale(1.05);
+}

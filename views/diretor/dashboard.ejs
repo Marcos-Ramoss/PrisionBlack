@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/css/dashboardDiretorAdmin.css">
   <!-- Icone Favicon -->
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
+  <link rel="stylesheet" href="/css/modal_dashboard_celas.css">
 
 </head>
 
@@ -68,6 +69,66 @@
             <i class="fa-solid fa-bed stats-icon text-success"></i>
             <h5 class="card-title">Celas Ocupadas</h5>
             <p class="stats-number"><%= totalCelasOcupadas %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card de Celas -->
+      <div class="col-md-4">
+        <div class="card stats-card text-center text-white">
+          <div class="card-body">
+            <i class="fa-solid fa-door-open stats-icon text-warning"></i>
+            <h5 class="card-title">Celas por Pavilhão</h5>
+
+            <!-- Formulário para filtrar pavilhões -->
+            <form id="pavilhaoForm" action="/admin/diretor/dashboard" method="GET">
+              <div class="mb-3">
+                <select class="form-select custom-select" name="pavilhao" id="pavilhaoSelect">
+                  <option value="" disabled selected>Selecione um Pavilhão</option>
+                  <% ['A', 'B' , 'C' ].forEach(pavilhao=> { %>
+                    <option value="<%= pavilhao %>" <%=pavilhaoSelecionado===pavilhao ? 'selected' : '' %>>
+                      Pavilhão <%= pavilhao %>
+                    </option>
+                    <% }) %>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal para exibir celas -->
+      <div class="modal fade" id="celasModal" tabindex="-1" aria-labelledby="celasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content bg-dark text-white border-0 rounded-3">
+            <div class="modal-header border-0">
+              <h5 class="modal-title" id="celasModalLabel">
+                <i class="fa-solid fa-door-open me-2 text-warning"></i>Celas do Pavilhão <span
+                  id="modalPavilhao"></span>
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <ul class="list-unstyled" id="celasList">
+                <% if (celasFiltradas && celasFiltradas.length> 0) { %>
+                  <% celasFiltradas.forEach(cela=> { %>
+                    <li><strong>Código:</strong>
+                      <%= cela.codigo %> (Capacidade: <%= cela.capacidade %>)
+                    </li>
+                    <% }) %>
+                      <% } else if (pavilhaoSelecionado) { %>
+                        <li>Nenhuma cela encontrada no Pavilhão <%= pavilhaoSelecionado %>.</li>
+                        <% } else { %>
+                          <li>Selecione um pavilhão para ver as celas.</li>
+                          <% } %>
+              </ul>
+            </div>
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <i class="fa-solid fa-times me-2"></i>Fechar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -155,8 +216,62 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Abrir o modal ao selecionar um pavilhão
+    document.getElementById('pavilhaoSelect').addEventListener('change', function () {
+      const pavilhao = this.value; // Obter o valor do pavilhão selecionado
+      const modalPavilhao = document.getElementById('modalPavilhao');
+      const celasList = document.getElementById('celasList');
+
+      // Atualizar o título do modal
+      modalPavilhao.textContent = pavilhao;
+
+      // Fazer uma requisição para buscar as celas do pavilhão selecionado
+      fetch(`/admin/diretor/dashboard?pavilhao=${pavilhao}`, {
+        headers: {
+          'Accept': 'application/json' // Garantir que a requisição espera um JSON
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao buscar celas');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Limpar a lista de celas
+          celasList.innerHTML = '';
+
+          if (data.celasFiltradas && data.celasFiltradas.length > 0) {
+            data.celasFiltradas.forEach(cela => {
+              const li = document.createElement('li');
+              li.innerHTML = `
+              <strong>Código:</strong> ${cela.codigo} (Capacidade: ${cela.capacidade})<br>
+              <strong>Ocupantes:</strong> ${cela.ocupantes.length} detentos<br>
+              <ul>
+                ${cela.ocupantes.map(ocupante => `<li>${ocupante.nome}</li>`).join('')}
+              </ul>
+            `;
+              celasList.appendChild(li);
+            });
+          } else {
+            celasList.innerHTML = '<li>Nenhuma cela encontrada no Pavilhão.</li>';
+          }
+
+          // Abrir o modal
+          const celasModal = new bootstrap.Modal(document.getElementById('celasModal'));
+          celasModal.show();
+        })
+        .catch(error => {
+          console.error('Erro ao buscar celas:', error);
+          alert('Erro ao buscar celas. Tente novamente.');
+        });
+    });
+  </script> 
+ 
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html> 
