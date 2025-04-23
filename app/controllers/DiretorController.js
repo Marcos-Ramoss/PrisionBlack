@@ -7,10 +7,10 @@ class DiretorController {
   static async dashboard(req, res) {
     try {
       const { pavilhao } = req.query;
-      // Obter estatísticas do sistema
+  
       const totalDetentos = await DetentoModel.countDocuments();
       const totalCelas = await CelaModel.countDocuments();
-      const totalCelasOcupadas = await CelaModel.countDocuments({ ocupantes: { $ne: [] } });
+      const totalCelasOcupadas = await CelaModel.countDocuments({ 'ocupantes.0': { $exists: true } });
       const totalCelasAlocadas = await CelaModel.countDocuments({ 'ocupantes.0': { $exists: true } });
       const totalVisitasFamiliares = await VisitaFamiliarModel.countDocuments();
       const totalVisitasAdvogados = await VisitaAdvogadoModel.countDocuments();
@@ -24,11 +24,15 @@ class DiretorController {
         celasFiltradas = await CelaModel.find({ pavilhao }).populate('ocupantes', 'nome');
       }
 
+      const celasOcupadas = await CelaModel.find({ 'ocupantes.0': { $exists: true } });
+      console.log('Detalhes das Celas Ocupadas:', celasOcupadas);
+
       // Verificar se a requisição é via fetch (AJAX)
       if (req.headers.accept && req.headers.accept.includes('application/json')) {
         return res.json({ celasFiltradas });
       }
 
+      console.log('Total de Celas Ocupadas:', totalCelasOcupadas);
 
       // Renderizar a view do dashboard com os dados
       res.render('diretor/dashboard', {

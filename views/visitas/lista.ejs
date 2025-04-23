@@ -42,7 +42,7 @@
         <% if (visitas.length > 0) { %>
           <% visitas.forEach(visita => { %>
             <tr>
-              <td><%= visita.detento.nome %></td>
+              <td><%= visita.detento ? visita.detento.nome : 'Detento não disponível' %></td>
               <td><%= visita.nomeFamiliar %></td>
               <td><%= visita.relacao %></td>
               <td><%= visita.dataVisita.toLocaleDateString() %></td>

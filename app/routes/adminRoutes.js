@@ -25,7 +25,7 @@ router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, 
       $expr: { $lt: [{ $size: "$ocupantes" }, "$capacidade"] } // Verifica se o número de ocupantes é menor que a capacidade
     });
 
-    
+
     const celasPorPavilhao = await CelaModel.aggregate([
       { $group: { _id: "$pavilhao", total: { $sum: 1 } } }
     ]);
@@ -35,7 +35,7 @@ router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, 
       celasFiltradas = await CelaModel.find({ pavilhao }).populate('ocupantes', 'nome');
     }
 
-    
+
     // Verificar se a requisição é via fetch (AJAX)
     if (req.headers.accept && req.headers.accept.includes('application/json')) {
       return res.json({ celasFiltradas });

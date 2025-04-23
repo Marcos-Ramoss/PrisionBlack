@@ -1,5 +1,7 @@
 const DetentoModel = require('../models/DetentoModel');
 const CelaModel = require('../models/CelaModel');
+const VisitaFamiliarModel = require('../models/VisitaFamiliarModel');
+const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
 
 class DetentoService {
   static async cadastrar(dados) {
@@ -69,9 +71,29 @@ class DetentoService {
     return await DetentoModel.findByIdAndUpdate(id, dados, { new: true });
   }
 
+  
   static async excluir(id) {
+    // Buscar o detento para obter a cela associada
+    const detento = await DetentoModel.findById(id);
+    if (!detento) {
+      throw new Error('Detento não encontrado.');
+    }
+
+    // Remover o detento da lista de ocupantes da cela
+    if (detento.cela) {
+      await CelaModel.findByIdAndUpdate(detento.cela, {
+        $pull: { ocupantes: detento._id }
+      });
+    }
+
+    // Excluir visitas associadas
+    await VisitaFamiliarModel.deleteMany({ detento: id });
+    await VisitaAdvogadoModel.deleteMany({ detento: id });
+
+    // Excluir o detento
     return await DetentoModel.findByIdAndDelete(id);
   }
+
 
   static async pesquisarPorNome(nome) {
     return await DetentoModel.find({ nome: { $regex: new RegExp(nome, 'i') } });

@@ -179,30 +179,38 @@
                        alt="Foto de <%= detento.nome %>" 
                        class="detento-foto">
                 </td>
-                <td><%= detento.nome %></td>
-                <td><%= detento._id %></td>
-                <td><%= detento.idade %></td>
-                <td><%= new Date(detento.dataEntrada).toLocaleDateString() %></td>
-                <td><%= new Date(detento.previsaoSaida).toLocaleDateString() %></td>
+                <td><%= detento.nome || 'Nome não disponível' %></td>
+                <td><%= detento._id || 'ID não disponível' %></td>
+                <td><%= detento.idade !== null ? detento.idade : 'Idade não disponível' %></td>
+                <td><%= detento.dataEntrada ? new Date(detento.dataEntrada).toLocaleDateString() : 'Data de entrada não disponível' %></td>
+                <td><%= detento.previsaoSaida ? new Date(detento.previsaoSaida).toLocaleDateString() : 'Previsão de saída não disponível' %></td>
                 <td>
-                  <span class="badge bg-info">
-                    <%= detento.cela.pavilhao %>/<%= detento.cela.codigo %>
-                  </span>
+                  <% if (detento.cela) { %>
+                    <span class="badge bg-info">
+                      <%= detento.cela.pavilhao %>/<%= detento.cela.codigo %>
+                    </span>
+                  <% } else { %>
+                    <span class="badge bg-secondary">Pavilhão/Cela não alocado! </span>
+                  <% } %>
                 </td>
                 <td>
-                  <% detento.crimes.forEach(crime => { %>
-                    <span class="badge bg-danger me-1"><%= crime %></span>
-                  <% }) %>
+                  <% if (detento.crimes && detento.crimes.length > 0) { %>
+                    <% detento.crimes.forEach(crime => { %>
+                      <span class="badge bg-danger me-1"><%= crime %></span>
+                    <% }) %>
+                  <% } else { %>
+                    <span class="badge bg-secondary">Crimes não disponíveis</span>
+                  <% } %>
                 </td>
                 <td>
                   <span class="badge bg-<%= detento.status === 'ativo' ? 'success' : 'warning' %>">
-                    <%= detento.status %>
+                    <%= detento.status || 'Status não disponível' %>
                   </span>
                 </td>
                 <td>
                   <i class="fa-solid <%= detento.reincidente ? 'fa-check text-danger' : 'fa-times text-success' %>"></i>
                 </td>
-                <td><%= detento.visitasPorMes %></td>
+                <td><%= detento.visitasPorMes !== null ? detento.visitasPorMes : 'Visitas não disponíveis' %></td>
                 <td>
                   <div class="btn-group">
                     <button class="btn btn-sm btn-primary" onclick="verDetalhes('<%= detento._id %>')">
