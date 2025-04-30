@@ -13,7 +13,16 @@ const DetentoSchema = new mongoose.Schema({
   historicoIsolamento: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Isolamento' }],
   visitasFamiliares: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaFamiliar' }],
   visitasAdvogados: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaAdvogado' }],
-  saida: { type: Date }
+  saida: { type: Date },
+  historicoAlocacao: [{
+    data: { type: Date, default: Date.now },
+    celaCodigo: { type: String },
+    usuarioAlocador: {
+      type: mongoose.Schema.Types.String,
+      ref: 'Usuario',
+      required: false
+    }
+  }]
 });
 
 module.exports = mongoose.model('Detento', DetentoSchema);

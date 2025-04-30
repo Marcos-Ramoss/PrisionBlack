@@ -9,7 +9,6 @@ class DetentoController {
   static async cadastrar(req, res) {
     try {
       if (req.method === 'GET') {
-        // Renderiza o formulário de cadastro com a lista de celas
         const celas = await CelaService.listar();
         res.render('detentos/cadastro', { 
           celas, 

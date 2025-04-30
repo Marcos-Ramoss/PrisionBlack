@@ -2,6 +2,8 @@ const AlocacaoService = require('../services/AlocacaoService');
 const Detento = require('../models/DetentoModel');
 const Cela = require('../models/CelaModel');
 
+
+
 class AlocacaoController {
   // Exibir página de detalhes de alocação
   async detalhes(req, res) {
@@ -12,7 +14,7 @@ class AlocacaoController {
       res.render('alocacao/detalhes', {
         detentos,
         celas,
-        user: req.user
+        user: req.session.user,
       });
     } catch (error) {
       console.error('Erro ao carregar dados de alocação:', error);
@@ -26,7 +28,7 @@ class AlocacaoController {
       const { celaId, detentoId } = req.body;
 
       // Chama o serviço para alocar o detento
-      const resultado = await AlocacaoService.alocarDetento(celaId, detentoId);
+      const resultado = await AlocacaoService.alocarDetento(celaId, detentoId, req.session.user);
 
       // Retorna resposta JSON
       res.json({ 
