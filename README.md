@@ -100,28 +100,13 @@ PrisionBlack/
 
 ### Diagrama de Fluxo de Dados
 
-```
-Cliente → Requisição HTTP → Express Server → Middleware de Autenticação → Rota → Controlador → Serviço → Modelo → MongoDB
-   ↑                                                                                                ↓
-   └────────────────────── Resposta HTTP ← Template EJS ← Dados processados ←─────────────────────┘
-```
+![Diagrama de Fluxo de Dados](public/img/flow-diagram.png)
 
-## Contribuição
-
-1. Faça um fork do projeto
-2. Crie sua branch de feature (`git checkout -b feature/NovoRecurso`)
-3. Commit suas alterações (`git commit -m 'Adiciona novo recurso'`)
-4. Push para a branch (`git push origin feature/NovoRecurso`)
-5. Abra um Pull Request
-
-## Licença
-
-Este projeto está licenciado sob a Licença ISC - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Contato
 
-Marcos - [contato@email.com](mailto:mar.stark.99@gmail.com)
+Marcos - [mar.stark.88@gmail.com](mailto:mar.stark.99@gmail.com)
 
-Link do projeto: [https://github.com/seu-usuario/PrisionBlack](https://github.com/seu-usuario/PrisionBlack)
+Link do projeto: [https://github.com/Marcos-Ramoss/PrisionBlack](https://github.com/Marcos-Ramoss/PrisionBlack)
 
 
