@@ -1,44 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Celas</title>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Estilo Personalizado -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/themeGlobal.css">
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
   <style>
     .animated-button {
       transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
+
     .animated-button:hover {
-      transform: scale(1.1); /* Aumenta o tamanho do botão */
-      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3); /* Adiciona sombra */
+      transform: scale(1.1);
+      /* Aumenta o tamanho do botão */
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3);
+      /* Adiciona sombra */
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
 
   <!-- Main Content -->
   <div class="container mt-5">
-    <div class="row">
-      <div class="col-12">
-        <h1 class="mb-4">Lista de Celas</h1>
+    <!-- Título com Botões -->
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-6">
+        <h1><i class="fa-solid fa-door-closed me-2"></i> Lista de Celas</h1>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="/celas/cadastrar" class="btn btn-danger">
+          <i class="fa-solid fa-plus me-2"></i> Cadastrar Cela
+        </a>
+      </div>
+    </div>
 
-        <!-- Botão Cadastrar Cela -->
-        <div class="text-end mb-4">
-          <a href="/celas/cadastrar" class="btn btn-danger animated-button">
-            <i class="fa-solid fa-plus"></i> Cadastrar Cela
-          </a>
+    <!-- Filtros -->
+    <div class="row search-and-filters mb-4">
+      <div class="col-md-4 mb-3 mb-md-0">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
+          <input type="text" id="searchInput" class="form-control" placeholder="Buscar cela...">
         </div>
+      </div>
+      <div class="col-md-3 mb-3 mb-md-0">
+        <select class="form-select" id="filterPavilhao">
+          <option value="">Todos os Pavilhões</option>
+          <option value="A">Pavilhão A</option>
+          <option value="B">Pavilhão B</option>
+          <option value="C">Pavilhão C</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-3 mb-md-0">
+        <select class="form-select" id="filterOcupacao">
+          <option value="">Ocupação (Todas)</option>
+          <option value="disponivel">Vagas Disponíveis</option>
+          <option value="cheia">Lotação Completa</option>
+        </select>
+      </div>
+      <div class="col-md-2 text-end">
+        <button type="button" id="btnResetFilters" class="btn btn-secondary">
+          <i class="fa-solid fa-rotate"></i> Limpar
+        </button>
+      </div>
+    </div>
 
-        <!-- Tabela de Celas -->
+    <!-- Tabela de Celas -->
+    <div class="card shadow mb-4">
+      <div class="card-body">
         <div class="table-responsive">
-          <table class="table theme-table table-striped table-hover align-middle">
+          <table class="table table-striped theme-table" id="tabela-celas">
             <thead>
               <tr>
                 <th class="text-center" style="width: 100px;">Código</th>
@@ -50,37 +89,37 @@
             </thead>
             <tbody>
               <% if (celas.length > 0) { %>
-                <% celas.forEach(cela => { %>
-                  <tr>
-                    <td class="text-center"><%= cela.codigo %></td>
-                    <td class="text-center">Pavilhão <%= cela.pavilhao %></td>
-                    <td class="text-center"><%= cela.capacidade %></td>
-                    <td class="text-center">
-                      <div class="d-flex flex-column align-items-center">
-                        <span class="badge <%= cela.ocupantes.length >= cela.capacidade ? 'bg-danger' : 'bg-success' %> mb-1">
-                          <%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes
-                        </span>
-                      </div>
-                    </td>
-                    <td class="text-center">
-                      <div class="btn-group" role="group">
-                        <a href="/alocacao/detalhes" class="btn btn-primary btn-sm me-1">
-                          <i class="fa-solid fa-user-plus"></i> Alocar
-                        </a>
-                        <a href="/celas/<%= cela._id %>/editar" class="btn btn-primary btn-sm me-1">
-                          <i class="fa-solid fa-pen-to-square"></i> Editar
-                        </a>
-                        <a href="/celas/<%= cela._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta Cela?');">
-                          <i class="fa-solid fa-trash"></i> Excluir
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                <% }) %>
+              <% celas.forEach(cela => { %>
+              <tr>
+                <td class="text-center"><%= cela.codigo %></td>
+                <td class="text-center">Pavilhão <%= cela.pavilhao %></td>
+                <td class="text-center"><%= cela.capacidade %></td>
+                <td class="text-center">
+                  <div class="d-flex flex-column align-items-center">
+                    <span class="badge <%= cela.ocupantes.length >= cela.capacidade ? 'theme-badge-cela' : 'theme-badge-sem-cela' %> theme-badge mb-1">
+                      <%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes
+                    </span>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group" role="group">
+                    <a href="/alocacao/detalhes" class="btn btn-primary btn-sm me-1">
+                      <i class="fa-solid fa-user-plus"></i> Alocar
+                    </a>
+                    <a href="/celas/<%= cela._id %>/editar" class="btn btn-primary btn-sm me-1">
+                      <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </a>
+                    <a href="/celas/<%= cela._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta Cela?');">
+                      <i class="fa-solid fa-trash"></i> Excluir
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
               <% } else { %>
-                <tr>
-                  <td colspan="5" class="text-center">Nenhuma cela cadastrada.</td>
-                </tr>
+              <tr>
+                <td colspan="5" class="text-center">Nenhuma cela cadastrada.</td>
+              </tr>
               <% } %>
             </tbody>
           </table>
@@ -94,5 +133,79 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Script para filtros -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      const filterPavilhao = document.getElementById('filterPavilhao');
+      const filterOcupacao = document.getElementById('filterOcupacao');
+      const btnResetFilters = document.getElementById('btnResetFilters');
+      
+      // Adicionar eventos de filtro
+      if (searchInput) {
+        searchInput.addEventListener('keyup', applyFilters);
+      }
+      
+      if (filterPavilhao) {
+        filterPavilhao.addEventListener('change', applyFilters);
+      }
+      
+      if (filterOcupacao) {
+        filterOcupacao.addEventListener('change', applyFilters);
+      }
+      
+      if (btnResetFilters) {
+        btnResetFilters.addEventListener('click', resetFilters);
+      }
+      
+      function resetFilters() {
+        searchInput.value = '';
+        filterPavilhao.value = '';
+        filterOcupacao.value = '';
+        applyFilters();
+      }
+      
+      function applyFilters() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const pavilhaoValue = filterPavilhao.value;
+        const ocupacaoValue = filterOcupacao.value;
+        const tableRows = document.querySelectorAll('#tabela-celas tbody tr');
+        
+        tableRows.forEach(row => {
+          let showRow = true;
+          
+          // Filtro de busca por texto
+          if (searchTerm) {
+            const codigo = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            const pavilhao = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            if (!codigo.includes(searchTerm) && !pavilhao.includes(searchTerm)) {
+              showRow = false;
+            }
+          }
+          
+          // Filtro por pavilhão
+          if (pavilhaoValue && !row.querySelector('td:nth-child(2)').textContent.includes(pavilhaoValue)) {
+            showRow = false;
+          }
+          
+          // Filtro por ocupação
+          if (ocupacaoValue) {
+            const ocupantesText = row.querySelector('td:nth-child(4)').textContent;
+            const [atual, capacidade] = ocupantesText.match(/(\d+)\/(\d+)/).slice(1).map(Number);
+            
+            if (ocupacaoValue === 'disponivel' && atual >= capacidade) {
+              showRow = false;
+            } else if (ocupacaoValue === 'cheia' && atual < capacidade) {
+              showRow = false;
+            }
+          }
+          
+          row.style.display = showRow ? '' : 'none';
+        });
+      }
+    });
+  </script>
 </body>
+
 </html>

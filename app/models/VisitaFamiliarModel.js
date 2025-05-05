@@ -5,6 +5,7 @@ const VisitaFamiliarSchema = new mongoose.Schema({
   nomeFamiliar: { type: String, required: true }, // Nome do familiar
   relacao: { type: String, required: true }, // Relação com o detento (pai, mãe, irmão, etc.)
   dataVisita: { type: Date, required: true }, // Data da visita
+  horaVisita: { type: String, required: true }, // Hora da visita (formato HH:MM)
   observacoes: { type: String } // Observações adicionais
 });
 

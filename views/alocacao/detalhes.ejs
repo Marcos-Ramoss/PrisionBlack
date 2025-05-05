@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alocação de Detentos</title>
-  
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
@@ -13,16 +14,19 @@
     .animated-button {
       transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
+
     .animated-button:hover {
       transform: scale(1.1);
       box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3);
     }
+
     .foto-detento {
       width: 50px;
       height: 50px;
       object-fit: cover;
       cursor: pointer;
     }
+
     .alert {
       display: none;
       position: fixed;
@@ -32,10 +36,11 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
-  
+
 
   <!-- Alert para mensagens -->
   <div class="alert alert-success" role="alert" id="successAlert"></div>
@@ -57,14 +62,14 @@
                   <select class="form-select" id="detentoId" name="detentoId" required>
                     <option value="">Selecione um detento</option>
                     <% detentos.forEach(detento => { %>
-                      <option value="<%= detento._id %>">
-                        <%= detento.nome %> 
-                        <% if (detento.cela) { %>
-                          (Atual: <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>)
-                        <% } else { %>
-                          (Sem cela)
-                        <% } %>
-                      </option>
+                    <option value="<%= detento._id %>">
+                      <%= detento.nome %>
+                      <% if (detento.cela) { %>
+                      (Atual: <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>)
+                      <% } else { %>
+                      (Sem cela)
+                      <% } %>
+                    </option>
                     <% }) %>
                   </select>
                 </div>
@@ -73,12 +78,10 @@
                   <select class="form-select" id="celaId" name="celaId" required>
                     <option value="">Selecione uma cela</option>
                     <% celas.forEach(cela => { %>
-                      <option value="<%= cela._id %>" 
-                              data-capacidade="<%= cela.capacidade %>"
-                              data-ocupantes="<%= cela.ocupantes.length %>">
-                        <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %> 
-                        (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
-                      </option>
+                    <option value="<%= cela._id %>" data-capacidade="<%= cela.capacidade %>" data-ocupantes="<%= cela.ocupantes.length %>">
+                      <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %>
+                      (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
+                    </option>
                     <% }) %>
                   </select>
                 </div>
@@ -106,43 +109,43 @@
             </thead>
             <tbody>
               <% if (detentos.length > 0) { %>
-                <% detentos.forEach(detento => { %>
-                  <tr>
-                    <td class="text-center">
-                      <% if (detento.foto) { %>
-                        <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento">
-                      <% } else { %>
-                        <span>N/A</span>
-                      <% } %>
-                    </td>
-                    <td class="text-center"><%= detento.nome %></td>
-                    <td class="text-center"><%= detento.idade %></td>
-                    <td class="text-center">
-                      <% if (detento.cela) { %>
-                        <span class="badge bg-info">
-                          <i class="fa-solid fa-door-closed me-1"></i>
-                          <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
-                        </span>
-                      <% } else { %>
-                        <span class="badge bg-secondary">
-                          <i class="fa-solid fa-door-open me-1"></i>
-                          Sem cela
-                        </span>
-                      <% } %>
-                    </td>
-                    <td class="text-center">
-                      <% if (detento.cela) { %>
-                        <span class="badge bg-success">Alocado</span>
-                      <% } else { %>
-                        <span class="badge bg-warning">Sem Alocação</span>
-                      <% } %>
-                    </td>
-                  </tr>
-                <% }) %>
+              <% detentos.forEach(detento => { %>
+              <tr>
+                <td class="text-center">
+                  <% if (detento.foto) { %>
+                  <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento">
+                  <% } else { %>
+                  <span>N/A</span>
+                  <% } %>
+                </td>
+                <td class="text-center"><%= detento.nome %></td>
+                <td class="text-center"><%= detento.idade %></td>
+                <td class="text-center">
+                  <% if (detento.cela) { %>
+                  <span class="badge bg-info">
+                    <i class="fa-solid fa-door-closed me-1"></i>
+                    <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
+                  </span>
+                  <% } else { %>
+                  <span class="badge bg-secondary">
+                    <i class="fa-solid fa-door-open me-1"></i>
+                    Sem cela
+                  </span>
+                  <% } %>
+                </td>
+                <td class="text-center">
+                  <% if (detento.cela) { %>
+                  <span class="badge bg-success">Alocado</span>
+                  <% } else { %>
+                  <span class="badge bg-warning">Sem Alocação</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
               <% } else { %>
-                <tr>
-                  <td colspan="5" class="text-center">Nenhum detento cadastrado.</td>
-                </tr>
+              <tr>
+                <td colspan="5" class="text-center">Nenhum detento cadastrado.</td>
+              </tr>
               <% } %>
             </tbody>
           </table>
@@ -160,16 +163,16 @@
   <script>
     document.getElementById('alocacaoForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const detentoId = document.getElementById('detentoId').value;
       const celaId = document.getElementById('celaId').value;
       const celaSelect = document.getElementById('celaId');
       const celaOption = celaSelect.options[celaSelect.selectedIndex];
-      
+
       // Verificar se a cela está cheia
       const capacidade = parseInt(celaOption.dataset.capacidade);
       const ocupantes = parseInt(celaOption.dataset.ocupantes);
-      
+
       if (ocupantes >= capacidade) {
         showAlert('error', 'Esta cela está com capacidade máxima');
         return;
@@ -181,7 +184,10 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ detentoId, celaId })
+          body: JSON.stringify({
+            detentoId,
+            celaId
+          })
         });
 
         const data = await response.json();
@@ -204,11 +210,12 @@
       const alert = document.getElementById(`${type}Alert`);
       alert.textContent = message;
       alert.style.display = 'block';
-      
+
       setTimeout(() => {
         alert.style.display = 'none';
       }, 3000);
     }
   </script>
 </body>
+
 </html>

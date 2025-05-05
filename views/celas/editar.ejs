@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,20 +11,25 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <!-- Estilo Personalizado -->
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
+  <link rel="stylesheet" href="/css/themeGlobal.css">
+  <link rel="stylesheet" href="/css/detentos.css">
 
   <style>
     .form-container {
       max-width: 800px;
       margin: 0 auto;
     }
+
     .btn-danger {
       transition: transform 0.3s ease-in-out;
     }
+
     .btn-danger:hover {
       transform: scale(1.05);
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
@@ -36,24 +42,28 @@
         <h1 class="text-center mb-4">Editar Cela</h1>
 
         <!-- Formulário -->
-        <form action="/celas/<%= cela._id %>/editar" method="POST">
+        <form action="/celas/<%= cela._id %>/editar" method="POST" class="theme-form border p-4 rounded">
           <div class="row">
             <!-- Código da Cela -->
             <div class="col-md-6 mb-3">
               <label for="codigo" class="form-label"><i class="fa-solid fa-door-closed me-2"></i> Código da Cela</label>
-              <input type="text" class="form-control" id="codigo" name="codigo" value="<%= cela.codigo %>" required>
+              <input type="text" class="form-control form-control-sm" id="codigo" name="codigo" value="<%= cela.codigo %>" required pattern="^[A-Za-z0-9-]{1,10}$" title="Digite um código válido (letras, números e hífen)">
             </div>
 
             <!-- Pavilhão -->
             <div class="col-md-6 mb-3">
               <label for="pavilhao" class="form-label"><i class="fa-solid fa-building me-2"></i> Pavilhão</label>
-              <input type="text" class="form-control" id="pavilhao" name="pavilhao" value="<%= cela.pavilhao %>" required>
+              <select class="form-select form-select-sm" id="pavilhao" name="pavilhao" required>
+                <option value="A" <%= cela.pavilhao === 'A' ? 'selected' : '' %>>Pavilhão A</option>
+                <option value="B" <%= cela.pavilhao === 'B' ? 'selected' : '' %>>Pavilhão B</option>
+                <option value="C" <%= cela.pavilhao === 'C' ? 'selected' : '' %>>Pavilhão C</option>
+              </select>
             </div>
 
             <!-- Capacidade -->
             <div class="col-md-6 mb-3">
               <label for="capacidade" class="form-label"><i class="fa-solid fa-users me-2"></i> Capacidade</label>
-              <input type="number" class="form-control" id="capacidade" name="capacidade" value="<%= cela.capacidade %>" required>
+              <input type="number" class="form-control form-control-sm" id="capacidade" name="capacidade" value="<%= cela.capacidade %>" required min="1" max="20" title="A capacidade deve estar entre 1 e 20 detentos">
             </div>
           </div>
 
@@ -64,6 +74,13 @@
             </button>
           </div>
         </form>
+
+        <!-- Botão Retornar -->
+        <div class="text-center mt-3">
+          <a href="/celas/lista" class="btn btn-danger w-50">
+            <i class="fa-solid fa-arrow-left me-2"></i> Voltar para Lista
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -74,4 +91,5 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

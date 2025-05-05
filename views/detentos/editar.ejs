@@ -10,99 +10,150 @@
   <!-- Font Awesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <!-- Estilo Personalizado -->
-  <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
+  <style>
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
 
+    .btn-danger {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .btn-danger:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
 
-    <!-- Main Content -->
-    <div class="container mt-5">
-      <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10 form-container">
-          <!-- Título Centralizado -->
-          <h1 class="text-center mb-4">Editar Detento</h1>
+  <!-- Main Content -->
+  <div class="container mt-5 ">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10 form-container">
+        <!-- Título Centralizado -->
+        <h1 class="text-center mb-4">Editar Detento</h1>
 
-          <!-- Formulário -->
-          <form action="/detentos/<%= detento._id %>/editar" method="POST" enctype="multipart/form-data">
-            <div class="row">
-              <!-- Nome -->
-              <div class="col-md-6 mb-3">
-                <label for="nome" class="form-label"><i class="fa-solid fa-user me-2"></i> Nome</label>
-                <input type="text" class="form-control" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma filiação válida (3 a 50 caracteres) somente letras" value="<%= detento.nome %>" required>
-              </div>
-
-              <!-- Idade -->
-              <div class="col-md-6 mb-3">
-                <label for="idade" class="form-label"><i class="fa-solid fa-calendar-days me-2"></i> Idade</label>
-                <input type="number" class="form-control" id="idade" required min="18" max="120" title="A idade deve estar entre 18 e 120 anos" name="idade" value="<%= detento.idade %>" required>
-              </div>
-
-              <!-- Filiação -->
-              <div class="col-md-6 mb-3">
-                <label for="filiacao" class="form-label"><i class="fa-solid fa-users me-2"></i> Filiação</label>
-                <input type="text" class="form-control" id="filiacao" name="filiacao" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma filiação válida (3 a 50 caracteres) somente letras" value="<%= detento.filiacao %>"
-                  required>
-              </div>
-
-              <!-- Estado Civil -->
-              <div class="col-md-6 mb-3">
-                <label for="estadoCivil" class="form-label"><i class="fa-solid fa-heart me-2"></i> Estado Civil</label>
-                <select class="form-select" id="estadoCivil" name="estadoCivil" required>
-                  <option value="solteiro" <%=detento.estadoCivil==='solteiro' ? 'selected' : '' %>>Solteiro(a)</option>
-                  <option value="casado" <%=detento.estadoCivil==='casado' ? 'selected' : '' %>>Casado(a)</option>
-                  <option value="divorciado" <%=detento.estadoCivil==='divorciado' ? 'selected' : '' %>>Divorciado(a)
-                  </option>
-                  <option value="viuvo" <%=detento.estadoCivil==='viuvo' ? 'selected' : '' %>>Viúvo(a)</option>
-                </select>
-              </div>
-
-            
-                  <!-- Nova Foto -->
-                  <div class="mb-3">
-                    <label for="novaFoto" class="form-label">Nova Foto</label>
-                    <input type="file" class="form-control" id="novaFoto" name="foto" accept="image/*">
-                  </div>
-
-                  <!-- Reincidência -->
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label"><i class="fa-solid fa-repeat me-2"></i> Reincidência</label>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="reincidencia" name="reincidencia" value="true"
-                        <%=detento.reincidencia ? 'checked' : '' %>>
-                      <label class="form-check-label" for="reincidencia">Sim</label>
-                    </div>
-                  </div>
-
-                  <!-- Crimes -->
-                  <div class="col-md-12 mb-3">
-                    <label for="crimes" class="form-label"><i class="fa-solid fa-gavel me-2"></i> Crimes
-                      Cometidos</label>
-                    <textarea class="form-control" id="crimes" name="crimes"
-                      rows="3" required minlength="10" maxlength="500" title="Descreva os crimes com pelo menos 10 caracteres e no máximo 500"><%= detento.crimes.join(', ') %></textarea>
-                  </div>
-            </div>
-
-            <!-- Botão de Envio -->
-            <div class="text-center mt-4">
-              <button type="submit" class="btn btn-danger w-50">
-                <i class="fa-solid fa-save me-2"></i> Salvar Alterações
-              </button>
-            </div>
-          </form>
+        <!-- Mensagem de Erro -->
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <% } %>
+
+        <!-- Formulário -->
+        <form action="/detentos/<%= detento._id %>/editar" method="POST" enctype="multipart/form-data" class="theme-form border p-4 rounded" onsubmit="return validateForm()">
+          <div class="row">
+            <!-- Nome -->
+            <div class="col-md-6 mb-3">
+              <label for="nome" class="form-label">
+                <i class="fa-solid fa-user me-2"></i> Nome
+              </label>
+              <input type="text" class="form-control form-control-sm" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite um nome válido (3 a 50 caracteres) somente letras" value="<%= detento.nome %>">
+            </div>
+
+            <!-- Idade -->
+            <div class="col-md-6 mb-3">
+              <label for="idade" class="form-label"><i class="fa-solid fa-calendar-days me-2"></i> Idade</label>
+              <input type="number" class="form-control form-control-sm" id="idade" name="idade" required min="18" max="120" title="A idade deve estar entre 18 e 120 anos" value="<%= detento.idade %>">
+            </div>
+
+            <!-- Filiação -->
+            <div class="col-md-6 mb-3">
+              <label for="filiacao" class="form-label"><i class="fa-solid fa-users me-2"></i> Filiação</label>
+              <input type="text" class="form-control form-control-sm" id="filiacao" name="filiacao" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma filiação válida (3 a 50 caracteres) somente letras" value="<%= detento.filiacao %>">
+            </div>
+
+            <!-- Estado Civil -->
+            <div class="col-md-6 mb-3">
+              <label for="estadoCivil" class="form-label"><i class="fa-solid fa-heart me-2"></i> Estado Civil</label>
+              <select class="form-select form-select-sm" id="estadoCivil" name="estadoCivil" required>
+                <option value="solteiro" <%=detento.estadoCivil==='solteiro' ? 'selected' : '' %>>Solteiro(a)</option>
+                <option value="casado" <%=detento.estadoCivil==='casado' ? 'selected' : '' %>>Casado(a)</option>
+                <option value="divorciado" <%=detento.estadoCivil==='divorciado' ? 'selected' : '' %>>Divorciado(a)</option>
+                <option value="viuvo" <%=detento.estadoCivil==='viuvo' ? 'selected' : '' %>>Viúvo(a)</option>
+              </select>
+            </div>
+
+            <!-- Foto -->
+            <div class="col-md-6 mb-3">
+              <label for="foto" class="form-label"><i class="fa-solid fa-image me-2"></i> Nova Foto</label>
+              <input type="file" class="form-control form-control-sm" id="foto" name="foto" accept="image/*">
+              <% if (detento.foto) { %>
+              <div class="mt-2">
+                <img src="/uploads/<%= detento.foto %>" alt="Foto atual" class="img-thumbnail" style="max-height: 100px;">
+                <small class="text-muted d-block">Foto atual</small>
+              </div>
+              <% } %>
+            </div>
+
+            <!-- Reincidência -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label"><i class="fa-solid fa-repeat me-2"></i> Reincidência</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="reincidencia" name="reincidencia" value="true" <%=detento.reincidencia ? 'checked' : '' %>>
+                <label class="form-check-label" for="reincidencia">Sim</label>
+              </div>
+            </div>
+
+            <!-- Crimes -->
+            <div class="col-md-12 mb-3">
+              <label for="crimes" class="form-label"><i class="fa-solid fa-gavel me-2"></i> Crimes Cometidos</label>
+              <textarea class="form-control form-control-sm" id="crimes" name="crimes" rows="3" placeholder="Descreva os crimes cometidos" required minlength="10" maxlength="500" title="Descreva os crimes com pelo menos 10 caracteres e no máximo 500"><%= detento.crimes && detento.crimes.length ? detento.crimes.join(', ') : '' %></textarea>
+            </div>
+
+            <!-- Cela -->
+            <div class="col-md-12 mb-3">
+              <label for="cela" class="form-label">
+                <i class="fa-solid fa-door-closed me-2"></i> Cela Atual
+              </label>
+              <% if (detento.cela) { %>
+              <div class="alert alert-info">
+                <i class="fa-solid fa-info-circle me-2"></i>
+                Cela atual: <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
+              </div>
+              <p class="text-muted small">Para transferir o detento de cela, use a opção "Transferir" na lista de detentos.</p>
+              <% } else { %>
+              <div class="alert alert-warning">
+                <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                Este detento não está alocado em nenhuma cela.
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Botão de Envio -->
+          <div class="text-center mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn btn-danger w-50 me-2">
+              <i class="fa-solid fa-save me-2"></i> Salvar Alterações
+            </button>
+            <a href="/detentos" class="animated-button btn btn-secondary w-50">
+              <i class="fa-solid fa-list me-2"></i> Retornar à Lista de Detentos
+            </a>
+          </div>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Footer -->
-    <%- include('../partials/footer') %>
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
 
-      <!-- Bootstrap JS -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Validação do formulário
+    function validateForm() {
+      return true; // Implementar validações personalizadas se necessário
+    }
+  </script>
 </body>
 
 </html>

@@ -5,6 +5,7 @@ const { authenticate, authorize } = require('../middlewares/authMiddleware');
 const session = require('../middlewares/autenticate');
 const UserModel = require('../models/UserModel');
 
+
 // Rota para verificar usuários existentes (apenas para debug)
 router.get('/check-users', async (req, res) => {
   try {
@@ -45,8 +46,8 @@ router.post('/register', AuthController.registrar);
 
 router.get('/logout', AuthController.logout);
 
-router.get('/sobre-nos', (req, res) => {
-  res.render('sobre-nos'); 
+router.get('/sobre-nos', authenticate, authorize('ADMIN', 'INSPETOR', 'DIRETOR'), (req, res) => {
+  res.render('sobre-nos', { user: req.session.user }); 
 });
 
 module.exports = router;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('partials/navbar', { user }) %>
@@ -43,11 +45,11 @@
           <h4>Detentos</h4>
           <p>Cadastre informações de detentos.</p>
           <% if (user) { %>
-            <a href="/detentos/cadastro" class="btn btn-danger">Cadastrar Detentos</a>
+          <a href="/detentos/cadastro" class="btn btn-danger">Cadastrar Detentos</a>
           <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Cadastrar
-            </button>
+          <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Entrar para Cadastrar
+          </button>
           <% } %>
         </div>
       </div>
@@ -59,11 +61,11 @@
           <h4>Detentos</h4>
           <p>Lista de detentos cadastrados.</p>
           <% if (user) { %>
-            <a href="/detentos/lista" class="btn btn-danger">Ver Detentos</a>
+          <a href="/detentos/lista" class="btn btn-danger">Ver Detentos</a>
           <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Ver Detentos
-            </button>
+          <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Entrar para Ver Detentos
+          </button>
           <% } %>
         </div>
       </div>
@@ -75,15 +77,15 @@
           <h4>Celas</h4>
           <p>Aloque detentos em celas e pavilhões.</p>
           <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
-            <a href="/celas/lista" class="btn btn-danger">Ver Celas</a>
+          <a href="/celas/lista" class="btn btn-danger">Ver Celas</a>
           <% } else if (user) { %>
-            <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
-              Acesso Negado
-            </button>
+          <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
+            Acesso Negado
+          </button>
           <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Ver Celas
-            </button>
+          <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Entrar para Ver Celas
+          </button>
           <% } %>
         </div>
       </div>
@@ -95,34 +97,19 @@
           <h4>Relatórios</h4>
           <p>Gerar relatórios de ocupação e atividades.</p>
           <% if (user && ['ADMIN', 'DIRETOR'].includes(user.nivelAcesso)) { %>
-            <a href="/relatorios/ocupacao" class="btn btn-danger">Ver Relatórios</a>
+          <a href="/relatorios/ocupacao" class="btn btn-danger">Ver Relatórios</a>
           <% } else if (user) { %>
-            <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
-              Acesso Negado
-            </button>
+          <button class="btn btn-danger disabled" title="Você não tem permissão para acessar esta funcionalidade.">
+            Acesso Negado
+          </button>
           <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Ver Relatórios
-            </button>
+          <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Entrar para Ver Relatórios
+          </button>
           <% } %>
         </div>
       </div>
 
-      <!-- Visitas Advogado -->
-      <div class="col-md-4">
-        <div class="card card-custom text-center p-4">
-          <i class="fa-solid fa-gavel fa-3x mb-3"></i>
-          <h4>Advogados</h4>
-          <p>Gerencie visitas de advogados.</p>
-          <% if (user) { %>
-            <a href="/visitasAdvogado/lista" class="btn btn-danger">Ver Visitas Advogados</a>
-          <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Ver Visitas Advogados
-            </button>
-          <% } %>
-        </div>
-      </div>
 
       <!-- Visitas Familiares -->
       <div class="col-md-4">
@@ -131,11 +118,11 @@
           <h4>Familiares</h4>
           <p>Gerencie visitas de familiares.</p>
           <% if (user) { %>
-            <a href="/visitas/lista" class="btn btn-danger">Ver Visitas Familiares</a>
+          <a href="/visitas/lista" class="btn btn-danger">Ver Visitas Familiares</a>
           <% } else { %>
-            <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
-              Entrar para Ver Visitas Familiares
-            </button>
+          <button class="btn btn-danger open-login-modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Entrar para Ver Visitas Familiares
+          </button>
           <% } %>
         </div>
       </div>
@@ -152,4 +139,5 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

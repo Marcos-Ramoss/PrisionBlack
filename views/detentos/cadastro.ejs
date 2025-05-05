@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,14 +18,17 @@
       max-width: 800px;
       margin: 0 auto;
     }
+
     .btn-danger {
       transition: transform 0.3s ease-in-out;
     }
+
     .btn-danger:hover {
       transform: scale(1.05);
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
@@ -39,10 +43,10 @@
 
         <!-- Mensagem de Erro -->
         <% if (typeof error !== 'undefined' && error) { %>
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <% } %>
 
         <!-- Formulário -->
@@ -53,27 +57,21 @@
               <label for="nome" class="form-label">
                 <i class="fa-solid fa-user me-2"></i> Nome
               </label>
-              <input type="text" 
-                     class="form-control form-control-sm" 
-                     id="nome" 
-                     name="nome" 
-                     required 
-                     pattern="^[A-Za-zÀ-ú\s]{3,50}$" 
-                     title="Digite um nome válido (3 a 50 caracteres) somente letras">
+              <input type="text" class="form-control form-control-sm" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite um nome válido (3 a 50 caracteres) somente letras">
             </div>
-        
+
             <!-- Idade -->
             <div class="col-md-6 mb-3">
               <label for="idade" class="form-label"><i class="fa-solid fa-calendar-days me-2"></i> Idade</label>
               <input type="number" class="form-control form-control-sm" id="idade" name="idade" required min="18" max="120" title="A idade deve estar entre 18 e 120 anos">
             </div>
-        
+
             <!-- Filiação -->
             <div class="col-md-6 mb-3">
               <label for="filiacao" class="form-label"><i class="fa-solid fa-users me-2"></i> Filiação</label>
               <input type="text" class="form-control form-control-sm" id="filiacao" name="filiacao" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma filiação válida (3 a 50 caracteres) somente letras">
             </div>
-        
+
             <!-- Estado Civil -->
             <div class="col-md-6 mb-3">
               <label for="estadoCivil" class="form-label"><i class="fa-solid fa-heart me-2"></i> Estado Civil</label>
@@ -84,13 +82,13 @@
                 <option value="viuvo">Viúvo(a)</option>
               </select>
             </div>
-        
+
             <!-- Foto -->
             <div class="col-md-6 mb-3">
               <label for="foto" class="form-label"><i class="fa-solid fa-image me-2"></i> Foto</label>
               <input type="file" class="form-control form-control-sm" id="foto" name="foto" accept="image/*">
             </div>
-        
+
             <!-- Reincidência -->
             <div class="col-md-6 mb-3">
               <label class="form-label"><i class="fa-solid fa-repeat me-2"></i> Reincidência</label>
@@ -99,7 +97,7 @@
                 <label class="form-check-label" for="reincidencia">Sim</label>
               </div>
             </div>
-        
+
             <!-- Crimes -->
             <div class="col-md-12 mb-3">
               <label for="crimes" class="form-label"><i class="fa-solid fa-gavel me-2"></i> Crimes Cometidos</label>
@@ -114,27 +112,26 @@
               <select class="form-select form-select-sm" id="cela" name="cela">
                 <option value="">Selecione uma cela</option>
                 <% if (celas && celas.length > 0) { %>
-                  <% celas.forEach(cela => { %>
-                    <option value="<%= cela._id %>" 
-                            <%= cela.ocupantes.length >= cela.capacidade ? 'disabled' : '' %>>
-                      <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %> 
-                      (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
-                    </option>
-                  <% }); %>
+                <% celas.forEach(cela => { %>
+                <option value="<%= cela._id %>" <%= cela.ocupantes.length >= cela.capacidade ? 'disabled' : '' %>>
+                  <%= cela.codigo %> - Pavilhão <%= cela.pavilhao %>
+                  (<%= cela.ocupantes.length %>/<%= cela.capacidade %> ocupantes)
+                </option>
+                <% }); %>
                 <% } else { %>
-                  <option disabled>Nenhuma cela disponível</option>
+                <option disabled>Nenhuma cela disponível</option>
                 <% } %>
               </select>
               <small class="text-muted">Celas cheias não aparecem na lista</small>
             </div>
           </div>
-        
+
           <!-- Botão de Envio -->
-          <div class="text-center mt-4">
-            <button type="submit" class="btn btn-danger w-50">
+          <div class="text-center mt-4 d-flex justify-content-center">
+            <button type="submit" class="btn btn-danger w-50 me-2">
               <i class="fa-solid fa-save me-2"></i> Cadastrar Detento
             </button>
-            <a href="/detentos/lista" class="animated-button btn btn-danger w-50">
+            <a href="/detentos/lista" class="animated-button btn btn-secondary w-50">
               <i class="fa-solid fa-list me-2"></i> Retornar à Lista de Detentos
             </a>
           </div>
@@ -149,4 +146,5 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

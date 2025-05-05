@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
@@ -45,16 +47,16 @@
       </thead>
       <tbody>
         <% cela.ocupantes.forEach(ocupante => { %>
-          <tr>
-            <td><%= ocupante.nome %></td>
-            <td>
-              <form action="/alocacao/<%= cela._id %>/remover/<%= ocupante._id %>" method="POST" style="display: inline;">
-                <button type="submit" class="btn btn-danger btn-sm">
-                  <i class="fa-solid fa-user-minus"></i> Remover
-                </button>
-              </form>
-            </td>
-          </tr>
+        <tr>
+          <td><%= ocupante.nome %></td>
+          <td>
+            <form action="/alocacao/<%= cela._id %>/remover/<%= ocupante._id %>" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-user-minus"></i> Remover
+              </button>
+            </form>
+          </td>
+        </tr>
         <% }); %>
       </tbody>
     </table>
@@ -68,7 +70,7 @@
           <label for="detentoId" class="form-label">Detento</label>
           <select class="form-select" id="detentoId" name="detentoId" required>
             <% detentosDisponiveis.forEach(detento => { %>
-              <option value="<%= detento._id %>"><%= detento.nome %></option>
+            <option value="<%= detento._id %>"><%= detento.nome %></option>
             <% }); %>
           </select>
         </div>
@@ -92,4 +94,5 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

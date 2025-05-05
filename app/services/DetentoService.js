@@ -6,7 +6,7 @@ const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
 class DetentoService {
   static async cadastrar(dados) {
     try {
-      const { nome, idade, filiacao, estadoCivil, foto, reincidencia, crimes, cela } = dados;
+      const { nome, idade, filiacao, estadoCivil, foto, reincidencia, crimes, cela, registradoPor, usuarioCadastro, comAlocacaoInicial } = dados;
 
       // Se uma cela foi selecionada, verifica se ela existe e tem capacidade
       if (cela) {
@@ -19,6 +19,17 @@ class DetentoService {
         }
       }
 
+      // Preparar entrada do histórico de alocação se for cadastrado diretamente na cela
+      let historicoAlocacao = [];
+      if (cela && comAlocacaoInicial) {
+        const celaExistente = await CelaModel.findById(cela);
+        historicoAlocacao.push({
+          data: new Date(),
+          celaCodigo: celaExistente ? `${celaExistente.pavilhao}/${celaExistente.codigo}` : 'Desconhecida',
+          usuarioAlocador: registradoPor || usuarioCadastro || 'Sistema'
+        });
+      }
+
       const novoDetento = new DetentoModel({
         nome,
         idade,
@@ -27,7 +38,13 @@ class DetentoService {
         foto,
         reincidencia,
         crimes,
-        cela
+        cela,
+        // Adicionar campos de registro
+        registradoPor: registradoPor || usuarioCadastro || 'Sistema',
+        usuarioCadastro: usuarioCadastro || registradoPor || 'Sistema',
+        dataRegistro: new Date(),
+        // Adicionar histórico de alocação se aplicável
+        historicoAlocacao: historicoAlocacao
       });
 
       const detentoSalvo = await novoDetento.save();

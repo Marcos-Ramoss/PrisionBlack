@@ -1,19 +1,18 @@
 // Função para calcular o tempo de carregamento baseado na velocidade da internet
 function calculateLoadingTime() {
-    // Por padrão, definimos um tempo mínimo de 3 segundos
+
     let loadingTime = 3000;
 
     // Usando a API Navigator.connection para detectar a velocidade da conexão (quando disponível)
     if (navigator.connection) {
         const connection = navigator.connection;
 
-        // Ajustar o tempo de carregamento baseado no tipo de conexão
         if (connection.effectiveType === '4g') {
-            loadingTime = 1500; // 3 segundos para conexões rápidas
+            loadingTime = 1500;
         } else if (connection.effectiveType === '3g') {
-            loadingTime = 2000; // 4 segundos para conexões médias
+            loadingTime = 2000;
         } else {
-            loadingTime = 3000; // 5 segundos para conexões lentas (2g ou menos)
+            loadingTime = 3000;
         }
     }
 
@@ -25,28 +24,24 @@ function createLoader() {
     const loaderContainer = document.createElement('div');
     loaderContainer.className = 'loader-container';
 
-    const loader = document.createElement('div');
-    loader.className = 'loader';
+    const loaderIcon = document.createElement('div');
+    loaderIcon.className = 'loader-icon';
+    loaderIcon.innerHTML = '<i class="fa-solid fa-gavel"></i>';
 
-    const loaderText = document.createElement('div');
-    loaderText.className = 'loader-text';
-    loaderText.innerHTML = '<i class="fa-solid fa-gavel"></i> Carregando...';
-
-    loaderContainer.appendChild(loader);
-    loaderContainer.appendChild(loaderText);
+    loaderContainer.appendChild(loaderIcon);
     document.body.appendChild(loaderContainer);
 
     return loaderContainer;
 }
 
-// Mostrar o loader
+
 function showLoader(loader) {
     if (loader) {
         loader.classList.remove('loader-hidden');
     }
 }
 
-// Esconder o loader
+
 function hideLoader(loader) {
     if (loader) {
         loader.classList.add('loader-hidden');
@@ -55,10 +50,9 @@ function hideLoader(loader) {
 
 // Configuração do loader global
 document.addEventListener('DOMContentLoaded', function () {
-    // Criar o loader ao carregar a página
+
     const loader = createLoader();
 
-    // Registrar página atual para detectar navegação
     let currentPage = window.location.href;
 
     // Esconder o loader após o carregamento inicial
@@ -74,25 +68,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (link && link.href && link.href.startsWith(window.location.origin) &&
             !link.hasAttribute('data-bs-toggle') &&
             !link.getAttribute('href').startsWith('#')) {
-            // É um link interno, não é um toggle de modal ou similar, e não é uma âncora
-            event.preventDefault();
 
-            // Mostrar o loader
+            event.preventDefault();
             showLoader(loader);
 
-            // Navegar para a página após o tempo de carregamento
             setTimeout(() => {
                 window.location.href = link.href;
             }, calculateLoadingTime());
         }
     });
 
-    // Lidar com navegação usando botões de voltar/avançar do navegador
+
     window.addEventListener('popstate', function () {
         if (currentPage !== window.location.href) {
             showLoader(loader);
 
-            // Recarregar a página após o tempo de carregamento
             setTimeout(() => {
                 window.location.reload();
             }, calculateLoadingTime());

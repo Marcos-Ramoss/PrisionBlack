@@ -1,0 +1,42 @@
+<!-- Visualização de Celas por Pavilhão -->
+<% if (pavilhaoSelecionado) { %>
+  <div class="pavilhao-header">
+    <h4>Pavilhão <%= pavilhaoSelecionado %></h4>
+    <span class="badge bg-primary"><%= celasFiltradas ? celasFiltradas.length : 0 %> Celas</span>
+  </div>
+  <% if (celasFiltradas && celasFiltradas.length > 0) { %>
+    <div class="cela-grid">
+      <% celasFiltradas.forEach(cela => { %>
+        <div class="cela-card <%= cela.ocupantes.length >= cela.capacidade ? 'cela-full' : 'cela-available' %>">
+          <div class="cela-card-header">
+            <strong><%= cela.codigo %></strong>
+            <span class="ocupantes-counter"><%= cela.ocupantes.length %>/<%= cela.capacidade %></span>
+          </div>
+          <div class="cela-card-body">
+            <% if (cela.ocupantes.length > 0) { %>
+              <small>Ocupantes:</small>
+              <div class="ocupante-list">
+                <% cela.ocupantes.slice(0, 2).forEach(ocupante => { %>
+                  <div class="ocupante-item"><%= ocupante.nome %></div>
+                <% }) %>
+                <% if (cela.ocupantes.length > 2) { %>
+                  <div class="ocupante-more">+<%= cela.ocupantes.length - 2 %> mais</div>
+                <% } %>
+              </div>
+            <% } else { %>
+              <div class="cela-empty">Cela vazia</div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="alert alert-info">
+      <i class="fa-solid fa-info-circle me-2"></i>Nenhuma cela encontrada no Pavilhão <%= pavilhaoSelecionado %>.
+    </div>
+  <% } %>
+<% } else { %>
+  <div class="alert alert-secondary">
+    <i class="fa-solid fa-hand-point-left me-2"></i>Selecione um pavilhão para visualizar as celas.
+  </div>
+<% } %> 

@@ -19,6 +19,9 @@ class DetentoController {
         const { nome, idade, filiacao, estadoCivil, reincidencia, crimes, cela } = req.body;
         const foto = req.file ? req.file.filename : null;
         
+        // Capturar informações do usuário atual
+        const usuarioAtual = req.session.user ? req.session.user.nome : 'Sistema';
+        
         const novoDetento = await DetentoService.cadastrar({
           nome,
           idade,
@@ -27,7 +30,12 @@ class DetentoController {
           foto,
           reincidencia: reincidencia === 'true',
           crimes: crimes.split(',').map((crime) => crime.trim()),
-          cela: cela || null
+          cela: cela || null,
+          // Adicionar informações sobre quem registrou
+          registradoPor: usuarioAtual,
+          usuarioCadastro: usuarioAtual,
+          // Se tem cela, adicionar ao histórico de alocação
+          comAlocacaoInicial: !!cela
         });
         
         // Redireciona para a lista de detentos após o cadastro bem-sucedido

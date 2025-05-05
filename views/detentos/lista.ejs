@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Detentos</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Estilo Personalizado -->
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
@@ -14,22 +17,33 @@
     .animated-button {
       transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
+
     .animated-button:hover {
-      transform: scale(1.1); 
-      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3); 
+      transform: scale(1.1);
+      box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3);
     }
 
     /* Animação para a foto */
     .foto-detento {
       transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-      cursor: pointer; /* Indica que é clicável */
+      cursor: pointer;
+      /* Indica que é clicável */
     }
+
     .foto-detento:hover {
-      transform: scale(1.1); /* Amplia a imagem */
-      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5); /* Adiciona sombra */
+      transform: scale(1.1);
+      /* Amplia a imagem */
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5);
+      /* Adiciona sombra */
+    }
+    
+    /* Estilo para a área de filtros */
+    .search-and-filters {
+      margin-bottom: 1.5rem;
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
@@ -46,10 +60,40 @@
             <i class="fa-solid fa-plus"></i> Cadastrar Detento
           </a>
         </div>
+        
+        <!-- Filtros -->
+        <div class="row search-and-filters mb-4">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fa-solid fa-search"></i></span>
+              <input type="text" id="searchInput" class="form-control" placeholder="Buscar detento...">
+            </div>
+          </div>
+          <div class="col-md-3 mb-3 mb-md-0">
+            <select class="form-select" id="filterPavilhao">
+              <option value="">Todos os Pavilhões</option>
+              <option value="A">Pavilhão A</option>
+              <option value="B">Pavilhão B</option>
+              <option value="C">Pavilhão C</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3 mb-md-0">
+            <select class="form-select" id="filterReincidencia">
+              <option value="">Reincidência (Todos)</option>
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </div>
+          <div class="col-md-2 text-end">
+            <button type="button" id="btnResetFilters" class="btn btn-secondary">
+              <i class="fa-solid fa-rotate"></i> Limpar
+            </button>
+          </div>
+        </div>
 
         <!-- Tabela de Detentos -->
         <div class="table-responsive">
-          <table class="table theme-table table-striped table-hover align-middle">
+          <table class="table theme-table table-striped table-hover align-middle" id="tabela-detentos">
             <thead class="table-dark">
               <tr>
                 <th class="text-center" style="width: 80px;">Foto</th>
@@ -65,50 +109,50 @@
             </thead>
             <tbody>
               <% if (detentos.length > 0) { %>
-                <% detentos.forEach(detento => { %>
-                  <tr>
-                    <td class="text-center">
-                      <% if (detento.foto) { %>
-                        <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento" style="width: 50px; height: 50px;" onclick="location.href='/detentos/<%= detento._id %>/'">
-                      <% } else { %>
-                        <span>N/A</span>
-                      <% } %>
-                    </td>
-                    <td class="text-center"><%= detento.nome %></td>
-                    <td class="text-center"><%= detento.idade %></td>
-                    <td class="text-center"><%= detento.filiacao %></td>
-                    <td class="text-center"><%= detento.estadoCivil %></td>
-                    <td class="text-center">
-                      <% if (detento.cela) { %>
-                        <span class="badge bg-info">
-                          <i class="fa-solid fa-door-closed me-1"></i>
-                          <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
-                        </span>
-                      <% } else { %>
-                        <span class="badge bg-secondary">
-                          <i class="fa-solid fa-door-open me-1"></i>
-                          Sem cela
-                        </span>
-                      <% } %>
-                    </td>
-                    <td class="text-center"><%= detento.reincidencia ? 'Sim' : 'Não' %></td>
-                    <td class="text-center"><%= detento.crimes.join(', ') %></td>
-                    <td class="text-center">
-                      <div class="btn-group" role="group">
-                        <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary btn-sm me-1">
-                          <i class="fa-solid fa-pen-to-square"></i> Editar
-                        </a>
-                        <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este Detento?');">
-                          <i class="fa-solid fa-trash"></i> Excluir
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                <% }) %>
+              <% detentos.forEach(detento => { %>
+              <tr>
+                <td class="text-center">
+                  <% if (detento.foto) { %>
+                  <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="rounded-circle foto-detento" style="width: 50px; height: 50px;" onclick="location.href='/detentos/<%= detento._id %>/'">
+                  <% } else { %>
+                  <span>N/A</span>
+                  <% } %>
+                </td>
+                <td class="text-center"><%= detento.nome %></td>
+                <td class="text-center"><%= detento.idade %></td>
+                <td class="text-center"><%= detento.filiacao %></td>
+                <td class="text-center"><%= detento.estadoCivil %></td>
+                <td class="text-center">
+                  <% if (detento.cela) { %>
+                  <span class="badge bg-info">
+                    <i class="fa-solid fa-door-closed me-1"></i>
+                    <%= detento.cela.codigo %> - Pavilhão <%= detento.cela.pavilhao %>
+                  </span>
+                  <% } else { %>
+                  <span class="badge bg-secondary">
+                    <i class="fa-solid fa-door-open me-1"></i>
+                    Sem cela
+                  </span>
+                  <% } %>
+                </td>
+                <td class="text-center"><%= detento.reincidencia ? 'Sim' : 'Não' %></td>
+                <td class="text-center"><%= detento.crimes.join(', ') %></td>
+                <td class="text-center">
+                  <div class="btn-group" role="group">
+                    <a href="/detentos/<%= detento._id %>/editar" class="btn btn-primary btn-sm me-1">
+                      <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </a>
+                    <a href="/detentos/<%= detento._id %>/excluir" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este Detento?');">
+                      <i class="fa-solid fa-trash"></i> Excluir
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
               <% } else { %>
-                <tr>
-                  <td colspan="9" class="text-center">Nenhum detento cadastrado.</td>
-                </tr>
+              <tr>
+                <td colspan="9" class="text-center">Nenhum detento cadastrado.</td>
+              </tr>
               <% } %>
             </tbody>
           </table>
@@ -122,5 +166,83 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Simple search functionality
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+          const searchTerm = this.value.toLowerCase();
+          const tableRows = document.querySelectorAll('#tabela-detentos tbody tr');
+          
+          tableRows.forEach(row => {
+            const textContent = row.textContent.toLowerCase();
+            if (textContent.includes(searchTerm)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      }
+      
+      // Reset filters
+      const btnResetFilters = document.getElementById('btnResetFilters');
+      if (btnResetFilters) {
+        btnResetFilters.addEventListener('click', function() {
+          document.getElementById('searchInput').value = '';
+          document.getElementById('filterPavilhao').value = '';
+          document.getElementById('filterReincidencia').value = '';
+          
+          // Reset table display
+          const tableRows = document.querySelectorAll('#tabela-detentos tbody tr');
+          tableRows.forEach(row => {
+            row.style.display = '';
+          });
+        });
+      }
+      
+      // Pavilhão filter
+      const filterPavilhao = document.getElementById('filterPavilhao');
+      if (filterPavilhao) {
+        filterPavilhao.addEventListener('change', applyFilters);
+      }
+      
+      // Reincidência filter
+      const filterReincidencia = document.getElementById('filterReincidencia');
+      if (filterReincidencia) {
+        filterReincidencia.addEventListener('change', applyFilters);
+      }
+      
+      function applyFilters() {
+        const pavilhaoValue = filterPavilhao.value.toLowerCase();
+        const reincidenciaValue = filterReincidencia.value;
+        const tableRows = document.querySelectorAll('#tabela-detentos tbody tr');
+        
+        tableRows.forEach(row => {
+          let showRow = true;
+          
+          // Check pavilhão filter
+          if (pavilhaoValue && !row.querySelector('td:nth-child(6)').textContent.toLowerCase().includes('pavilhão ' + pavilhaoValue)) {
+            showRow = false;
+          }
+          
+          // Check reincidência filter
+          if (reincidenciaValue) {
+            const isReincidente = row.querySelector('td:nth-child(7)').textContent.trim().includes('Sim');
+            if ((reincidenciaValue === 'true' && !isReincidente) || (reincidenciaValue === 'false' && isReincidente)) {
+              showRow = false;
+            }
+          }
+          
+          row.style.display = showRow ? '' : 'none';
+        });
+      }
+    });
+  </script>
 </body>
+
 </html>

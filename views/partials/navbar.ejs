@@ -25,98 +25,89 @@
       <ul class="navbar-nav me-auto">
         <!-- Detentos -->
         <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
-          <li class="nav-item">
-            <a class="nav-link" href="/detentos/lista">
-              <i class="fa-solid fa-user"></i> Detentos
-            </a>
-          </li>
-          <% } %>
+        <li class="nav-item">
+          <a class="nav-link" href="/detentos/lista">
+            <i class="fa-solid fa-user"></i> Detentos
+          </a>
+        </li>
+        <% } %>
 
-            <!-- Celas -->
-            <% if (user && ['ADMIN', 'DIRETOR' ].includes(user.nivelAcesso)) { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/celas/lista">
-                  <i class="fa-solid fa-door-closed"></i> Celas
-                </a>
-              </li>
-              <% } %>
+        <!-- Celas -->
+        <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR' ].includes(user.nivelAcesso)) { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/celas/lista">
+            <i class="fa-solid fa-door-closed"></i> Celas
+          </a>
+        </li>
+        <% } %>
 
-                <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
-                  <!-- Visitas Familiar -->
-                  <li class="nav-item">
-                    <a class="nav-link" href="/visitas/lista">
-                      <i class="fa-solid fa-users"></i> Visitas Familiar
-                    </a>
-                  </li>
-                  <% } %>
+        <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
+        <!-- Visitas -->
+        <li class="nav-item">
+          <a class="nav-link" href="/visitas/lista">
+            <i class="fa-solid fa-users"></i> Visitas
+          </a>
+        </li>
+        <% } %>
 
-                    <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
-                      <li class="nav-item">
-                        <a class="nav-link" href="/visitasAdvogado/lista">
-                          <i class="fa-solid fa-gavel"></i> Visitas Advogado
-                        </a>
-                      </li>
-                      <% } %>
+        <!-- Relatórios -->
+        <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR' ].includes(user.nivelAcesso)) { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/relatorios/ocupacao">
+            <i class="fa-solid fa-chart-line"></i> Relatórios
+          </a>
+        </li>
+        <% } %>
 
-                        <!-- Relatórios -->
-                        <% if (user && ['ADMIN', 'DIRETOR' ].includes(user.nivelAcesso)) { %>
-                          <li class="nav-item">
-                            <a class="nav-link" href="/relatorios/ocupacao">
-                              <i class="fa-solid fa-chart-line"></i> Relatórios
-                            </a>
-                          </li>
-                          <% } %>
+        <!-- Dashboard -->
+        <% if (user && user.nivelAcesso==='ADMIN' ) { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/dashboard">
+            <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <% } else if (user && user.nivelAcesso==='DIRETOR' ) { %>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/diretor/dashboard">
+            <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <% } %>
 
-                            <!-- Dashboard -->
-                            <% if (user && user.nivelAcesso==='ADMIN' ) { %>
-                              <li class="nav-item">
-                                <a class="nav-link" href="/admin/dashboard">
-                                  <i class="fa-solid fa-tachometer-alt"></i> Dashboard
-                                </a>
-                              </li>
-                              <% } else if (user && user.nivelAcesso==='DIRETOR' ) { %>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="/admin/diretor/dashboard">
-                                    <i class="fa-solid fa-tachometer-alt"></i> Dashboard
-                                  </a>
-                                </li>
-                                <% } %>
-
-                                  <button class="nav-link btn btn-link" onclick="toggleTheme()"
-                                    aria-label="Toggle theme">
-                                    <i id="theme-icon" class="fas fa-sun"></i> </button>
+        <button class="nav-link btn btn-link" onclick="toggleTheme()" aria-label="Toggle theme">
+          <i id="theme-icon" class="fas fa-sun"></i> </button>
 
       </ul>
 
 
       <!-- Usuário Logado -->
       <% if (user) { %>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <span class="nav-link">
-              <i class="fa-solid fa-user-circle"></i> Olá, <%= user.nome %>!
-            </span>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">
-              <i class="fa-solid fa-sign-out-alt"></i> Logout
-            </a>
-          </li>
-        </ul>
-        <% } else { %>
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
-                <i class="fa-solid fa-sign-in-alt"></i> Login
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
-                <i class="fa-solid fa-user-plus"></i> Registrar
-              </a>
-            </li>
-          </ul>
-          <% } %>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <span class="nav-link">
+            <i class="fa-solid fa-user-circle"></i> Olá, <%= user.nome %> (<%= user.nivelAcesso %>)!
+          </span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">
+            <i class="fa-solid fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+      </ul>
+      <% } else { %>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <i class="fa-solid fa-sign-in-alt"></i> Login
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
+            <i class="fa-solid fa-user-plus"></i> Registrar
+          </a>
+        </li>
+      </ul>
+      <% } %>
 
 
 

@@ -14,6 +14,10 @@ const DetentoSchema = new mongoose.Schema({
   visitasFamiliares: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaFamiliar' }],
   visitasAdvogados: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaAdvogado' }],
   saida: { type: Date },
+  // Campos para rastreamento de registro
+  registradoPor: { type: String, default: 'Sistema' },
+  usuarioCadastro: { type: String, default: 'Sistema' }, 
+  dataRegistro: { type: Date, default: Date.now },
   historicoAlocacao: [{
     data: { type: Date, default: Date.now },
     celaCodigo: { type: String },

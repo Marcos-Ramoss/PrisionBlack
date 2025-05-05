@@ -68,332 +68,854 @@
       height: 300px;
       margin-bottom: 20px;
     }
+
+    .pagination-container {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .pagination .page-link {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #fff;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+      background-color: #333;
+      border-color: #444;
+      color: #777;
+    }
+
+    .filter-section .form-select,
+    .filter-section .form-control {
+      background-color: #333;
+      border-color: #444;
+      color: #fff;
+    }
+
+    .filter-section .form-select option {
+      background-color: #333;
+      color: #fff;
+    }
+
+    table th {
+      cursor: pointer;
+    }
+
+    table th i.fa-sort {
+      margin-left: 5px;
+      opacity: 0.5;
+    }
+
+    table th.asc i.fa-sort:before {
+      content: "\f0de";
+      /* fa-sort-up */
+      opacity: 1;
+    }
+
+    table th.desc i.fa-sort:before {
+      content: "\f0dd";
+      /* fa-sort-down */
+      opacity: 1;
+    }
   </style>
 </head>
 
 <body>
   <%- include('../partials/navbar', { user }) %>
 
-    <div class="container mt-5">
-      <!-- Cabeçalho do Relatório -->
-      <div class="report-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h1><i class="fa-solid fa-file-lines me-2"></i>Relatório Geral do Sistema</h1>
-          <div class="action-buttons">
-            <button id="baixar-xlsx" class="btn btn-success me-2">
-              <i class="fa-solid fa-file-excel me-2"></i>XLSX
-            </button>
-            <button id="baixar-pdf" class="btn btn-danger me-2">
-              <i class="fa-solid fa-file-pdf me-2"></i>PDF
-            </button>
-            <button id="compartilhar" class="btn btn-primary">
-              <i class="fa-solid fa-share me-2"></i>Compartilhar
-            </button>
-          </div>
-        </div>
-
-        <!-- Estatísticas Gerais -->
-        <div class="row g-4 mb-4">
-          <div class="col-md-3">
-            <div class="stats-card text-center p-3">
-              <i class="fa-solid fa-users fa-2x mb-2 text-primary"></i>
-              <h3>
-                <%= totalDetentos %>
-              </h3>
-              <p>Total de Detentos</p>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="stats-card text-center p-3">
-              <i class="fa-solid fa-door-closed fa-2x mb-2 text-success"></i>
-              <h3>
-                <%= taxaOcupacao %>%
-              </h3>
-              <p>Taxa de Ocupação</p>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="stats-card text-center p-3">
-              <i class="fa-solid fa-rotate-left fa-2x mb-2 text-warning"></i>
-              <h3>
-                <%= percentualReincidencia %>%
-              </h3>
-              <p>Taxa de Reincidência</p>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="stats-card text-center p-3">
-              <i class="fa-solid fa-calendar fa-2x mb-2 text-info"></i>
-              <h3>
-                <%= mediaTempoDetencao %>
-              </h3>
-              <p>Média de Detenção</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filtros -->
-        <div class="filter-section">
-          <div class="row">
-            <div class="col-md-3">
-              <select class="form-select" id="pavilhaoFilter">
-                <option value="">Pavilhão</option>
-                <% pavilhoes.forEach(pavilhao=> { %>
-                  <option value="<%= pavilhao %>">
-                    <%= pavilhao %>
-                  </option>
-                  <% }) %>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <select class="form-select" id="statusFilter">
-                <option value="">Status</option>
-                <option value="ativo">Ativo</option>
-                <option value="transferido">Transferido</option>
-                <option value="libertado">Libertado</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar...">
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary w-100" id="aplicarFiltros">
-                <i class="fa-solid fa-filter me-2"></i>Aplicar Filtros
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabela de Detentos -->
-        <div class="table-responsive">
-          <table class="table table-dark table-striped">
-            <thead>
-              <tr>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Pavilhão/Cela</th>
-                <th>Data de Alocação</th>
-                <th>Usuário Alocador</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% detentos.forEach(detento=> { %>
-                <tr>
-                  <td>
-                    <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="detento-foto">
-                  </td>
-                  <td>
-                    <%= detento.nome || 'Nome não disponível' %>
-                  </td>
-                  <td>
-                    <% if (detento.cela) { %>
-                      <span class="badge bg-info">
-                        <%= detento.cela.pavilhao %>/<%= detento.cela.codigo %>
-                      </span>
-                      <% } else { %>
-                        <span class="badge bg-secondary">Pavilhão/Cela não alocado!</span>
-                        <% } %>
-                  </td>
-
-                  <td>
-                    <% if (detento.historicoAlocacao && detento.historicoAlocacao.length> 0) { %>
-                      <ul>
-                        <% detento.historicoAlocacao.forEach(alocacao=> { %>
-                          <li>
-                            <div>
-                              <%= new Date(alocacao.data).toLocaleDateString('pt-BR') %>
-                            </div>
-                            <div>
-                              <%= new Date(alocacao.data).toLocaleTimeString('pt-BR') %>
-                            </div>
-                          </li>
-                          <% }) %>
-                      </ul>
-                      <% } else { %>
-                        <span class="badge bg-secondary">Sem data</span>
-                        <% } %>
-                  </td>
-                  <td>
-                    <% if (detento.historicoAlocacao && detento.historicoAlocacao.length> 0) { %>
-                      <ul>
-                        <% detento.historicoAlocacao.forEach(alocacao=> { %>
-                          <li>Alocado por: <%= alocacao.usuarioAlocador || 'Usuário não disponível' %>
-                          </li>
-                          <% }) %>
-                      </ul>
-                      <% } else { %>
-                        <span class="badge bg-secondary">Usuário não disponível</span>
-                        <% } %>
-                  </td>
-                  <td>
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-primary" onclick="verDetalhes('<%= detento._id %>')">
-                        <i class="fa-solid fa-eye"></i>
-                      </button>
-                      <button class="btn btn-sm btn-warning" onclick="editarDetento('<%= detento._id %>')">
-                        <i class="fa-solid fa-pen"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <% }) %>
-            </tbody>
-          </table>
+  <div class="container mt-5">
+    <!-- Cabeçalho do Relatório -->
+    <div class="report-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fa-solid fa-file-lines me-2"></i>Relatório Geral do Sistema</h1>
+        <div class="action-buttons">
+          <button id="baixar-xlsx" class="btn btn-success me-2">
+            <i class="fa-solid fa-file-excel me-2"></i>XLSX
+          </button>
+          <button id="baixar-pdf" class="btn btn-danger me-2">
+            <i class="fa-solid fa-file-pdf me-2"></i>PDF
+          </button>
+          <button id="compartilhar" class="btn btn-primary">
+            <i class="fa-solid fa-share me-2"></i>Compartilhar
+          </button>
         </div>
       </div>
 
-      <!-- Gráficos e Análises -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="report-section">
-            <h4>Distribuição por Pavilhão</h4>
-            <div class="chart-container">
-              <canvas id="pavilhaoChart"></canvas>
-            </div>
+      <!-- Estatísticas Gerais -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-3">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-users fa-2x mb-2 text-primary"></i>
+            <h3>
+              <%= totalDetentos %>
+            </h3>
+            <p>Total de Detentos</p>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="report-section">
-            <h4>Tipos de Crimes</h4>
-            <div class="chart-container">
-              <canvas id="crimesChart"></canvas>
-            </div>
+        <div class="col-md-3">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-door-closed fa-2x mb-2 text-success"></i>
+            <h3>
+              <%= taxaOcupacao %>%
+            </h3>
+            <p>Taxa de Ocupação</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-rotate-left fa-2x mb-2 text-warning"></i>
+            <h3>
+              <%= percentualReincidencia %>%
+            </h3>
+            <p>Taxa de Reincidência</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-calendar fa-2x mb-2 text-info"></i>
+            <h3>
+              <%= mediaTempoDetencao %>
+            </h3>
+            <p>Média de Detenção</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filter-section">
+        <div class="row">
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '3' : '4' %>">
+            <select class="form-select" id="pavilhaoFilter">
+              <option value="">Pavilhão</option>
+              <% pavilhoes.forEach(pavilhao=> { %>
+              <option value="<%= pavilhao %>">
+                <%= pavilhao %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+          <% if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+          <div class="col-md-3">
+            <select class="form-select" id="inspetorFilter">
+              <option value="">Todos Inspetores</option>
+              <% 
+                // Extrair inspetores únicos do histórico de alocação
+                const inspetoresUnicos = new Set();
+                detentos.forEach(detento => {
+                  // Adicionar registrador
+                  if (detento.registradoPor && detento.registradoPor !== 'Usuário não disponível') {
+                    inspetoresUnicos.add(detento.registradoPor);
+                  }
+                  // Adicionar alocadores
+                  if (detento.historicoAlocacao && detento.historicoAlocacao.length > 0) {
+                    detento.historicoAlocacao.forEach(alocacao => {
+                      if (alocacao.usuarioAlocador && alocacao.usuarioAlocador !== 'Usuário não disponível') {
+                        inspetoresUnicos.add(alocacao.usuarioAlocador);
+                      }
+                    });
+                  }
+                });
+                // Converter para array e ordenar alfabeticamente
+                const inspetoresArray = Array.from(inspetoresUnicos).sort();
+              %>
+              <% inspetoresArray.forEach(inspetor => { %>
+              <option value="<%= inspetor %>"><%= inspetor %></option>
+              <% }); %>
+            </select>
+          </div>
+          <% } %>
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '3' : '4' %>">
+            <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar por nome...">
+          </div>
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '3' : '4' %>">
+            <button class="btn btn-primary w-100" id="aplicarFiltros" onclick="aplicarFiltrosManualmente(); return false;">
+              <i class="fa-solid fa-filter me-2"></i>Aplicar Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de Detentos -->
+      <div class="table-responsive">
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th onclick="sortTable(1)">Nome <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(2)">Pavilhão/Cela <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(3)">Data de Alocação <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(4)">Usuário <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(5)">Registrado <i class="fa-solid fa-sort"></i></th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% detentos.forEach(detento=> { %>
+            <tr data-inspector="<%= detento.registradoPor %> <%= detento.historicoAlocacao && detento.historicoAlocacao.length ? detento.historicoAlocacao.map(a => a.usuarioAlocador).join(' ') : '' %>" data-registrador="<%= detento.registradoPor %>">
+              <td>
+                <img src="/uploads/<%= detento.foto %>" alt="Foto de <%= detento.nome %>" class="detento-foto">
+              </td>
+              <td>
+                <%= detento.nome || 'Nome não disponível' %>
+              </td>
+              <td>
+                <% if (detento.cela) { %>
+                <span class="badge bg-info">
+                  <%= detento.cela.pavilhao %>/<%= detento.cela.codigo %>
+                </span>
+                <% } else { %>
+                <span class="badge bg-secondary">Pavilhão/Cela não alocado!</span>
+                <% } %>
+              </td>
+
+              <td>
+                <% if (detento.historicoAlocacao && detento.historicoAlocacao.length > 0) { %>
+                <ul>
+                  <% detento.historicoAlocacao.forEach(alocacao=> { %>
+                  <li>
+                    <div>
+                      <%= new Date(alocacao.data).toLocaleDateString('pt-BR') %>
+                    </div>
+                    <div>
+                      <%= new Date(alocacao.data).toLocaleTimeString('pt-BR') %>
+                    </div>
+                  </li>
+                  <% }) %>
+                </ul>
+                <% } else if (detento.cela) { %>
+                <span class="badge bg-success">Cadastrado diretamente na cela</span>
+                <% } else { %>
+                <span class="badge bg-secondary">Sem data</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (detento.historicoAlocacao && detento.historicoAlocacao.length > 0) { %>
+                <ul>
+                  <% detento.historicoAlocacao.forEach(alocacao=> { %>
+                  <li>Alocado por: <%= alocacao.usuarioAlocador || 'Usuário não disponível' %>
+                  </li>
+                  <% }) %>
+                </ul>
+                <% } else if (detento.cela) { %>
+                <span>Cadastrado diretamente por: <%= detento.registradoPor || 'Usuário não disponível' %></span>
+                <% } else { %>
+                <span class="badge bg-secondary">Não alocado</span>
+                <% } %>
+              </td>
+              <td>
+                Cadastrado por: <%= detento.registradoPor || 'Usuário não disponível' %>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="/detentos/<%= detento._id %>/editar" class="btn btn-warning btn-sm me-1">
+                    <i class="fa-solid fa-pen-to-square"></i> 
+                  </a>
+                  <a href="/detentos/<%= detento._id %>" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-eye"></i> 
+                  </a>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination-container">
+      <nav aria-label="Navegação por páginas">
+        <ul class="pagination justify-content-center" id="pagination">
+          <!-- Paginação será gerada pelo JavaScript -->
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Gráficos e Análises -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="report-section">
+          <h4>Distribuição por Pavilhão</h4>
+          <div class="chart-container">
+            <canvas id="pavilhaoChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="report-section">
+          <h4>Tipos de Crimes</h4>
+          <div class="chart-container">
+            <canvas id="crimesChart"></canvas>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <%- include('../partials/footer') %>
+  <%- include('../partials/footer') %>
 
-      <!-- Scripts -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
-      <script>
-        // Função para gerar o PDF
-        document.getElementById('baixar-pdf').addEventListener('click', function () {
-          const docDefinition = {
-            content: [
-              { text: 'Relatório Geral do Sistema Penitenciário', style: 'header' },
-              { text: `Data: ${new Date().toLocaleDateString()}`, margin: [0, 0, 0, 20] },
-              {
-                table: {
-                  widths: ['*', '*', '*', '*'],
-                  body: [
-                    [
-                      { text: 'Nome', style: 'tableHeader' },
-                      { text: 'Pavilhão/Cela', style: 'tableHeader' },
-                      { text: 'Data de Alocação', style: 'tableHeader' },
-                      { text: 'Usuário Alocador', style: 'tableHeader' }
-                    ],
-                    ...generatePdfTableData()
-                  ]
-                }
-              }
-            ],
-            styles: {
-              header: {
-                fontSize: 22,
-                bold: true,
-                margin: [0, 0, 0, 10]
-              },
-              tableHeader: {
-                bold: true,
-                fontSize: 13,
-                color: 'black'
-              }
-            }
-          };
-          pdfMake.createPdf(docDefinition).download('relatorio_sistema_penitenciario.pdf');
-        });
+  <script>
+    function filtroDebug(mensagem) {}
 
-        function generatePdfTableData() {
-          const tableData = [];
-          document.querySelectorAll('table tbody tr').forEach(row => {
-            const nome = row.cells[1].textContent.trim();
-            const pavilhaoCela = row.cells[2].textContent.trim();
-            const dataAlocacao = Array.from(row.cells[3].querySelectorAll('li')).map(li => li.textContent.trim()).join(', ');
-            const usuarioAlocador = Array.from(row.cells[4].querySelectorAll('li')).map(li => li.textContent.trim()).join(', ');
+    // Função para aplicar filtros - disponível globalmente
+    function aplicarFiltrosManualmente() {
+      filtroDebug("Botão de filtro clicado!");
 
-            tableData.push([nome, pavilhaoCela, dataAlocacao, usuarioAlocador]);
-          });
-          return tableData;
+      try {
+        // Obter valores dos filtros
+        const pavilhaoSelect = document.getElementById('pavilhaoFilter');
+        const pavilhao = pavilhaoSelect ? pavilhaoSelect.value : '';
+        filtroDebug("Filtro de pavilhão: " + pavilhao);
+
+        const searchInput = document.getElementById('searchInput');
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
+        filtroDebug("Filtro de pesquisa: " + search);
+
+        // Obter valor do inspetor conforme o nível de acesso
+        let inspetor = '';
+        <% if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+        const inspetorSelect = document.getElementById('inspetorFilter');
+        inspetor = inspetorSelect ? inspetorSelect.value : '';
+        filtroDebug("Usuário é admin/diretor, filtro de inspetor: " + inspetor);
+        <% } else if (user.nivelAcesso === 'INSPETOR') { %>
+        inspetor = '<%= user.nome %>';
+        filtroDebug("Usuário é inspetor: " + inspetor);
+        <% } %>
+
+        // Obter todas as linhas da tabela
+        const tbody = document.querySelector('table tbody');
+        if (!tbody) {
+          filtroDebug("ERRO: Tbody não encontrado!");
+          return;
         }
 
-        // Função para exportar para XLSX
-        document.getElementById('baixar-xlsx').addEventListener('click', function () {
-          const wb = XLSX.utils.book_new();
+        const rows = tbody.querySelectorAll('tr');
+        filtroDebug("Número total de linhas na tabela: " + rows.length);
 
-          // Dados das estatísticas
-          const statsData = [
-            ['Métrica', 'Valor'],
-            ['Total de Detentos', document.querySelector('.stats-card:nth-child(1) h3').textContent.trim()],
-            ['Taxa de Ocupação', document.querySelector('.stats-card:nth-child(2) h3').textContent.trim()],
-            ['Taxa de Reincidência', document.querySelector('.stats-card:nth-child(3) h3').textContent.trim()],
-            ['Média de Detenção', document.querySelector('.stats-card:nth-child(4) h3').textContent.trim()]
-          ];
-          const statsWs = XLSX.utils.aoa_to_sheet(statsData);
-          XLSX.utils.book_append_sheet(wb, statsWs, "Estatísticas");
+        // Contador para linhas visíveis
+        let visibleCount = 0;
 
-          // Dados dos detentos
-          const detentoData = [['Nome', 'ID', 'Pavilhão/Cela', 'Status']];
-          document.querySelectorAll('table tbody tr').forEach(row => {
-            detentoData.push([
-              row.cells[1].textContent.trim(),
-              row.cells[2].textContent.trim(),
-              row.cells[3].textContent.trim(),
-              row.cells[4].textContent.trim()
-            ]);
-          });
-          const detentoWs = XLSX.utils.aoa_to_sheet(detentoData);
-          XLSX.utils.book_append_sheet(wb, detentoWs, "Detentos");
+        // Processando cada linha
+        rows.forEach((row, index) => {
+          // Por padrão, a linha é visível
+          let isVisible = true;
 
-          // Exportar o arquivo
-          XLSX.writeFile(wb, 'relatorio_sistema_penitenciario.xlsx');
-        });
+          // Para inspetores, verificar se a linha pertence a eles
+          <% if (user.nivelAcesso === 'INSPETOR') { %>
+          const cellRegistrador = row.cells[5].textContent;
+          const cellAlocador = row.cells[4].textContent;
+          const pertenceAoInspetor = cellRegistrador.includes(inspetor) || cellAlocador.includes(inspetor);
+          isVisible = pertenceAoInspetor;
+          <% } %>
 
-        // Função para compartilhar
-        document.getElementById('compartilhar').addEventListener('click', async function () {
-          try {
-            // Criar objeto com dados do relatório
-            const dadosCompartilhamento = {
-              title: 'Relatório Sistema Penitenciário',
-              text: 'Relatório completo do sistema penitenciário',
-              url: window.location.href
-            };
-            // Verificar se a API de compartilhamento está disponível
-            if (navigator.share) {
-              await navigator.share(dadosCompartilhamento);
-            } else {
-              // Fallback para navegadores que não suportam a API Share
-              const textArea = document.createElement('textarea');
-              textArea.value = window.location.href;
-              document.body.appendChild(textArea);
-              textArea.select();
-              document.execCommand('copy');
-              document.body.removeChild(textArea);
-              alert('Link copiado para a área de transferência!');
+          // Se ainda estiver visível e tiver filtro de pavilhão, aplicar
+          if (isVisible && pavilhao) {
+            const cellPavilhao = row.cells[2].textContent.trim();
+            // Obter a primeira parte (pavilhão) do formato "X/YYYY" 
+            const pavilhaoMatch = cellPavilhao.match(/([A-Z])\/[A-Z0-9]+/);
+            let pavilhaoDetento = '';
+
+            if (pavilhaoMatch && pavilhaoMatch[1]) {
+              pavilhaoDetento = pavilhaoMatch[1];
             }
-          } catch (error) {
-            console.error('Erro ao compartilhar:', error);
-            alert('Não foi possível compartilhar o relatório.');
+
+            // Verificar se o pavilhão é exatamente igual ao selecionado
+            isVisible = pavilhaoDetento === pavilhao;
+            filtroDebug(`Filtro pavilhão [${pavilhao}]: Detento em pavilhão "${pavilhaoDetento}"? ${isVisible ? "Sim" : "Não"} - "${cellPavilhao}"`);
+          }
+
+          // Se ainda estiver visível e tiver filtro de inspetor (para admin/diretor), aplicar
+          <% if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+          if (isVisible && inspetor) {
+            const cellAlocador = row.cells[4].textContent;
+            const cellRegistrador = row.cells[5].textContent;
+            isVisible = cellAlocador.includes(inspetor) || cellRegistrador.includes(inspetor);
+          }
+          <% } %>
+
+          // Se ainda estiver visível e tiver pesquisa, aplicar
+          if (isVisible && search) {
+            const cellNome = row.cells[1].textContent.toLowerCase();
+            isVisible = cellNome.includes(search);
+          }
+
+          // Mostrar ou esconder a linha
+          row.style.display = isVisible ? '' : 'none';
+
+          if (isVisible) {
+            visibleCount++;
+          }
+
+          if (index < 5) {
+            filtroDebug(`Linha ${index}: ${isVisible ? 'Visível' : 'Oculta'} - ${row.cells[1].textContent}`);
           }
         });
 
-        // Função para visualizar detalhes do detento
-        function verDetalhes(id) {
-          window.location.href = `/detentos/detalhes/${id}`;
+        filtroDebug(`Total de linhas visíveis após filtragem: ${visibleCount}`);
+
+        // Atualizar a paginação
+        if (typeof updateFilteredRows === 'function') {
+          updateFilteredRows();
+          currentPage = 1;
+          renderTable();
+        } else {
+          filtroDebug("ERRO: Função updateFilteredRows não encontrada!");
+        }
+      } catch (error) {
+        filtroDebug("ERRO ao aplicar filtros: " + error.message);
+      }
+
+      return false; // Impedir envio de formulário
+    }
+
+    // Inicializar quando o DOM estiver carregado
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Adicionar evento de Enter para o campo de pesquisa
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('keyup', function(e) {
+          if (e.key === 'Enter') {
+            filtroDebug("Tecla Enter pressionada no campo de pesquisa");
+            aplicarFiltrosManualmente();
+          }
+        });
+      }
+    });
+
+    // Dados para os gráficos
+    const pavilhaoData = {};
+    <% pavilhoes.forEach(pavilhao => { %>
+    pavilhaoData['<%= pavilhao %>'] = <%= detentos.filter(d => d.cela && d.cela.pavilhao === pavilhao).length %>;
+    <% }); %>
+
+    // Dados para o gráfico de crimes
+    const crimesData = {};
+    <% 
+      // Extrair todos os crimes de todos os detentos
+      const todosCrimes = detentos.flatMap(d => d.crimes || []);
+      // Contar ocorrências de cada crime
+      const crimeCount = {};
+      todosCrimes.forEach(crime => {
+        crimeCount[crime] = (crimeCount[crime] || 0) + 1;
+      });
+      // Ordenar por frequência e pegar os top 5
+      const topCrimes = Object.entries(crimeCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    %>
+    <% topCrimes.forEach(([crime, count]) => { %>
+    crimesData['<%= crime %>'] = <%= count %>;
+    <% }); %>
+
+    // Função simples para filtrar por inspetor
+    function filterByInspector(inspetorNome) {
+
+      // Pegar todas as linhas da tabela
+      const tbody = document.querySelector('table tbody');
+      if (!tbody) {
+        console.error("Tbody não encontrado!");
+        return;
+      }
+
+      const rows = tbody.querySelectorAll('tr');
+
+      let visibleCount = 0;
+
+      // Filtrar apenas as linhas com detentos registrados/alocados pelo inspetor
+      rows.forEach((row, index) => {
+        // Verificar nos textos completos das células relevantes
+        const cellRegistrador = row.cells[5].textContent;
+        const cellAlocador = row.cells[4].textContent;
+
+        // Verificar se o nome do inspetor aparece em qualquer lugar do texto
+        const isVisible = cellRegistrador.includes(inspetorNome) || cellAlocador.includes(inspetorNome);
+
+        // Esconder ou mostrar a linha
+        row.style.display = isVisible ? '' : 'none';
+        if (isVisible) visibleCount++;
+
+      });
+
+
+      // Atualizar a paginação
+      updateFilteredRows();
+      currentPage = 1;
+      renderPagination();
+    }
+
+    // Atualizar linhas filtradas
+    function updateFilteredRows() {
+      filteredRows = Array.from(document.querySelectorAll('table tbody tr'));
+    }
+
+    // Renderizar tabela com paginação
+    function renderTable() {
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const endIndex = startIndex + rowsPerPage;
+
+      // Esconder todas as linhas
+      document.querySelectorAll('table tbody tr').forEach(row => {
+        row.style.display = 'none';
+      });
+
+      // Mostrar apenas as linhas filtradas e na página atual
+      filteredRows.slice(startIndex, endIndex).forEach(row => {
+        row.style.display = '';
+      });
+
+      // Renderizar controles de paginação
+      renderPagination();
+    }
+
+    // Renderizar controles de paginação
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+      // Criar elemento de paginação se ainda não existir
+      let paginationContainer = document.querySelector('.pagination-container');
+      if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination-container mt-4';
+        document.querySelector('.table-responsive').after(paginationContainer);
+      }
+
+      paginationContainer.innerHTML = `
+        <nav aria-label="Navegação pelas páginas">
+          <ul class="pagination justify-content-center">
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+              <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Anterior</a>
+            </li>
+            ${generatePageItems(totalPages)}
+            <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+              <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Próximo</a>
+            </li>
+          </ul>
+        </nav>
+      `;
+    }
+
+    // Gerar itens de página para paginação
+    function generatePageItems(totalPages) {
+      let items = '';
+      for (let i = 1; i <= totalPages; i++) {
+        items += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+          </li>
+        `;
+      }
+      return items;
+    }
+
+    // Mudar página
+    function changePage(page) {
+      currentPage = page;
+      renderTable();
+    }
+
+    // Ordenar tabela
+    function sortTable(columnIndex) {
+      // Reset ícones de ordenação
+      document.querySelectorAll('th').forEach(th => {
+        th.classList.remove('asc', 'desc');
+      });
+
+      // Determinar a direção da ordenação
+      const th = document.querySelector(`th:nth-child(${columnIndex + 1})`);
+      const isAscending = !th.classList.contains('asc');
+
+      // Atualizar o ícone
+      th.classList.add(isAscending ? 'asc' : 'desc');
+
+      // Ordenar as linhas filtradas
+      filteredRows.sort((a, b) => {
+        let valueA, valueB;
+
+        // Extrair valores baseado na coluna
+        switch (columnIndex) {
+          case 1: // Nome
+            valueA = a.cells[1].textContent.trim().toLowerCase();
+            valueB = b.cells[1].textContent.trim().toLowerCase();
+            break;
+          case 2: // Pavilhão/Cela
+            valueA = a.cells[2].textContent.trim().toLowerCase();
+            valueB = b.cells[2].textContent.trim().toLowerCase();
+            break;
+          case 3: // Data de Alocação - pegar a data mais recente
+            valueA = a.cells[3].querySelector('li:first-child div:first-child') ?
+              a.cells[3].querySelector('li:first-child div:first-child').textContent.trim() : '';
+            valueB = b.cells[3].querySelector('li:first-child div:first-child') ?
+              b.cells[3].querySelector('li:first-child div:first-child').textContent.trim() : '';
+
+            // Converter para datas se possível
+            if (valueA && valueB) {
+              const partsA = valueA.split('/');
+              const partsB = valueB.split('/');
+
+              if (partsA.length === 3 && partsB.length === 3) {
+                valueA = new Date(`${partsA[2]}-${partsA[1]}-${partsA[0]}`);
+                valueB = new Date(`${partsB[2]}-${partsB[1]}-${partsB[0]}`);
+              }
+            }
+            break;
+          case 4: // Usuário Alocador
+            valueA = a.cells[4].textContent.trim().toLowerCase();
+            valueB = b.cells[4].textContent.trim().toLowerCase();
+            break;
+          default:
+            return 0;
         }
 
-        // Função para editar detento
-        function editarDetento(id) {
-          window.location.href = `/detentos/editar/${id}`;
+        // Comparação para datas
+        if (valueA instanceof Date && valueB instanceof Date) {
+          return isAscending ? valueA - valueB : valueB - valueA;
         }
-      </script>
+
+        // Comparação para strings
+        if (valueA < valueB) return isAscending ? -1 : 1;
+        if (valueA > valueB) return isAscending ? 1 : -1;
+        return 0;
+      });
+
+      // Resetar para a primeira página e renderizar
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Função para gerar o PDF
+    document.getElementById('baixar-pdf').addEventListener('click', function() {
+      const docDefinition = {
+        content: [{
+            text: 'Relatório Geral do Sistema Penitenciário',
+            style: 'header'
+          },
+          {
+            text: `Data: ${new Date().toLocaleDateString()}`,
+            margin: [0, 0, 0, 20]
+          },
+          {
+            text: 'Estatísticas Gerais',
+            style: 'subheader'
+          },
+          {
+            columns: [{
+                text: `Total de Detentos: <%= totalDetentos %>`,
+                width: '*'
+              },
+              {
+                text: `Taxa de Ocupação: <%= taxaOcupacao %>%`,
+                width: '*'
+              },
+              {
+                text: `Taxa de Reincidência: <%= percentualReincidencia %>%`,
+                width: '*'
+              },
+              {
+                text: `Média de Detenção: <%= mediaTempoDetencao %> meses`,
+                width: '*'
+              }
+            ],
+            margin: [0, 0, 0, 20]
+          },
+          {
+            text: 'Lista de Detentos',
+            style: 'subheader'
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['*', '*', '*', '*'],
+              body: [
+                [{
+                    text: 'Nome',
+                    style: 'tableHeader'
+                  },
+                  {
+                    text: 'Pavilhão/Cela',
+                    style: 'tableHeader'
+                  },
+                  {
+                    text: 'Data de Alocação',
+                    style: 'tableHeader'
+                  },
+                  {
+                    text: 'Usuário Alocador',
+                    style: 'tableHeader'
+                  }
+                ],
+                ...generatePdfTableData()
+              ]
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 22,
+            bold: true,
+            margin: [0, 0, 0, 10]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [0, 10, 0, 5]
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 13,
+            color: 'black'
+          }
+        }
+      };
+      pdfMake.createPdf(docDefinition).download('relatorio_sistema_penitenciario.pdf');
+    });
+
+    function generatePdfTableData() {
+      const tableData = [];
+      const rows = Array.from(document.querySelectorAll('table tbody tr')).filter(row => row.style.display !== 'none');
+
+      rows.forEach(row => {
+        const nome = row.cells[1].textContent.trim();
+        const pavilhaoCela = row.cells[2].textContent.trim();
+
+        // Obter dados de alocação ou registro direto
+        let dataAlocacao = '';
+        const liElements = Array.from(row.cells[3].querySelectorAll('li'));
+        if (liElements.length > 0) {
+          dataAlocacao = liElements.map(li => li.textContent.trim()).join(', ');
+        } else {
+          dataAlocacao = row.cells[3].textContent.trim();
+        }
+
+        // Obter usuário alocador ou registrador
+        let usuarioAlocador = '';
+        const liAloc = Array.from(row.cells[4].querySelectorAll('li'));
+        if (liAloc.length > 0) {
+          usuarioAlocador = liAloc.map(li => li.textContent.trim()).join(', ');
+        } else {
+          usuarioAlocador = row.cells[4].textContent.trim();
+        }
+
+        tableData.push([nome, pavilhaoCela, dataAlocacao, usuarioAlocador]);
+      });
+      return tableData;
+    }
+
+    // Função para exportar para XLSX
+    document.getElementById('baixar-xlsx').addEventListener('click', function() {
+      const wb = XLSX.utils.book_new();
+
+      // Dados das estatísticas
+      const statsData = [
+        ['Métrica', 'Valor'],
+        ['Total de Detentos', document.querySelector('.stats-card:nth-child(1) h3').textContent.trim()],
+        ['Taxa de Ocupação', document.querySelector('.stats-card:nth-child(2) h3').textContent.trim()],
+        ['Taxa de Reincidência', document.querySelector('.stats-card:nth-child(3) h3').textContent.trim()],
+        ['Média de Detenção', document.querySelector('.stats-card:nth-child(4) h3').textContent.trim()]
+      ];
+      const statsWs = XLSX.utils.aoa_to_sheet(statsData);
+      XLSX.utils.book_append_sheet(wb, statsWs, "Estatísticas");
+
+      // Dados dos detentos
+      const detentoData = [
+        ['Nome', 'Pavilhão/Cela', 'Data de Alocação', 'Usuário Alocador/Registrador']
+      ];
+
+      const rows = Array.from(document.querySelectorAll('table tbody tr')).filter(row => row.style.display !== 'none');
+
+      rows.forEach(row => {
+        const nome = row.cells[1].textContent.trim();
+        const pavilhaoCela = row.cells[2].textContent.trim();
+
+        // Obter dados de alocação ou registro direto
+        let dataAlocacao = '';
+        const liElements = Array.from(row.cells[3].querySelectorAll('li'));
+        if (liElements.length > 0) {
+          dataAlocacao = liElements.map(li => li.textContent.trim()).join(', ');
+        } else {
+          dataAlocacao = row.cells[3].textContent.trim();
+        }
+
+        // Obter usuário alocador ou registrador
+        let usuarioAlocador = '';
+        const liAloc = Array.from(row.cells[4].querySelectorAll('li'));
+        if (liAloc.length > 0) {
+          usuarioAlocador = liAloc.map(li => li.textContent.trim()).join(', ');
+        } else {
+          usuarioAlocador = row.cells[4].textContent.trim();
+        }
+
+        detentoData.push([nome, pavilhaoCela, dataAlocacao, usuarioAlocador]);
+      });
+
+      const detentoWs = XLSX.utils.aoa_to_sheet(detentoData);
+      XLSX.utils.book_append_sheet(wb, detentoWs, "Detentos");
+
+      // Dados de distribuição por pavilhão
+      const pavilhaoDistData = [
+        ['Pavilhão', 'Quantidade de Detentos']
+      ];
+      for (const [pavilhao, quantidade] of Object.entries(pavilhaoData)) {
+        pavilhaoDistData.push([pavilhao, quantidade]);
+      }
+      const pavilhaoWs = XLSX.utils.aoa_to_sheet(pavilhaoDistData);
+      XLSX.utils.book_append_sheet(wb, pavilhaoWs, "Distribuição por Pavilhão");
+
+      // Exportar o arquivo
+      XLSX.writeFile(wb, 'relatorio_sistema_penitenciario.xlsx');
+    });
+
+    // Função para compartilhar
+    document.getElementById('compartilhar').addEventListener('click', async function() {
+      try {
+        // Criar objeto com dados do relatório
+        const dadosCompartilhamento = {
+          title: 'Relatório Sistema Penitenciário',
+          text: 'Relatório completo do sistema penitenciário',
+          url: window.location.href
+        };
+        // Verificar se a API de compartilhamento está disponível
+        if (navigator.share) {
+          await navigator.share(dadosCompartilhamento);
+        } else {
+          // Fallback para navegadores que não suportam a API Share
+          const textArea = document.createElement('textarea');
+          textArea.value = window.location.href;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          alert('Link copiado para a área de transferência!');
+        }
+      } catch (error) {
+        console.error('Erro ao compartilhar:', error);
+        alert('Não foi possível compartilhar o relatório.');
+      }
+    });
+
+    // Função para visualizar detalhes do detento
+    function verDetalhes(id) {
+      window.location.href = `/detentos/detalhes/${id}`;
+    }
+
+    // Função para editar detento
+    function editarDetento(id) {
+      window.location.href = `/detentos/editar/${id}`;
+    }
+  </script>
 </body>
 
 </html>

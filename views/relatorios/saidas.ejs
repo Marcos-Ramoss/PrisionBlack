@@ -1,54 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório de Saídas</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #ffffff;
+    }
+
+    .report-section {
+      background: #242424;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .stats-card {
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+      border: none;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .table-dark {
+      background-color: #242424;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .action-buttons .btn {
+      transition: all 0.3s ease;
+    }
+
+    .action-buttons .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-section {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .pagination-container {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .pagination .page-link {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #fff;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+      background-color: #333;
+      border-color: #444;
+      color: #777;
+    }
+    
+    .filter-section .form-select,
+    .filter-section .form-control {
+      background-color: #333;
+      border-color: #444;
+      color: #fff;
+    }
+    
+    .filter-section .form-select option {
+      background-color: #333;
+      color: #fff;
+    }
+    
+    table th {
+      cursor: pointer;
+    }
+    
+    table th i.fa-sort {
+      margin-left: 5px;
+      opacity: 0.5;
+    }
+    
+    table th.asc i.fa-sort:before {
+      content: "\f0de"; /* fa-sort-up */
+      opacity: 1;
+    }
+    
+    table th.desc i.fa-sort:before {
+      content: "\f0dd"; /* fa-sort-down */
+      opacity: 1;
+    }
+  </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <%- include('../partials/navbar', { user }) %>
 
   <!-- Main Content -->
   <div class="container mt-5">
-    <h1 class="mb-4">Relatório de Saídas de Detentos</h1>
+    <div class="report-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fa-solid fa-door-open me-2"></i>Relatório de Saídas de Detentos</h1>
+        <div class="action-buttons">
+          <button id="baixar-xlsx" class="btn btn-success me-2">
+            <i class="fa-solid fa-file-excel me-2"></i>XLSX
+          </button>
+          <button id="baixar-pdf" class="btn btn-danger me-2">
+            <i class="fa-solid fa-file-pdf me-2"></i>PDF
+          </button>
+          <a href="/relatorios" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>Voltar
+          </a>
+        </div>
+      </div>
 
-    <!-- Botão Voltar -->
-    <div class="mb-4">
-      <a href="/relatorios" class="btn btn-secondary">
-        <i class="fa-solid fa-arrow-left"></i> Voltar
-      </a>
-    </div>
+      <!-- Estatísticas Gerais -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-users fa-2x mb-2 text-primary"></i>
+            <h3>
+              <%= detentosSaidos.length %>
+            </h3>
+            <p>Total de Saídas</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-calendar-check fa-2x mb-2 text-success"></i>
+            <h3>
+              <% 
+                const hoje = new Date();
+                const mesAtual = hoje.getMonth();
+                const anoAtual = hoje.getFullYear();
+                const saidasMes = detentosSaidos.filter(d => {
+                  if (!d.saida) return false;
+                  const dataSaida = new Date(d.saida);
+                  return dataSaida.getMonth() === mesAtual && dataSaida.getFullYear() === anoAtual;
+                }).length;
+              %>
+              <%= saidasMes %>
+            </h3>
+            <p>Saídas do Mês</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-card text-center p-3">
+            <i class="fa-solid fa-clock fa-2x mb-2 text-warning"></i>
+            <h3>
+              <% 
+                let totalDias = 0;
+                let contagemValida = 0;
+                
+                detentosSaidos.forEach(detento => {
+                  if (detento.dataEntrada && detento.saida) {
+                    const entrada = new Date(detento.dataEntrada);
+                    const saida = new Date(detento.saida);
+                    const dias = Math.floor((saida - entrada) / (1000 * 60 * 60 * 24));
+                    
+                    totalDias += dias;
+                    contagemValida++;
+                  }
+                });
+                
+                const mediaDias = contagemValida > 0 ? Math.round(totalDias / contagemValida) : 0;
+              %>
+              <%= mediaDias %> dias
+            </h3>
+            <p>Média de Permanência</p>
+          </div>
+        </div>
+      </div>
 
-    <!-- Tabela de Saídas -->
-    <table class="table table-dark table-striped">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Data de Saída</th>
-          <th>Crimes Cometidos</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (detentosSaidos.length > 0) { %>
-          <% detentosSaidos.forEach(detento => { %>
+      <!-- Filtros -->
+      <div class="filter-section">
+        <div class="row">
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '2' : '3' %>">
+            <input type="date" class="form-control" id="dataInicio" placeholder="Data Início">
+          </div>
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '2' : '3' %>">
+            <input type="date" class="form-control" id="dataFim" placeholder="Data Fim">
+          </div>
+          <% if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+          <div class="col-md-2">
+            <select class="form-select" id="inspetorFilter">
+              <option value="">Todos Inspetores</option>
+              <% 
+                // Extrair inspetores únicos dos registros de detentos
+                const inspetoresUnicos = new Set();
+                detentosSaidos.forEach(detento => {
+                  if (detento.registradoPor) {
+                    inspetoresUnicos.add(detento.registradoPor);
+                  }
+                });
+              %>
+              <% Array.from(inspetoresUnicos).forEach(inspetor => { %>
+              <option value="<%= inspetor %>"><%= inspetor %></option>
+              <% }); %>
+            </select>
+          </div>
+          <% } %>
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '3' : '3' %>">
+            <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar por nome...">
+          </div>
+          <div class="col-md-<%= user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR' ? '3' : '3' %>">
+            <button class="btn btn-primary w-100" id="aplicarFiltros">
+              <i class="fa-solid fa-filter me-2"></i>Aplicar Filtros
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de Saídas -->
+      <div class="table-responsive">
+        <table class="table table-dark table-striped">
+          <thead>
             <tr>
-              <td><%= detento.nome %></td>
-              <td><%= detento.saida.toLocaleDateString() %></td>
-              <td><%= detento.crimes.join(', ') %></td>
+              <th onclick="sortTable(0)">Nome <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(1)">Data de Saída <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(2)">Data de Entrada <i class="fa-solid fa-sort"></i></th>
+              <th onclick="sortTable(3)">Permanência <i class="fa-solid fa-sort"></i></th>
+              <th>Crimes Cometidos</th>
+              <th onclick="sortTable(5)">Registrado Por <i class="fa-solid fa-sort"></i></th>
+              <th>Ações</th>
             </tr>
-          <% }); %>
-        <% } else { %>
-          <tr>
-            <td colspan="3" class="text-center">Nenhum detento com saída registrada.</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+            <% if (detentosSaidos.length > 0) { %>
+            <% detentosSaidos.forEach(detento => { %>
+            <tr class="linha-detento" data-inspector="<%= detento.registradoPor %>">
+              <td><%= detento.nome %></td>
+              <td><%= new Date(detento.saida).toLocaleDateString('pt-BR') %></td>
+              <td><%= detento.dataEntrada ? new Date(detento.dataEntrada).toLocaleDateString('pt-BR') : 'N/A' %></td>
+              <td>
+                <% 
+                  if (detento.dataEntrada && detento.saida) {
+                    const entrada = new Date(detento.dataEntrada);
+                    const saida = new Date(detento.saida);
+                    const dias = Math.floor((saida - entrada) / (1000 * 60 * 60 * 24));
+                    const meses = Math.floor(dias / 30);
+                    const anos = Math.floor(meses / 12);
+                    
+                    if (anos > 0) {
+                      %><%=anos%> anos<% 
+                    } else if (meses > 0) {
+                      %><%=meses%> meses<% 
+                    } else {
+                      %><%=dias%> dias<% 
+                    }
+                  } else {
+                    %>N/A<%
+                  }
+                %>
+              </td>
+              <td><%= detento.crimes ? detento.crimes.join(', ') : 'N/A' %></td>
+              <td><%= detento.registradoPor || 'Não disponível' %></td>
+              <td>
+                <button class="btn btn-sm btn-primary" onclick="verDetalhes('<%= detento._id %>')">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </td>
+            </tr>
+            <% }); %>
+            <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center">Nenhum detento com saída registrada.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <div class="pagination-container">
+        <nav aria-label="Navegação por páginas">
+          <ul class="pagination justify-content-center" id="pagination">
+            <!-- Paginação será gerada pelo JavaScript -->
+          </ul>
+        </nav>
+      </div>
+    </div>
   </div>
 
   <!-- Footer -->
@@ -56,5 +308,455 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+  <script>
+    // Variáveis globais
+    const itemsPerPage = 10;
+    let currentPage = 1;
+    let filteredRows = [];
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      // Inicializar dados filtrados com todos os dados da tabela
+      updateFilteredRows();
+      
+      <% if (user.nivelAcesso === 'INSPETOR') { %>
+      // Para inspetores, aplicar o filtro automaticamente ao carregar a página
+      filterData();
+      <% } %>
+      
+      setupPagination();
+      showPage(1);
+      
+      // Adicionar eventos aos filtros
+      document.getElementById('aplicarFiltros').addEventListener('click', function() {
+        filterData();
+        setupPagination();
+        showPage(1);
+      });
+      
+      document.getElementById('searchInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+          filterData();
+          setupPagination();
+          showPage(1);
+        }
+      });
+    });
+    
+    // Atualizar dados filtrados
+    function updateFilteredRows() {
+      filteredRows = Array.from(document.querySelectorAll('.linha-detento'));
+    }
+    
+    // Filtrar dados
+    function filterData() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const dataInicio = document.getElementById('dataInicio').value ? new Date(document.getElementById('dataInicio').value) : null;
+      const dataFim = document.getElementById('dataFim').value ? new Date(document.getElementById('dataFim').value) : null;
+      
+      <% if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+      // Para admin e diretor, pegar o inspetor selecionado no filtro
+      const inspetor = document.getElementById('inspetorFilter').value;
+      <% } else if (user.nivelAcesso === 'INSPETOR') { %>
+      // Para inspetor, filtrar apenas seus próprios registros
+      const inspetor = '<%= user.nome %>'; // Nome do inspetor atual
+      <% } else { %>
+      const inspetor = '';
+      <% } %>
+      
+      // Resetar para todas as linhas
+      updateFilteredRows();
+      
+      // Aplicar filtros
+      filteredRows = filteredRows.filter(row => {
+        let show = true;
+        
+        // Filtro por nome
+        if (searchTerm && show) {
+          const cellNome = row.cells[0].textContent.toLowerCase().trim();
+          show = cellNome.includes(searchTerm);
+        }
+        
+        // Filtro por data
+        if ((dataInicio || dataFim) && show) {
+          const dataSaidaStr = row.cells[1].textContent.trim();
+          const dataParts = dataSaidaStr.split('/');
+          
+          if (dataParts.length === 3) {
+            const dataSaida = new Date(`${dataParts[2]}-${dataParts[1]}-${dataParts[0]}`);
+            
+            if (dataInicio && dataSaida < dataInicio) show = false;
+            if (dataFim && dataSaida > dataFim) show = false;
+          }
+        }
+        
+        // Filtro por inspetor
+        <% if (user.nivelAcesso === 'INSPETOR') { %>
+        // Se for inspetor, aplicar filtro automaticamente
+        // Nota: Esta parte requer que a informação do inspetor esteja no HTML da tabela
+        // Se não estiver visível na tabela, será necessário adicionar um atributo data
+        const rowData = row.getAttribute('data-inspector') || '';
+        if (inspetor && !rowData.includes(inspetor)) {
+          show = false;
+        }
+        <% } else if (user.nivelAcesso === 'ADMIN' || user.nivelAcesso === 'DIRETOR') { %>
+        // Se for admin ou diretor e filtro de inspetor estiver selecionado
+        if (inspetor) {
+          const rowData = row.getAttribute('data-inspector') || '';
+          if (!rowData.includes(inspetor)) {
+            show = false;
+          }
+        }
+        <% } %>
+        
+        return show;
+      });
+      
+      // Atualizar estatísticas visuais baseadas em dados filtrados
+      updateStats();
+    }
+    
+    // Atualizar estatísticas com base nos dados filtrados
+    function updateStats() {
+      const totalSaidas = filteredRows.length;
+      document.querySelector('.stats-card:nth-child(1) h3').textContent = totalSaidas;
+      
+      // Outras estatísticas poderiam ser atualizadas aqui se necessário
+    }
+    
+    // Configurar paginação
+    function setupPagination() {
+      const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+      
+      // Adicionar botão "Anterior"
+      const prevLi = document.createElement('li');
+      prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      const prevLink = document.createElement('a');
+      prevLink.className = 'page-link';
+      prevLink.href = '#';
+      prevLink.textContent = 'Anterior';
+      prevLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          showPage(currentPage - 1);
+        }
+      });
+      prevLi.appendChild(prevLink);
+      pagination.appendChild(prevLi);
+      
+      // Adicionar links numéricos
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        const link = document.createElement('a');
+        link.className = 'page-link';
+        link.href = '#';
+        link.textContent = i;
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          showPage(i);
+        });
+        li.appendChild(link);
+        pagination.appendChild(li);
+      }
+      
+      // Adicionar botão "Próximo"
+      const nextLi = document.createElement('li');
+      nextLi.className = `page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`;
+      const nextLink = document.createElement('a');
+      nextLink.className = 'page-link';
+      nextLink.href = '#';
+      nextLink.textContent = 'Próximo';
+      nextLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          showPage(currentPage + 1);
+        }
+      });
+      nextLi.appendChild(nextLink);
+      pagination.appendChild(nextLi);
+    }
+    
+    // Mostrar página específica
+    function showPage(page) {
+      currentPage = page;
+      
+      // Esconder todas as linhas
+      filteredRows.forEach(row => {
+        row.style.display = 'none';
+      });
+      
+      // Mostrar apenas as linhas da página atual
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      
+      for (let i = start; i < end && i < filteredRows.length; i++) {
+        filteredRows[i].style.display = '';
+      }
+      
+      // Atualizar estado ativo nos links de paginação
+      document.querySelectorAll('#pagination .page-item').forEach((item, index) => {
+        // Pular o primeiro (Anterior) e o último (Próximo)
+        if (index !== 0 && index !== document.querySelectorAll('#pagination .page-item').length - 1) {
+          if (index === currentPage) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        }
+      });
+      
+      // Atualizar estados dos botões anterior/próximo
+      const prevButton = document.querySelector('#pagination .page-item:first-child');
+      const nextButton = document.querySelector('#pagination .page-item:last-child');
+      
+      if (prevButton) {
+        if (currentPage === 1) {
+          prevButton.classList.add('disabled');
+        } else {
+          prevButton.classList.remove('disabled');
+        }
+      }
+      
+      if (nextButton) {
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        if (currentPage === totalPages || totalPages === 0) {
+          nextButton.classList.add('disabled');
+        } else {
+          nextButton.classList.remove('disabled');
+        }
+      }
+    }
+    
+    // Ordenar tabela
+    function sortTable(columnIndex) {
+      // Reset ícones de ordenação
+      document.querySelectorAll('th').forEach(th => {
+        th.classList.remove('asc', 'desc');
+      });
+      
+      // Determinar a direção da ordenação
+      const th = document.querySelector(`th:nth-child(${columnIndex + 1})`);
+      const isAscending = !th.classList.contains('asc');
+      
+      // Atualizar o ícone
+      th.classList.add(isAscending ? 'asc' : 'desc');
+      
+      // Ordenar as linhas
+      const rows = Array.from(filteredRows);
+      rows.sort((a, b) => {
+        let valueA, valueB;
+        
+        switch(columnIndex) {
+          case 0: // Nome
+            valueA = a.cells[0].textContent.trim().toLowerCase();
+            valueB = b.cells[0].textContent.trim().toLowerCase();
+            break;
+          case 1: // Data de Saída
+            const dateStrA = a.cells[1].textContent.trim();
+            const dateStrB = b.cells[1].textContent.trim();
+            
+            const partsA = dateStrA.split('/');
+            const partsB = dateStrB.split('/');
+            
+            if (partsA.length === 3 && partsB.length === 3) {
+              valueA = new Date(`${partsA[2]}-${partsA[1]}-${partsA[0]}`);
+              valueB = new Date(`${partsB[2]}-${partsB[1]}-${partsB[0]}`);
+            } else {
+              valueA = dateStrA;
+              valueB = dateStrB;
+            }
+            break;
+          case 2: // Data de Entrada
+            const entryDateStrA = a.cells[2].textContent.trim();
+            const entryDateStrB = b.cells[2].textContent.trim();
+            
+            if (entryDateStrA === 'N/A') return isAscending ? 1 : -1;
+            if (entryDateStrB === 'N/A') return isAscending ? -1 : 1;
+            
+            const entryPartsA = entryDateStrA.split('/');
+            const entryPartsB = entryDateStrB.split('/');
+            
+            if (entryPartsA.length === 3 && entryPartsB.length === 3) {
+              valueA = new Date(`${entryPartsA[2]}-${entryPartsA[1]}-${entryPartsA[0]}`);
+              valueB = new Date(`${entryPartsB[2]}-${entryPartsB[1]}-${entryPartsB[0]}`);
+            } else {
+              valueA = entryDateStrA;
+              valueB = entryDateStrB;
+            }
+            break;
+          case 3: // Permanência
+            const permanenciaA = a.cells[3].textContent.trim();
+            const permanenciaB = b.cells[3].textContent.trim();
+            
+            // Extrair números para classificação
+            const numA = parseInt(permanenciaA);
+            const numB = parseInt(permanenciaB);
+            
+            if (!isNaN(numA) && !isNaN(numB)) {
+              valueA = numA;
+              valueB = numB;
+              
+              // Considerar a unidade (dias, meses, anos)
+              if (permanenciaA.includes('anos')) valueA *= 365;
+              else if (permanenciaA.includes('meses')) valueA *= 30;
+              
+              if (permanenciaB.includes('anos')) valueB *= 365;
+              else if (permanenciaB.includes('meses')) valueB *= 30;
+            } else {
+              valueA = permanenciaA;
+              valueB = permanenciaB;
+            }
+            break;
+          case 5: // Registrado Por
+            const registradoPorA = a.cells[5].textContent.trim();
+            const registradoPorB = b.cells[5].textContent.trim();
+            
+            // Comparação para strings
+            if (registradoPorA < registradoPorB) return isAscending ? -1 : 1;
+            if (registradoPorA > registradoPorB) return isAscending ? 1 : -1;
+            return 0;
+          default:
+            valueA = a.cells[columnIndex].textContent.trim();
+            valueB = b.cells[columnIndex].textContent.trim();
+        }
+        
+        // Comparação para datas
+        if (valueA instanceof Date && valueB instanceof Date) {
+          return isAscending ? valueA - valueB : valueB - valueA;
+        }
+        
+        // Comparação para números
+        if (typeof valueA === 'number' && typeof valueB === 'number') {
+          return isAscending ? valueA - valueB : valueB - valueA;
+        }
+        
+        // Comparação para strings
+        if (valueA < valueB) return isAscending ? -1 : 1;
+        if (valueA > valueB) return isAscending ? 1 : -1;
+        return 0;
+      });
+      
+      // Atualizar a ordem dos elementos filtrados
+      filteredRows = rows;
+      
+      // Mostrar a página atual
+      showPage(currentPage);
+    }
+    
+    // Função para visualizar detalhes do detento
+    function verDetalhes(id) {
+      window.location.href = `/detentos/detalhes/${id}`;
+    }
+    
+    // Exportar para Excel
+    document.getElementById('baixar-xlsx').addEventListener('click', function() {
+      const wb = XLSX.utils.book_new();
+      
+      // Dados estatísticos
+      const statsData = [
+        ['Estatística', 'Valor'],
+        ['Total de Saídas', document.querySelector('.stats-card:nth-child(1) h3').textContent.trim()],
+        ['Saídas do Mês', document.querySelector('.stats-card:nth-child(2) h3').textContent.trim()],
+        ['Média de Permanência', document.querySelector('.stats-card:nth-child(3) h3').textContent.trim()]
+      ];
+      const statsWs = XLSX.utils.aoa_to_sheet(statsData);
+      XLSX.utils.book_append_sheet(wb, statsWs, "Estatísticas");
+      
+      // Dados dos detentos
+      const detentoData = [
+        ['Nome', 'Data de Saída', 'Data de Entrada', 'Permanência', 'Crimes Cometidos', 'Registrado Por']
+      ];
+      
+      filteredRows.forEach(row => {
+        detentoData.push([
+          row.cells[0].textContent.trim(),
+          row.cells[1].textContent.trim(),
+          row.cells[2].textContent.trim(),
+          row.cells[3].textContent.trim(),
+          row.cells[4].textContent.trim(),
+          row.cells[5].textContent.trim()
+        ]);
+      });
+      
+      const detentoWs = XLSX.utils.aoa_to_sheet(detentoData);
+      XLSX.utils.book_append_sheet(wb, detentoWs, "Detentos Saídos");
+      
+      // Exportar arquivo
+      XLSX.writeFile(wb, 'relatorio_saidas_detentos.xlsx');
+    });
+    
+    // Exportar para PDF
+    document.getElementById('baixar-pdf').addEventListener('click', function() {
+      const docDefinition = {
+        content: [
+          { text: 'Relatório de Saídas de Detentos', style: 'header' },
+          { text: `Data de geração: ${new Date().toLocaleDateString('pt-BR')}`, margin: [0, 0, 0, 20] },
+          
+          { text: 'Estatísticas', style: 'subheader' },
+          {
+            columns: [
+              { text: `Total de Saídas: ${document.querySelector('.stats-card:nth-child(1) h3').textContent.trim()}`, width: '*' },
+              { text: `Saídas do Mês: ${document.querySelector('.stats-card:nth-child(2) h3').textContent.trim()}`, width: '*' },
+              { text: `Média de Permanência: ${document.querySelector('.stats-card:nth-child(3) h3').textContent.trim()}`, width: '*' }
+            ],
+            margin: [0, 0, 0, 20]
+          },
+          
+          { text: 'Lista de Detentos que Saíram', style: 'subheader' },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['*', 'auto', 'auto', 'auto', '*', 'auto'],
+              body: [
+                [
+                  { text: 'Nome', style: 'tableHeader' },
+                  { text: 'Data de Saída', style: 'tableHeader' },
+                  { text: 'Data de Entrada', style: 'tableHeader' },
+                  { text: 'Permanência', style: 'tableHeader' },
+                  { text: 'Crimes Cometidos', style: 'tableHeader' },
+                  { text: 'Registrado Por', style: 'tableHeader' }
+                ],
+                ...filteredRows.map(row => [
+                  row.cells[0].textContent.trim(),
+                  row.cells[1].textContent.trim(),
+                  row.cells[2].textContent.trim(),
+                  row.cells[3].textContent.trim(),
+                  row.cells[4].textContent.trim(),
+                  row.cells[5].textContent.trim()
+                ])
+              ]
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 22,
+            bold: true,
+            margin: [0, 0, 0, 10]
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            margin: [0, 10, 0, 5]
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 13,
+            color: 'black'
+          }
+        }
+      };
+      
+      pdfMake.createPdf(docDefinition).download('relatorio_saidas_detentos.pdf');
+    });
+  </script>
 </body>
+
 </html>

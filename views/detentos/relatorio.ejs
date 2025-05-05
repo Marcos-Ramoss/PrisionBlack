@@ -1,254 +1,257 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório Detalhado do Detento</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #1a1a1a;
-            color: #ffffff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório Detalhado do Detento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #ffffff;
+    }
 
-        .report-container {
-            background: #242424;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
+    .report-container {
+      background: #242424;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
 
-        .report-header {
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
+    .report-header {
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
 
-        .report-section {
-            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
+    .report-section {
+      background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
 
-        .report-title {
-            color: #ff4444;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
+    .report-title {
+      color: #ff4444;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
 
-        .info-label {
-            color: #888;
-            font-size: 0.9rem;
-        }
+    .info-label {
+      color: #888;
+      font-size: 0.9rem;
+    }
 
-        .info-value {
-            color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
+    .info-value {
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
 
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
 
-        .timeline-item {
-            padding: 15px;
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
-            margin-left: 20px;
-            position: relative;
-        }
+    .timeline-item {
+      padding: 15px;
+      border-left: 2px solid rgba(255, 255, 255, 0.1);
+      margin-left: 20px;
+      position: relative;
+    }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 20px;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #ff4444;
-        }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 20px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ff4444;
+    }
 
-        .photo-container {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            width: 200px;
-            height: 200px;
-        }
+    .photo-container {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 200px;
+      height: 200px;
+    }
 
-        .photo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .photo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-        .status-active {
-            background-color: #28a745;
-        }
+    .status-active {
+      background-color: #28a745;
+    }
 
-        .status-pending {
-            background-color: #ffc107;
-        }
+    .status-pending {
+      background-color: #ffc107;
+    }
 
-        .status-danger {
-            background-color: #dc3545;
-        }
+    .status-danger {
+      background-color: #dc3545;
+    }
 
-        .print-button {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-        }
-    </style>
+    .print-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+  </style>
 </head>
+
 <body>
-    <%- include('../partials/navbar', { user }) %>
+  <%- include('../partials/navbar', { user }) %>
 
-    <div class="container">
-        <div class="report-container">
-            <!-- Cabeçalho do Relatório -->
-            <div class="report-header">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        <div class="photo-container">
-                            <img src="/uploads/<%= detento.foto %>" alt="Foto do Detento">
-                        </div>
-                    </div>
-                    <div class="col-md-9">
-                        <h1><%= detento.nome %></h1>
-                        <div class="d-flex gap-3">
-                            <span class="status-badge status-active">ID: <%= detento._id %></span>
-                            <span class="status-badge status-<%= detento.statusPericulosidade === 'Alta' ? 'danger' : 'pending' %>">
-                                Periculosidade: <%= detento.statusPericulosidade %>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+  <div class="container">
+    <div class="report-container">
+      <!-- Cabeçalho do Relatório -->
+      <div class="report-header">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="photo-container">
+              <img src="/uploads/<%= detento.foto %>" alt="Foto do Detento">
             </div>
-
-            <!-- Informações Pessoais -->
-            <div class="report-section">
-                <h3 class="report-title"><i class="fas fa-user me-2"></i>Informações Pessoais</h3>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="info-label">Data de Nascimento</div>
-                        <div class="info-value"><%= new Date(detento.dataNascimento).toLocaleDateString() %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">Idade</div>
-                        <div class="info-value"><%= detento.idade %> anos</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">Estado Civil</div>
-                        <div class="info-value"><%= detento.estadoCivil %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">RG</div>
-                        <div class="info-value"><%= detento.rg %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">CPF</div>
-                        <div class="info-value"><%= detento.cpf %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">Naturalidade</div>
-                        <div class="info-value"><%= detento.naturalidade %></div>
-                    </div>
-                </div>
+          </div>
+          <div class="col-md-9">
+            <h1><%= detento.nome %></h1>
+            <div class="d-flex gap-3">
+              <span class="status-badge status-active">ID: <%= detento._id %></span>
+              <span class="status-badge status-<%= detento.statusPericulosidade === 'Alta' ? 'danger' : 'pending' %>">
+                Periculosidade: <%= detento.statusPericulosidade %>
+              </span>
             </div>
-
-            <!-- Informações Penais -->
-            <div class="report-section">
-                <h3 class="report-title"><i class="fas fa-gavel me-2"></i>Informações Penais</h3>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-label">Crimes</div>
-                        <div class="info-value">
-                            <% detento.crimes.forEach(crime => { %>
-                                <span class="badge bg-danger me-2"><%= crime %></span>
-                            <% }) %>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-label">Data de Entrada</div>
-                        <div class="info-value"><%= new Date(detento.dataEntrada).toLocaleDateString() %></div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-label">Tempo de Pena</div>
-                        <div class="info-value"><%= detento.tempoPena %> anos</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Localização na Prisão -->
-            <div class="report-section">
-                <h3 class="report-title"><i class="fas fa-door-closed me-2"></i>Localização na Prisão</h3>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="info-label">Pavilhão</div>
-                        <div class="info-value"><%= detento.cela ? detento.cela.pavilhao : 'Não alocado' %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">Cela</div>
-                        <div class="info-value"><%= detento.cela ? detento.cela.codigo : 'Não alocado' %></div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-label">Status da Cela</div>
-                        <div class="info-value">
-                            <span class="status-badge <%= detento.cela ? 'status-active' : 'status-pending' %>">
-                                <%= detento.cela ? 'Alocado' : 'Não Alocado' %>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Histórico de Visitas -->
-            <div class="report-section">
-                <h3 class="report-title"><i class="fas fa-history me-2"></i>Histórico de Visitas</h3>
-                <div class="timeline">
-                    <% if (detento.visitas && detento.visitas.length > 0) { %>
-                        <% detento.visitas.forEach(visita => { %>
-                            <div class="timeline-item">
-                                <div class="info-label"><%= new Date(visita.data).toLocaleDateString() %></div>
-                                <div class="info-value">
-                                    <%= visita.visitante %> - <%= visita.tipo %>
-                                </div>
-                                <small class="text-muted"><%= visita.observacao %></small>
-                            </div>
-                        <% }) %>
-                    <% } else { %>
-                        <div class="timeline-item">
-                            <div class="info-value">Nenhuma visita registrada</div>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-
-            <!-- Observações -->
-            <div class="report-section">
-                <h3 class="report-title"><i class="fas fa-clipboard me-2"></i>Observações</h3>
-                <div class="info-value">
-                    <%= detento.observacoes || 'Nenhuma observação registrada' %>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
 
-        <!-- Botão de Impressão -->
-        <button class="btn btn-primary print-button" onclick="window.print()">
-            <i class="fas fa-print me-2"></i>Imprimir Relatório
-        </button>
+      <!-- Informações Pessoais -->
+      <div class="report-section">
+        <h3 class="report-title"><i class="fas fa-user me-2"></i>Informações Pessoais</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="info-label">Data de Nascimento</div>
+            <div class="info-value"><%= new Date(detento.dataNascimento).toLocaleDateString() %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">Idade</div>
+            <div class="info-value"><%= detento.idade %> anos</div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">Estado Civil</div>
+            <div class="info-value"><%= detento.estadoCivil %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">RG</div>
+            <div class="info-value"><%= detento.rg %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">CPF</div>
+            <div class="info-value"><%= detento.cpf %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">Naturalidade</div>
+            <div class="info-value"><%= detento.naturalidade %></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informações Penais -->
+      <div class="report-section">
+        <h3 class="report-title"><i class="fas fa-gavel me-2"></i>Informações Penais</h3>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-label">Crimes</div>
+            <div class="info-value">
+              <% detento.crimes.forEach(crime => { %>
+              <span class="badge bg-danger me-2"><%= crime %></span>
+              <% }) %>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="info-label">Data de Entrada</div>
+            <div class="info-value"><%= new Date(detento.dataEntrada).toLocaleDateString() %></div>
+          </div>
+          <div class="col-md-3">
+            <div class="info-label">Tempo de Pena</div>
+            <div class="info-value"><%= detento.tempoPena %> anos</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localização na Prisão -->
+      <div class="report-section">
+        <h3 class="report-title"><i class="fas fa-door-closed me-2"></i>Localização na Prisão</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="info-label">Pavilhão</div>
+            <div class="info-value"><%= detento.cela ? detento.cela.pavilhao : 'Não alocado' %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">Cela</div>
+            <div class="info-value"><%= detento.cela ? detento.cela.codigo : 'Não alocado' %></div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-label">Status da Cela</div>
+            <div class="info-value">
+              <span class="status-badge <%= detento.cela ? 'status-active' : 'status-pending' %>">
+                <%= detento.cela ? 'Alocado' : 'Não Alocado' %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Histórico de Visitas -->
+      <div class="report-section">
+        <h3 class="report-title"><i class="fas fa-history me-2"></i>Histórico de Visitas</h3>
+        <div class="timeline">
+          <% if (detento.visitas && detento.visitas.length > 0) { %>
+          <% detento.visitas.forEach(visita => { %>
+          <div class="timeline-item">
+            <div class="info-label"><%= new Date(visita.data).toLocaleDateString() %></div>
+            <div class="info-value">
+              <%= visita.visitante %> - <%= visita.tipo %>
+            </div>
+            <small class="text-muted"><%= visita.observacao %></small>
+          </div>
+          <% }) %>
+          <% } else { %>
+          <div class="timeline-item">
+            <div class="info-value">Nenhuma visita registrada</div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="report-section">
+        <h3 class="report-title"><i class="fas fa-clipboard me-2"></i>Observações</h3>
+        <div class="info-value">
+          <%= detento.observacoes || 'Nenhuma observação registrada' %>
+        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Botão de Impressão -->
+    <button class="btn btn-primary print-button" onclick="window.print()">
+      <i class="fas fa-print me-2"></i>Imprimir Relatório
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+
+</html>
