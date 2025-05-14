@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
@@ -12,10 +12,9 @@
   <!-- Estilos Personalizados -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/dashboardAdmin.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
   <!-- Icone Favicon -->
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
-  <link rel="stylesheet" href="/css/modal_dashboard_celas.css">
-
 </head>
 
 <body>
@@ -37,7 +36,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout">
-              <i class="fa-solid fa-sign-out-alt"></i> Logout
+              <i class="fa-solid fa-sign-out-alt"></i> Sair
             </a>
           </li>
         </ul>
@@ -45,487 +44,233 @@
     </div>
   </nav>
 
-  <!-- Conteúdo do Dashboard -->
-  <div class="container mt-5">
+  <!-- Botão da Barra Lateral -->
+ 
+
+  <!-- Barra Lateral -->
+  <div class="sidebar">
+    <button class="close-sidebar">
+      <i class="fas fa-times"></i>
+    </button>
+    <ul class="sidebar-menu">
+      <li>
+        <button data-section="estatisticas">
+          <i class="fas fa-chart-bar"></i> Estatísticas
+        </button>
+      </li>
+      <li>
+        <button data-section="gerenciamento">
+          <i class="fas fa-cogs"></i> Gerenciamento Rápido
+        </button>
+      </li>
+      <li>
+        <button data-section="graficos">
+          <i class="fas fa-chart-line"></i> Gráficos
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div class="main-content">
+    <button class="sidebar-toggle">
+      <i class="fas fa-bars"></i>
+    </button>
     <h1 class="page-title"><i class="fa-solid fa-tachometer-alt me-2"></i>Dashboard do Admin</h1>
-
-    <!-- Estatísticas Resumidas -->
-    <div class="row g-4">
-      <!-- Detentos -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-users stats-icon text-primary"></i>
-            <h5 class="card-title">Detentos</h5>
-            <p class="stats-number">
-              <%= totalDetentos %>
-            </p>
-          </div>
+    
+    <!-- Seção de Estatísticas -->
+    <div id="estatisticas" class="content-section">
+      <h3>Estatísticas</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <i class="fa-solid fa-users text-primary"></i>
+          <h5>Detentos</h5>
+          <p class="stats-number"><%= totalDetentos %></p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-bed text-success"></i>
+          <h5>Celas Ocupadas</h5>
+          <p class="stats-number"><%= totalCelasOcupadas %></p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-door-open text-warning"></i>
+          <h5>Celas Disponíveis</h5>
+          <p class="stats-number"><%= totalCelasDisponiveis %></p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-user-check text-info"></i>
+          <h5>Celas Alocadas</h5>
+          <p class="stats-number"><%= totalCelasAlocadas %></p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-handshake text-info"></i>
+          <h5>Visitas Familiares</h5>
+          <p class="stats-number"><%= totalVisitasFamiliares %></p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-balance-scale text-danger"></i>
+          <h5>Visitas Advogados</h5>
+          <p class="stats-number"><%= totalVisitasAdvogados %></p>
         </div>
       </div>
+    </div>
 
-      <!-- Celas Ocupadas -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-bed stats-icon text-success"></i>
-            <h5 class="card-title">Celas Ocupadas</h5>
-            <p class="stats-number">
-              <%= totalCelasOcupadas %>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card de Celas -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-door-open stats-icon text-warning"></i>
-            <h5 class="card-title">Celas por Pavilhão</h5>
-
-            <!-- Formulário para filtrar pavilhões -->
-            <form id="pavilhaoForm" action="/admin/dashboard" method="GET">
-              <div class="mb-3">
-                <select class="form-select custom-select" name="pavilhao" id="pavilhaoSelect">
-                  <option value="" disabled selected>Selecione um Pavilhão</option>
-                  <% ['A', 'B' , 'C' ].forEach(pavilhao=> { %>
-                    <option value="<%= pavilhao %>" <%=pavilhaoSelecionado===pavilhao ? 'selected' : '' %>>
-                      Pavilhão <%= pavilhao %>
-                    </option>
-                    <% }) %>
-                </select>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal para exibir celas -->
-      <div class="modal fade" id="celasModal" tabindex="-1" aria-labelledby="celasModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content bg-dark text-white border-0 rounded-3">
-            <div class="modal-header border-0">
-              <h5 class="modal-title" id="celasModalLabel">
-                <i class="fa-solid fa-door-open me-2 text-warning"></i>Celas do Pavilhão <span
-                  id="modalPavilhao"></span>
-              </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                aria-label="Close"></button>
+    <!-- Seção de Gerenciamento Rápido -->
+    <div id="gerenciamento" class="content-section" style="display: none;">
+      <h3>Gerenciamento Rápido</h3>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <a href="/detentos/lista" class="card text-decoration-none text-white h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <i class="fa-solid fa-user fa-3x text-primary mb-3"></i>
+              <h5 class="card-title text-center">Gerenciar Detentos</h5>
             </div>
-            <div class="modal-body">
-              <ul class="list-unstyled" id="celasList">
-                <% if (celasFiltradas && celasFiltradas.length> 0) { %>
-                  <% celasFiltradas.forEach(cela=> { %>
-                    <li><strong>Código:</strong>
-                      <%= cela.codigo %> (Capacidade: <%= cela.capacidade %>)
-                    </li>
-                    <% }) %>
-                      <% } else if (pavilhaoSelecionado) { %>
-                        <li>Nenhuma cela encontrada no Pavilhão <%= pavilhaoSelecionado %>.</li>
-                        <% } else { %>
-                          <li>Selecione um pavilhão para ver as celas.</li>
-                          <% } %>
-              </ul>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/celas/lista" class="card text-decoration-none text-white h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <i class="fa-solid fa-door-closed fa-3x text-success mb-3"></i>
+              <h5 class="card-title text-center">Gerenciar Celas</h5>
             </div>
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                <i class="fa-solid fa-times me-2"></i>Fechar
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/relatorios/ocupacao" class="card text-decoration-none text-white h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <i class="fa-solid fa-chart-line fa-3x text-info mb-3"></i>
+              <h5 class="card-title text-center">Ver Relatórios</h5>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <a href="/admin/gerenciar-usuarios" class="card text-decoration-none text-white h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <i class="fa-solid fa-users-gear fa-3x text-warning mb-3"></i>
+              <h5 class="card-title text-center">Gerenciar Inspetores/Diretores</h5>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Gráficos -->
+    <div id="graficos" class="content-section" style="display: none;">
+      <h3>Gráficos</h3>
+      <div class="graficos-grid">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h5 class="chart-title">Estatísticas de Celas</h5>
+            <div class="btn-group">
+              <button class="btn btn-dark" onclick="changeChartType('celasChart', 'bar')" title="Gráfico de Barras">
+                <i class="fa-solid fa-chart-bar"></i>
+              </button>
+              <button class="btn btn-dark" onclick="changeChartType('celasChart', 'line')" title="Gráfico de Linha">
+                <i class="fa-solid fa-chart-line"></i>
+              </button>
+              <button class="btn btn-dark" onclick="changeChartType('celasChart', 'pie')" title="Gráfico de Pizza">
+                <i class="fa-solid fa-chart-pie"></i>
               </button>
             </div>
           </div>
+          <canvas id="celasChart"></canvas>
         </div>
-      </div>
 
-      <!-- Celas Disponíveis -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-door-open stats-icon text-warning"></i>
-            <h5 class="card-title">Celas Disponíveis</h5>
-            <p class="stats-number">
-              <%= totalCelasDisponiveis %>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Celas Alocadas -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-user-check stats-icon text-info"></i>
-            <h5 class="card-title">Celas Alocadas</h5>
-            <p class="stats-number">
-              <%= totalCelasAlocadas %>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Visitas Familiares -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-handshake stats-icon text-info"></i>
-            <h5 class="card-title">Visitas Familiares</h5>
-            <p class="stats-number">
-              <%= totalVisitasFamiliares %>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Visitas Advogados -->
-      <div class="col-md-4">
-        <div class="card stats-card text-center text-white">
-          <div class="card-body">
-            <i class="fa-solid fa-balance-scale stats-icon text-danger"></i>
-            <h5 class="card-title">Visitas Advogados</h5>
-            <p class="stats-number">
-              <%= totalVisitasAdvogados %>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="row mt-5">
-      <!-- Gráfico de Celas -->
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="card-title">Estatísticas de Celas</h5>
-              <div class="btn-group">
-                <button class="btn" onclick="changeChartType('cellChart', 'bar')">
-                  <i class="fa-solid fa-chart-bar"></i> Barras
-                </button>
-                <button class="btn" onclick="changeChartType('cellChart', 'line')">
-                  <i class="fa-solid fa-chart-line"></i> Linha
-                </button>
-                <button class="btn" onclick="changeChartType('cellChart', 'pie')">
-                  <i class="fa-solid fa-chart-pie"></i> Pizza
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="cellChart"></canvas>
+        <div class="chart-container">
+          <div class="chart-header">
+            <h5 class="chart-title">Estatísticas de Visitas</h5>
+            <div class="btn-group">
+              <button class="btn btn-dark" onclick="changeChartType('visitChart', 'bar')" title="Gráfico de Barras">
+                <i class="fa-solid fa-chart-bar"></i>
+              </button>
+              <button class="btn btn-dark" onclick="changeChartType('visitChart', 'line')" title="Gráfico de Linha">
+                <i class="fa-solid fa-chart-line"></i>
+              </button>
+              <button class="btn btn-dark" onclick="changeChartType('visitChart', 'pie')" title="Gráfico de Pizza">
+                <i class="fa-solid fa-chart-pie"></i>
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Gráfico de Visitas -->
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="card-title">Estatísticas de Visitas</h5>
-              <div class="btn-group">
-                <button class="btn" onclick="changeChartType('visitChart', 'bar')">
-                  <i class="fa-solid fa-chart-bar"></i> Barras
-                </button>
-                <button class="btn" onclick="changeChartType('visitChart', 'line')">
-                  <i class="fa-solid fa-chart-line"></i> Linha
-                </button>
-                <button class="btn" onclick="changeChartType('visitChart', 'pie')">
-                  <i class="fa-solid fa-chart-pie"></i> Pizza
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="visitChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Links Rápidos -->
-    <div class="row mt-5 quick-links">
-      <div class="col-md-12">
-        <h4 class="mb-4"><i class="fa-solid fa-bolt me-2"></i> Gerenciamento Rápido</h4>
-        <div class="row g-4">
-          <!-- Gerenciar Detentos -->
-          <div class="col-md-6 col-lg-3">
-            <a href="/detentos/lista" class="card text-decoration-none text-white h-100">
-              <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                <i class="fa-solid fa-user fa-3x text-primary mb-3"></i>
-                <h5 class="card-title text-center">Gerenciar Detentos</h5>
-              </div>
-            </a>
-          </div>
-
-          <!-- Gerenciar Celas -->
-          <div class="col-md-6 col-lg-3">
-            <a href="/celas/lista" class="card text-decoration-none text-white h-100">
-              <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                <i class="fa-solid fa-door-closed fa-3x text-success mb-3"></i>
-                <h5 class="card-title text-center">Gerenciar Celas</h5>
-              </div>
-            </a>
-          </div>
-
-          <!-- Ver Relatórios -->
-          <div class="col-md-6 col-lg-3">
-            <a href="/relatorios/ocupacao" class="card text-decoration-none text-white h-100">
-              <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                <i class="fa-solid fa-chart-line fa-3x text-info mb-3"></i>
-                <h5 class="card-title text-center">Ver Relatórios</h5>
-              </div>
-            </a>
-          </div>
-
-          <!-- Gerenciar Inspetores/Diretores -->
-          <div class="col-md-6 col-lg-3">
-            <a href="/admin/gerenciar-usuarios" class="card text-decoration-none text-white h-100">
-              <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                <i class="fa-solid fa-users-gear fa-3x text-warning mb-3"></i>
-                <h5 class="card-title text-center">Gerenciar Inspetores/Diretores</h5>
-              </div>
-            </a>
-          </div>
+          <canvas id="visitChart"></canvas>
         </div>
       </div>
     </div>
   </div>
 
-  <br><br><br>
-
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/sidebar.js"></script>
   <script>
-
-    // Dados para os gráficos
-    const cellData = {
+    // Inicialização dos gráficos
+    const celasData = {
       labels: ['Total de Celas', 'Celas Ocupadas', 'Celas Disponíveis', 'Celas Alocadas'],
       datasets: [{
         label: 'Estatísticas de Celas',
         data: [<%= totalCelas %>, <%= totalCelasOcupadas %>, <%= totalCelasDisponiveis %>, <%= totalCelasAlocadas %>],
-        backgroundColor: [
-          'rgba(13, 110, 253, 0.8)',  // Primary blue
-          'rgba(25, 135, 84, 0.8)',   // Success green
-          'rgba(255, 193, 7, 0.8)',   // Warning yellow
-          'rgba(108, 117, 125, 0.8)'  // Secondary gray
-        ],
-        borderColor: [
-          'rgba(13, 110, 253, 1)',
-          'rgba(25, 135, 84, 1)',
-          'rgba(255, 193, 7, 1)',
-          'rgba(108, 117, 125, 1)'
-        ],
+        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8'],
+        borderColor: ['#0056b3', '#1e7e34', '#d39e00', '#117a8b'],
         borderWidth: 1
       }]
     };
 
-    const visitData = {
-      labels: ['Visitas Familiares', 'Visitas de Advogados'],
+    const visitasData = {
+      labels: ['Visitas Familiares', 'Visitas Advogados'],
       datasets: [{
+        label: 'Estatísticas de Visitas',
         data: [<%= totalVisitasFamiliares %>, <%= totalVisitasAdvogados %>],
-        backgroundColor: [
-          'rgba(13, 202, 240, 0.8)',  // Info blue
-          'rgba(220, 53, 69, 0.8)'    // Danger red
-        ],
-        borderColor: [
-          'rgba(13, 202, 240, 1)',
-          'rgba(220, 53, 69, 1)'
-        ],
+        backgroundColor: ['#17a2b8', '#dc3545'],
+        borderColor: ['#117a8b', '#bd2130'],
         borderWidth: 1
       }]
     };
 
-    // Configuração dos gráficos
-    const cellChartConfig = {
+    const celasChart = new Chart(document.getElementById('celasChart'), {
       type: 'bar',
-      data: cellData,
+      data: celasData,
       options: {
         responsive: true,
-        maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'top',
-            labels: {
-              color: '#fff'
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#fff'
-            }
-          },
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#fff'
-            }
+            display: false
           }
         }
       }
-    };
+    });
 
-    const visitChartConfig = {
+    const visitChart = new Chart(document.getElementById('visitChart'), {
       type: 'pie',
-      data: visitData,
+      data: visitasData,
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              color: '#fff',
-              font: {
-                size: 12
-              }
-            }
-          }
-        }
+        responsive: true
       }
-    };
+    });
 
-    // Variáveis globais para os gráficos
-    let cellChart;
-    let visitChart;
-
-    // Função para mudar o tipo de gráfico
     function changeChartType(chartId, type) {
-      const chart = chartId === 'cellChart' ? cellChart : visitChart;
-      const data = chartId === 'cellChart' ? cellData : visitData;
-      const config = chartId === 'cellChart' ? cellChartConfig : visitChartConfig;
-
-      // Destruir o gráfico existente
-      chart.destroy();
-
-      // Criar novo gráfico com o tipo selecionado
-      const newConfig = {
-        ...config,
-        type: type,
-        data: data,
-        options: {
-          ...config.options,
-          maintainAspectRatio: false,
-          plugins: {
-            ...config.options.plugins,
-            legend: {
-              position: 'top',
-              labels: {
-                color: '#fff',
-                font: {
-                  size: 12
-                }
-              }
-            }
-          }
-        }
-      };
-
-      // Adicionar escalas apenas para gráficos de barra e linha
-      if (type === 'bar' || type === 'line') {
-        newConfig.options.scales = {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#fff'
-            }
-          },
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: '#fff'
-            }
-          }
-        };
-      }
-
-      // Criar novo gráfico
-      if (chartId === 'cellChart') {
-        cellChart = new Chart(document.getElementById(chartId), newConfig);
-      } else {
-        visitChart = new Chart(document.getElementById(chartId), newConfig);
-      }
+      const chart = chartId === 'celasChart' ? celasChart : visitChart;
+      chart.config.type = type;
+      chart.update();
     }
 
-    // Criar os gráficos iniciais
-    window.onload = function () {
-      cellChart = new Chart(document.getElementById('cellChart'), cellChartConfig);
-      visitChart = new Chart(document.getElementById('visitChart'), visitChartConfig);
-    };
+    // Função para mostrar a seção selecionada
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(sectionId).style.display = 'block';
+    }
 
-  </script>
-
-
-
-  <script>
-    // Abrir o modal ao selecionar um pavilhão
-    document.getElementById('pavilhaoSelect').addEventListener('change', function () {
-      const pavilhao = this.value; // Obter o valor do pavilhão selecionado
-      const modalPavilhao = document.getElementById('modalPavilhao');
-      const celasList = document.getElementById('celasList');
-
-      // Atualizar o título do modal
-      modalPavilhao.textContent = pavilhao;
-
-      // Fazer uma requisição para buscar as celas do pavilhão selecionado
-      fetch(`/admin/dashboard?pavilhao=${pavilhao}`, {
-        headers: {
-          'Accept': 'application/json' // Garantir que a requisição espera um JSON
-        }
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Erro ao buscar celas');
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Limpar a lista de celas
-          celasList.innerHTML = '';
-
-          if (data.celasFiltradas && data.celasFiltradas.length > 0) {
-            data.celasFiltradas.forEach(cela => {
-              const li = document.createElement('li');
-              li.innerHTML = `
-              <strong>Código:</strong> ${cela.codigo} (Capacidade: ${cela.capacidade})<br>
-              <strong>Ocupantes:</strong> ${cela.ocupantes.length} detentos<br>
-              <ul>
-                ${cela.ocupantes.map(ocupante => `<li>${ocupante.nome}</li>`).join('')}
-              </ul>
-            `;
-              celasList.appendChild(li);
-            });
-          } else {
-            celasList.innerHTML = '<li>Nenhuma cela encontrada no Pavilhão.</li>';
-          }
-
-          // Abrir o modal
-          const celasModal = new bootstrap.Modal(document.getElementById('celasModal'));
-          celasModal.show();
-        })
-        .catch(error => {
-          console.error('Erro ao buscar celas:', error);
-          alert('Erro ao buscar celas. Tente novamente.');
-        });
+    // Adicionar eventos aos botões do menu
+    document.querySelectorAll('.sidebar-menu button').forEach(button => {
+      button.addEventListener('click', function() {
+        const sectionId = this.getAttribute('data-section');
+        showSection(sectionId);
+      });
     });
+
+    // Mostrar a seção de estatísticas por padrão
+    showSection('estatisticas');
   </script>
-
-
 </body>
 
 </html>

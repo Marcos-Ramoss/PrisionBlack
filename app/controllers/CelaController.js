@@ -4,8 +4,23 @@ const DetentoService = require('../services/DetentoService');
 class CelaController {
   static async listar(req, res) {
     try {
-      const celas = await CelaService.listar();
-      res.render('celas/lista', { celas, user: req.session.user });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || '';
+      const pavilhao = req.query.pavilhao || '';
+      const ocupacao = req.query.ocupacao || '';
+      const { celas, total, totalPages } = await CelaService.listarPaginado(page, limit, search, pavilhao, ocupacao);
+      res.render('celas/lista', {
+        celas,
+        user: req.session.user,
+        page,
+        totalPages,
+        total,
+        limit,
+        search,
+        pavilhao,
+        ocupacao
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }

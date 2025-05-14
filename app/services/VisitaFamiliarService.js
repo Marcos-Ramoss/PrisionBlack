@@ -28,6 +28,32 @@ class VisitaFamiliarService {
   static async excluir(id) {
     return await VisitaFamiliarModel.findByIdAndDelete(id);
   }
+
+  static async listarPaginado(page = 1, limit = 5, search = '') {
+    const skip = (page - 1) * limit;
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { nomeFamiliar: { $regex: new RegExp(search, 'i') } },
+          { relacao: { $regex: new RegExp(search, 'i') } }
+        ]
+      };
+    }
+    const [visitas, total] = await Promise.all([
+      VisitaFamiliarModel.find(query)
+        .populate('detento')
+        .skip(skip)
+        .limit(limit),
+      VisitaFamiliarModel.countDocuments(query)
+    ]);
+    return {
+      visitas,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    };
+  }
 }
 
 module.exports = VisitaFamiliarService;

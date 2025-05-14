@@ -6,19 +6,49 @@ const moment = require('moment-timezone');
 class VisitaController {
   static async listar(req, res) {
     try {
-      const visitasFamiliares = await VisitaFamiliarService.listar();
-      const visitasAdvogados = await VisitaAdvogadoService.listar();
-      
-      // Unindo os dois tipos de visitas em um único array e adicionando uma propriedade para identificar o tipo
-      const visitas = [
-        ...visitasFamiliares.map(v => ({ ...v.toObject(), tipo: 'familiar' })),
-        ...visitasAdvogados.map(v => ({ ...v.toObject(), tipo: 'advogado' }))
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || '';
+      const tipo = req.query.tipo || '';
+      const data = req.query.data || '';
+      // Buscar todas as visitas filtradas (sem skip/limit)
+      const [familiar, advogado] = await Promise.all([
+        VisitaFamiliarService.listarPaginado(1, Number.MAX_SAFE_INTEGER, search),
+        VisitaAdvogadoService.listarPaginado(1, Number.MAX_SAFE_INTEGER, search)
+      ]);
+      // Unir e marcar tipo
+      let visitas = [
+        ...familiar.visitas.map(v => ({ ...v.toObject(), tipo: 'familiar' })),
+        ...advogado.visitas.map(v => ({ ...v.toObject(), tipo: 'advogado' }))
       ];
-      
-      // Ordenando por data, das mais recentes para as mais antigas
+      // Filtrar por tipo se necessário
+      if (tipo === 'familiar' || tipo === 'advogado') {
+        visitas = visitas.filter(v => v.tipo === tipo);
+      }
+      // Filtrar por data se necessário
+      if (data) {
+        visitas = visitas.filter(v => {
+          const dataVisitaStr = new Date(v.dataVisita).toISOString().slice(0, 10);
+          return dataVisitaStr === data;
+        });
+      }
+      // Ordenar por data
       visitas.sort((a, b) => new Date(b.dataVisita) - new Date(a.dataVisita));
-      
-      res.render('visitas/lista', { visitas, user: req.session.user });
+      // Paginar no array unido
+      const total = visitas.length;
+      const totalPages = Math.ceil(total / limit);
+      const paginatedVisitas = visitas.slice((page - 1) * limit, page * limit);
+      res.render('visitas/lista', {
+        visitas: paginatedVisitas,
+        user: req.session.user,
+        page,
+        totalPages,
+        total,
+        limit,
+        search,
+        tipo,
+        data
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }
@@ -31,21 +61,21 @@ class VisitaController {
         const detentos = await DetentoService.listar();
         res.render('visitas/cadastro', { detentos, user: req.session.user });
       } else if (req.method === 'POST') {
-        const { 
-          detentoId, 
-          tipoVisita, 
-          nomeFamiliar, 
-          relacao, 
-          nomeAdvogado, 
-          numeroOAB, 
+        const {
+          detentoId,
+          tipoVisita,
+          nomeFamiliar,
+          relacao,
+          nomeAdvogado,
+          numeroOAB,
           dataVisita,
           horaVisita,
-          observacoes 
+          observacoes
         } = req.body;
-        
+
         // Usar o timezone correto para a data da visita
         const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
-        
+
         if (tipoVisita === 'familiar') {
           // Cadastra visita familiar
           await VisitaFamiliarService.cadastrar({
@@ -67,7 +97,7 @@ class VisitaController {
             observacoes
           });
         }
-        
+
         res.redirect('/visitas/lista');
       }
     } catch (error) {
@@ -87,16 +117,16 @@ class VisitaController {
         } else if (tipo === 'advogado') {
           visita = await VisitaAdvogadoService.buscarPorId(id);
         }
-        
+
         if (!visita) return res.status(404).send('Visita não encontrada.');
-        
+
         const detentos = await DetentoService.listar();
         res.render('visitas/editar', { visita, tipo, detentos, user: req.session.user });
       } else if (req.method === 'POST') {
         // Campos comuns
         const { detentoId, dataVisita, horaVisita, observacoes } = req.body;
         const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
-        
+
         if (tipo === 'familiar') {
           // Atualiza visita familiar
           const { nomeFamiliar, relacao } = req.body;
@@ -120,7 +150,7 @@ class VisitaController {
             observacoes
           });
         }
-        
+
         res.redirect('/visitas/lista');
       }
     } catch (error) {
@@ -131,13 +161,13 @@ class VisitaController {
   static async excluir(req, res) {
     try {
       const { id, tipo } = req.params;
-      
+
       if (tipo === 'familiar') {
         await VisitaFamiliarService.excluir(id);
       } else if (tipo === 'advogado') {
         await VisitaAdvogadoService.excluir(id);
       }
-      
+
       res.redirect('/visitas/lista');
     } catch (error) {
       res.status(500).send(error.message);

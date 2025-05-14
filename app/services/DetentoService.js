@@ -116,6 +116,33 @@ class DetentoService {
     return await DetentoModel.find({ nome: { $regex: new RegExp(nome, 'i') } });
   }
 
+  static async listarPaginado(page = 1, limit = 5, search = '', pavilhao = '', reincidencia = '') {
+    const skip = (page - 1) * limit;
+    let query = {};
+    if (search) {
+      query.nome = { $regex: new RegExp(search, 'i') };
+    }
+    if (reincidencia === 'true') {
+      query.reincidencia = true;
+    } else if (reincidencia === 'false') {
+      query.reincidencia = false;
+    }
+    let detentos = await DetentoModel.find(query)
+      .populate({ path: 'cela', select: 'codigo pavilhao capacidade' });
+    if (pavilhao) {
+      detentos = detentos.filter(d => d.cela && d.cela.pavilhao === pavilhao);
+    }
+    const total = detentos.length;
+    const totalPages = Math.ceil(total / limit);
+    const paginatedDetentos = detentos.slice(skip, skip + limit);
+    return {
+      detentos: paginatedDetentos,
+      total,
+      page,
+      totalPages
+    };
+  }
+
 }
 
 module.exports = DetentoService;

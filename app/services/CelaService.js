@@ -79,6 +79,36 @@ class CelaService {
     return await CelaModel.findByIdAndDelete(id);
   }
 
+  static async listarPaginado(page = 1, limit = 5, search = '', pavilhao = '', ocupacao = '') {
+    const skip = (page - 1) * limit;
+    let query = {};
+    if (search) {
+      query.$or = [
+        { codigo: { $regex: new RegExp(search, 'i') } },
+        { pavilhao: { $regex: new RegExp(search, 'i') } }
+      ];
+    }
+    if (pavilhao) {
+      query.pavilhao = pavilhao;
+    }
+    // Buscar todas as celas para filtrar por ocupação depois do populate
+    let celas = await CelaModel.find(query)
+      .populate({ path: 'ocupantes', select: 'nome idade estadoCivil' });
+    if (ocupacao === 'disponivel') {
+      celas = celas.filter(cela => cela.ocupantes.length < cela.capacidade);
+    } else if (ocupacao === 'cheia') {
+      celas = celas.filter(cela => cela.ocupantes.length >= cela.capacidade);
+    }
+    const total = celas.length;
+    const totalPages = Math.ceil(total / limit);
+    const paginatedCelas = celas.slice(skip, skip + limit);
+    return {
+      celas: paginatedCelas,
+      total,
+      page,
+      totalPages
+    };
+  }
 }
 
 module.exports = CelaService;

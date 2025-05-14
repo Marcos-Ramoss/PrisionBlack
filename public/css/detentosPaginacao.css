@@ -1,0 +1,63 @@
+ /* Animação para o botão */
+ .animated-button {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .animated-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(255, 0, 0, 0.3);
+  }
+
+  /* Animação para a foto */
+  .foto-detento {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+    /* Indica que é clicável */
+  }
+
+  .foto-detento:hover {
+    transform: scale(1.1);
+    /* Amplia a imagem */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5);
+    /* Adiciona sombra */
+  }
+  
+  /* Estilo para a área de filtros */
+  .search-and-filters {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Paginação customizada */
+  .pagination .page-item .page-link {
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    margin: 0 2px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .pagination .page-item.active .page-link {
+    background: #23272b;
+    color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: 2px solid #444;
+  }
+  .pagination .page-item.disabled .page-link {
+    color: #888;
+    background: transparent;
+    border: none;
+  }
+  .pagination .page-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #444;
+  }
+  .pagination .page-link:hover:not(.active) {
+    background: #343a40;
+    color: #fff;
+  }

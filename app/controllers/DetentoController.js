@@ -55,8 +55,23 @@ class DetentoController {
 
   static async listar(req, res) {
     try {
-      const detentos = await DetentoService.listar();
-      res.render('detentos/lista', { detentos, user: req.session.user });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || '';
+      const pavilhao = req.query.pavilhao || '';
+      const reincidencia = req.query.reincidencia || '';
+      const { detentos, total, totalPages } = await DetentoService.listarPaginado(page, limit, search, pavilhao, reincidencia);
+      res.render('detentos/lista', {
+        detentos,
+        user: req.session.user,
+        page,
+        totalPages,
+        total,
+        limit,
+        search,
+        pavilhao,
+        reincidencia
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }
