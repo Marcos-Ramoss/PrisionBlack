@@ -5,7 +5,11 @@ class VisitaFamiliarController {
   static async listar(req, res) {
     try {
       const visitas = await VisitaFamiliarService.listar();
-      res.render('visitas/lista', { visitas, user: req.session.user });
+      res.render('visitas/lista', { 
+        visitas, 
+        user: req.session.user,
+        currentPage: 'visitas'
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }
@@ -16,7 +20,11 @@ class VisitaFamiliarController {
       if (req.method === 'GET') {
         // Renderiza o formulário de cadastro com a lista de detentos
         const detentos = await DetentoService.listar();
-        res.render('visitas/cadastro', { detentos, user: req.session.user });
+        res.render('visitas/cadastro', { 
+          detentos, 
+          user: req.session.user,
+          currentPage: 'visitas'
+        });
       } else if (req.method === 'POST') {
         // Cadastra uma nova visita
         const { detentoId, nomeFamiliar, relacao, dataVisita, observacoes } = req.body;
@@ -61,7 +69,11 @@ class VisitaFamiliarController {
     try {
       const { dataInicio, dataFim } = req.query;
       const visitas = await VisitaFamiliarService.listarPorData(new Date(dataInicio), new Date(dataFim));
-      res.render('visitas/listaPorData', { visitas, user: req.session.user });
+      res.render('visitas/listaPorData', { 
+        visitas, 
+        user: req.session.user,
+        currentPage: 'visitas'
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }

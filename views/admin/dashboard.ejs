@@ -5,20 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard do Admin</title>
-  <!-- Bootstrap CSS -->
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <!-- Estilos Personalizados -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/dashboardAdmin.css">
   <link rel="stylesheet" href="/css/sidebar.css">
-  <!-- Icone Favicon -->
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 </head>
 
 <body>
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="/home">
@@ -44,9 +40,6 @@
     </div>
   </nav>
 
-  <!-- Botão da Barra Lateral -->
- 
-
   <!-- Barra Lateral -->
   <div class="sidebar">
     <button class="close-sidebar">
@@ -71,13 +64,12 @@
     </ul>
   </div>
 
-  <!-- Conteúdo Principal -->
   <div class="main-content">
     <button class="sidebar-toggle">
       <i class="fas fa-bars"></i>
     </button>
     <h1 class="page-title"><i class="fa-solid fa-tachometer-alt me-2"></i>Dashboard do Admin</h1>
-    
+
     <!-- Seção de Estatísticas -->
     <div id="estatisticas" class="content-section">
       <h3>Estatísticas</h3>
@@ -197,80 +189,28 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/sidebar.js"></script>
+  <script src="/js/dashboard-charts.js"></script>
   <script>
-    // Inicialização dos gráficos
-    const celasData = {
-      labels: ['Total de Celas', 'Celas Ocupadas', 'Celas Disponíveis', 'Celas Alocadas'],
-      datasets: [{
-        label: 'Estatísticas de Celas',
-        data: [<%= totalCelas %>, <%= totalCelasOcupadas %>, <%= totalCelasDisponiveis %>, <%= totalCelasAlocadas %>],
-        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8'],
-        borderColor: ['#0056b3', '#1e7e34', '#d39e00', '#117a8b'],
-        borderWidth: 1
-      }]
+    const chartData = {
+      totalCelas: <%= totalCelas %>,
+      totalCelasOcupadas: <%= totalCelasOcupadas %>,
+      totalCelasDisponiveis: <%= totalCelasDisponiveis %>,
+      totalCelasAlocadas: <%= totalCelasAlocadas %>,
+      totalVisitasFamiliares: <%= totalVisitasFamiliares %>,
+      totalVisitasAdvogados: <%= totalVisitasAdvogados %>
     };
 
-    const visitasData = {
-      labels: ['Visitas Familiares', 'Visitas Advogados'],
-      datasets: [{
-        label: 'Estatísticas de Visitas',
-        data: [<%= totalVisitasFamiliares %>, <%= totalVisitasAdvogados %>],
-        backgroundColor: ['#17a2b8', '#dc3545'],
-        borderColor: ['#117a8b', '#bd2130'],
-        borderWidth: 1
-      }]
-    };
-
-    const celasChart = new Chart(document.getElementById('celasChart'), {
-      type: 'bar',
-      data: celasData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeCharts(chartData);
     });
-
-    const visitChart = new Chart(document.getElementById('visitChart'), {
-      type: 'pie',
-      data: visitasData,
-      options: {
-        responsive: true
-      }
-    });
-
-    function changeChartType(chartId, type) {
-      const chart = chartId === 'celasChart' ? celasChart : visitChart;
-      chart.config.type = type;
-      chart.update();
-    }
-
-    // Função para mostrar a seção selecionada
-    function showSection(sectionId) {
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.style.display = 'none';
-      });
-      document.getElementById(sectionId).style.display = 'block';
-    }
-
-    // Adicionar eventos aos botões do menu
-    document.querySelectorAll('.sidebar-menu button').forEach(button => {
-      button.addEventListener('click', function() {
-        const sectionId = this.getAttribute('data-section');
-        showSection(sectionId);
-      });
-    });
-
-    // Mostrar a seção de estatísticas por padrão
-    showSection('estatisticas');
   </script>
+
+
+
 </body>
 
 </html>

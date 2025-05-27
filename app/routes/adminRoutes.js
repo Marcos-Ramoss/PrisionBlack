@@ -13,7 +13,6 @@ const DiretorController = require('../controllers/DiretorController');
 router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, res) => {
   try {
     const { pavilhao } = req.query;
-    // Obter estatísticas do sistema
     const totalDetentos = await DetentoModel.countDocuments();
     const totalCelas = await CelaModel.countDocuments();
     const totalCelasOcupadas = await CelaModel.countDocuments({ ocupantes: { $ne: [] } });
@@ -41,9 +40,6 @@ router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, 
       return res.json({ celasFiltradas });
     }
 
-
-
-    // Renderizar a view do dashboard com os dados
     res.render('admin/dashboard', {
       title: 'Dashboard do Admin',
       user: req.usuario,
@@ -65,13 +61,7 @@ router.get('/dashboard', authenticate, authorize('ADMIN'), session, async (req, 
 });
 
 
-
-
-
-// Rota para o Dashboard do Diretor
 router.get('/diretor/dashboard', authenticate, authorize('DIRETOR'), session, DiretorController.dashboard);
-
-// Rotas de gerenciamento de usuários
 router.get('/gerenciar-usuarios', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.listarUsuarios);
 router.post('/cadastrar-usuario', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.cadastrarUsuario);
 router.post('/excluir-usuario/:id', authenticate, authorize('ADMIN', 'DIRETOR'), session, UserController.excluirUsuario);

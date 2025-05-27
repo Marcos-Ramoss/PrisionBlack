@@ -1,0 +1,175 @@
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .report-section {
+    background: #242424;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .stats-card {
+    background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .table-dark {
+    background-color: #242424;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .action-buttons .btn {
+    transition: all 0.3s ease;
+  }
+
+  .action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .detento-foto {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .filter-section {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .chart-container {
+    height: 300px;
+    margin-bottom: 20px;
+  }
+
+  .pagination-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .pagination .page-link {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    background-color: #333;
+    border-color: #444;
+    color: #777;
+  }
+
+  .filter-section .form-select,
+  .filter-section .form-control {
+    background-color: #333;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .filter-section .form-select option {
+    background-color: #333;
+    color: #fff;
+  }
+
+  table th {
+    cursor: pointer;
+  }
+
+  table th i.fa-sort {
+    margin-left: 5px;
+    opacity: 0.5;
+  }
+
+  table th.asc i.fa-sort:before {
+    content: "\f0de";
+    /* fa-sort-up */
+    opacity: 1;
+  }
+
+  table th.desc i.fa-sort:before {
+    content: "\f0dd";
+    /* fa-sort-down */
+    opacity: 1;
+  }
+
+  /* Tema Claro */
+  body.light-theme {
+    background-color: #f4f4f4;
+    color: #222;
+  }
+
+  body.light-theme .report-section {
+    background: #fff;
+    color: #222;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+  }
+
+  body.light-theme .stats-card {
+    background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #222;
+    border: 1px solid #e0e0e0;
+  }
+
+  body.light-theme .table-dark {
+    background-color: #fff;
+    color: #222;
+  }
+
+  body.light-theme .filter-section {
+    background: #f8f9fa;
+    color: #222;
+  }
+
+  body.light-theme .pagination .page-link {
+    background-color: #fff;
+    border-color: #bbb;
+    color: #222;
+  }
+
+  body.light-theme .pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+  }
+
+  body.light-theme .pagination .page-item.disabled .page-link {
+    background-color: #eee;
+    border-color: #bbb;
+    color: #bbb;
+  }
+
+  body.light-theme .filter-section .form-select,
+  body.light-theme .filter-section .form-control {
+    background-color: #fff;
+    border-color: #bbb;
+    color: #222;
+  }
+
+  body.light-theme .filter-section .form-select option {
+    background-color: #fff;
+    color: #222;
+  }
+
+  body.light-theme .detento-foto {
+    border: 1px solid #ddd;
+  }

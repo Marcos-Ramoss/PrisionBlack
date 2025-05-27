@@ -4,10 +4,7 @@ const RelatorioController = require('../controllers/RelatorioController');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 const session = require('../middlewares/autenticate');
 
-
-// Relatório de Ocupação de Celas
 router.get('/ocupacao', authenticate, authorize('DIRETOR', 'ADMIN', 'INSPETOR'), session, RelatorioController.ocupacao);
-
-router.get('/saidas', authenticate, authorize('DIRETOR','ADMIN', 'INSPETOR'), session, RelatorioController.saidas);
+router.get('/saidas', authenticate, authorize('DIRETOR', 'ADMIN', 'INSPETOR'), session, RelatorioController.saidas);
 
 module.exports = router;

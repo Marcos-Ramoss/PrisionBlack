@@ -6,7 +6,11 @@ class VisitaAdvogadoController {
   static async listar(req, res) {
     try {
       const visitas = await VisitaAdvogadoService.listar();
-      res.render('visitasAdvogado/lista', { visitas, user: req.session.user });
+      res.render('visitasAdvogado/lista', { 
+        visitas, 
+        user: req.session.user,
+        currentPage: 'visitas'
+      });
     } catch (error) {
       res.status(500).send(error.message);
     }
@@ -17,7 +21,11 @@ class VisitaAdvogadoController {
       if (req.method === 'GET') {
         // Renderiza o formulário de cadastro com a lista de detentos
         const detentos = await DetentoService.listar();
-        res.render('visitasAdvogado/cadastro', { detentos, user: req.session.user });
+        res.render('visitasAdvogado/cadastro', { 
+          detentos, 
+          user: req.session.user,
+          currentPage: 'visitas'
+        });
       } else if (req.method === 'POST') {
         // Cadastra uma nova visita
         const { detentoId, nomeAdvogado, numeroOAB, dataVisita, observacoes } = req.body;
@@ -45,7 +53,12 @@ class VisitaAdvogadoController {
         const visita = await VisitaAdvogadoService.buscarPorId(id);
         const detentos = await DetentoService.listar();
         if (!visita) return res.status(404).send('Visita não encontrada.');
-        res.render('visitasAdvogado/editar', { visita, detentos, user: req.session.user });
+        res.render('visitasAdvogado/editar', { 
+          visita, 
+          detentos, 
+          user: req.session.user,
+          currentPage: 'visitas'
+        });
       } else if (req.method === 'POST') {
         // Atualiza a visita com os novos dados
         const { detentoId, nomeAdvogado, numeroOAB, dataVisita, observacoes } = req.body;

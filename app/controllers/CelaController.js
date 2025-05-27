@@ -19,7 +19,8 @@ class CelaController {
         limit,
         search,
         pavilhao,
-        ocupacao
+        ocupacao,
+        currentPage: 'celas'
       });
     } catch (error) {
       res.status(500).send(error.message);
@@ -34,7 +35,7 @@ class CelaController {
         success: true,
         message: 'Cela cadastrada com sucesso!',
         data: novaCela,
-      }); 
+      });
     } catch (error) {
       res.status(400).json({
         success: false,
@@ -47,7 +48,7 @@ class CelaController {
     try {
       const { celaId, detentoId } = req.body;
       const celaAtualizada = await CelaService.alocar(celaId, detentoId);
-      res.redirect('/celas/lista'); 
+      res.redirect('/celas/lista');
     } catch (error) {
       res.status(400).send(error.message);
     }
@@ -61,14 +62,18 @@ class CelaController {
         // Renderiza o formulário de edição com os dados da cela
         const cela = await CelaService.buscarPorId(id);
         if (!cela) return res.status(404).send('Cela não encontrada.');
-        res.render('celas/editar', { cela, user: req.session.user });
+        res.render('celas/editar', {
+          cela,
+          user: req.session.user,
+          currentPage: 'celas'
+        });
       } else if (req.method === 'POST') {
         // Atualiza a cela com os novos dados
         const { codigo, pavilhao, capacidade } = req.body;
         const dadosAtualizados = { codigo, pavilhao, capacidade };
         const celaAtualizada = await CelaService.editar(id, dadosAtualizados);
         if (!celaAtualizada) return res.status(404).send('Cela não encontrada.');
-        res.redirect('/celas/lista'); // Redireciona para a lista de celas
+        res.redirect('/celas/lista');
       }
     } catch (error) {
       res.status(500).send(error.message);

@@ -26,7 +26,7 @@
         <!-- Detentos -->
         <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/detentos/lista">
+          <a class="nav-link <%= currentPage === 'detentos' ? 'active' : '' %>" href="/detentos/lista">
             <i class="fa-solid fa-user"></i> Detentos
           </a>
         </li>
@@ -35,7 +35,7 @@
         <!-- Celas -->
         <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR' ].includes(user.nivelAcesso)) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/celas/lista">
+          <a class="nav-link <%= currentPage === 'celas' ? 'active' : '' %>" href="/celas/lista">
             <i class="fa-solid fa-door-closed"></i> Celas
           </a>
         </li>
@@ -44,7 +44,7 @@
         <% if (user && ['ADMIN', 'DIRETOR' , 'INSPETOR' ].includes(user.nivelAcesso)) { %>
         <!-- Visitas -->
         <li class="nav-item">
-          <a class="nav-link" href="/visitas/lista">
+          <a class="nav-link <%= currentPage === 'visitas' ? 'active' : '' %>" href="/visitas/lista">
             <i class="fa-solid fa-users"></i> Visitas
           </a>
         </li>
@@ -53,7 +53,7 @@
         <!-- Relatórios -->
         <% if (user && ['ADMIN', 'DIRETOR', 'INSPETOR' ].includes(user.nivelAcesso)) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/relatorios/ocupacao">
+          <a class="nav-link <%= currentPage === 'relatorios' ? 'active' : '' %>" href="/relatorios/ocupacao">
             <i class="fa-solid fa-chart-line"></i> Relatórios
           </a>
         </li>
@@ -62,13 +62,13 @@
         <!-- Dashboard -->
         <% if (user && user.nivelAcesso==='ADMIN' ) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/admin/dashboard">
+          <a class="nav-link <%= currentPage === 'admin-dashboard' ? 'active' : '' %>" href="/admin/dashboard">
             <i class="fa-solid fa-tachometer-alt"></i> Dashboard
           </a>
         </li>
         <% } else if (user && user.nivelAcesso==='DIRETOR' ) { %>
         <li class="nav-item">
-          <a class="nav-link" href="/admin/diretor/dashboard">
+          <a class="nav-link <%= currentPage === 'diretor-dashboard' ? 'active' : '' %>" href="/admin/diretor/dashboard">
             <i class="fa-solid fa-tachometer-alt"></i> Dashboard
           </a>
         </li>

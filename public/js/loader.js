@@ -1,18 +1,18 @@
 // Função para calcular o tempo de carregamento baseado na velocidade da internet
 function calculateLoadingTime() {
 
-    let loadingTime = 3000;
+    let loadingTime = 1000;
 
     // Usando a API Navigator.connection para detectar a velocidade da conexão (quando disponível)
     if (navigator.connection) {
         const connection = navigator.connection;
 
         if (connection.effectiveType === '4g') {
-            loadingTime = 1500;
+            loadingTime = 1000; // 1500
         } else if (connection.effectiveType === '3g') {
-            loadingTime = 2000;
+            loadingTime = 1000; // 2000
         } else {
-            loadingTime = 3000;
+            loadingTime = 1000; // 3000
         }
     }
 

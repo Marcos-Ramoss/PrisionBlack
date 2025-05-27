@@ -5,33 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sobre Nós</title>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <!-- Estilo Personalizado -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" type="image/png" href="/img/Logo_PrisionBlack.png">
 
 </head>
 
 <body>
-  <!-- Navbar -->
-  <%- include('partials/navbar', { user }) %>
+  <%- include('partials/navbar', { user, currentPage: 'sobre-nos' }) %>
 
-  <!-- Main Content -->
   <div class="container mt-5">
     <h1 class="text-center mb-5">Sobre Nós</h1>
     <div class="row">
+
       <!-- Integrante 1 -->
       <div class="col-md-4">
         <div class="team-member text-center">
           <img src="/img/Marcos.jpg" alt="Integrante 1">
           <h4>Marcos Oliveira Ferreira</h4>
-          <p>Desenvolvedor Backend e Banco de dados</p>
+          <p>Desenvolvedor Full Stack</p>
           <div class="social-icons">
-            <a href="https://github.com/Marcos-Ramoss" target="_blank"><i class="fab fa-github fa-lg"></i></a>
-            <a href="www.linkedin.com/in/marcos-oliveira-ferreira-a68728348" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://github.com/Marcos-Ramoss" target="_blank" class="me-3"><i class="fab fa-github fa-lg"></i></a>
+            <a href="https://linkedin.com/in/marcos-oliveira-ferreira-a68728348" target="_blank" class="me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://wa.me/5592986321151" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
           </div>
         </div>
       </div>
@@ -39,12 +36,13 @@
       <!-- Integrante 2 -->
       <div class="col-md-4">
         <div class="team-member text-center">
-          <img src="/img/integrante2.jpg" alt="Integrante 2">
+          <img src="/img/igor.jpg" alt="Integrante 2">
           <h4>Igor Santiago de Carvalho</h4>
-          <p>Desenvolvedor Backend e Frontend</p>
+          <p>Desenvolvedor Full Stack</p>
           <div class="social-icons">
-            <a href="https://github.com/integrante2" target="_blank"><i class="fab fa-github fa-lg"></i></a>
-            <a href="https://linkedin.com/in/integrante2" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://github.com/IgorSan1" target="_blank" class="me-3"><i class="fab fa-github fa-lg"></i></a>
+            <a href="https://linkedin.com/in/integrante2" target="_blank" class="me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://wa.me/5511999999999" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
           </div>
         </div>
       </div>
@@ -54,10 +52,11 @@
         <div class="team-member text-center">
           <img src="/img/Fabio.jpg" alt="Integrante 3">
           <h4>Fabio de Souza</h4>
-          <p>Descrição breve do papel do integrante no projeto.</p>
+          <p> Analista de requisitos </p>
           <div class="social-icons">
-            <a href="https://github.com/integrante3" target="_blank"><i class="fab fa-github fa-lg"></i></a>
-            <a href="https://linkedin.com/in/integrante3" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://github.com/integrante3" target="_blank" class="me-3"><i class="fab fa-github fa-lg"></i></a>
+            <a href="https://linkedin.com/in/integrante3" target="_blank" class="me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://wa.me/559292176544" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
           </div>
         </div>
       </div>
@@ -68,10 +67,11 @@
         <div class="team-member text-center">
           <img src="/img/Bruno.jpeg" alt="Integrante 4">
           <h4>Bruno Renê</h4>
-          <p>Descrição breve do papel do integrante no projeto.</p>
+          <p>Web Designer</p>
           <div class="social-icons">
-            <a href="https://github.com/integrante3" target="_blank"><i class="fab fa-github fa-lg"></i></a>
-            <a href="https://linkedin.com/in/integrante3" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://github.com/integrante3" target="_blank" class="me-3"><i class="fab fa-github fa-lg"></i></a>
+            <a href="https://linkedin.com/in/integrante3" target="_blank" class="me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://wa.me/559291475885" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
           </div>
         </div>
       </div>
@@ -81,10 +81,11 @@
         <div class="team-member text-center">
           <img src="/img/Izumi.jpeg" alt="Integrante 4">
           <h4>Alexandre Izumi Filho</h4>
-          <p>Gerente e Product Backlog</p>
+          <p>Scrum Master</p>
           <div class="social-icons">
-            <a href="https://github.com/integrante3" target="_blank"><i class="fab fa-github fa-lg"></i></a>
-            <a href="https://linkedin.com/in/integrante3" target="_blank"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://github.com/Alex1zum1" target="_blank" class="me-3"><i class="fab fa-github fa-lg"></i></a>
+            <a href="https://linkedin.com/in/integrante3" target="_blank" class="me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+            <a href="https://wa.me/559282265069" target="_blank"><i class="fab fa-whatsapp fa-lg"></i></a>
           </div>
         </div>
       </div>
@@ -94,13 +95,8 @@
 
   </div>
 
-
-
-
-  <!-- Footer -->
   <%- include('partials/footer') %>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

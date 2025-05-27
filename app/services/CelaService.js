@@ -1,4 +1,4 @@
-const CelaModel = require ('../models/CelaModel');
+const CelaModel = require('../models/CelaModel');
 const DetentoModel = require('../models/DetentoModel');
 const LogService = require('./LogService');
 
@@ -23,8 +23,7 @@ class CelaService {
 
   static async cadastrar(dados) {
     const { codigo, pavilhao, capacidade } = dados;
-    
-    // Verifica se a cela já existe
+
     const celaExistente = await CelaModel.findOne({ codigo });
     if (celaExistente) {
       throw new Error('cela já cadastrada');
@@ -36,16 +35,14 @@ class CelaService {
 
   static async validarDetentos(detentos) {
     try {
-      // Busca todas as celas que contêm algum dos detentos na lista de ocupantes
       const celasComDetentos = await CelaModel.find({ ocupantes: { $in: detentos } });
 
       if (celasComDetentos.length > 0) {
-        // Extrai os IDs dos detentos que já estão associados a outras celas
         const detentosJaCadastrados = celasComDetentos.flatMap(detentos => CelaModel.ocupantes);
         return detentosJaCadastrados;
       }
 
-      return null; // Nenhum detento duplicado encontrado
+      return null;
     } catch (error) {
       throw new Error('Erro ao validar detentos: ' + error.message);
     }
@@ -82,18 +79,21 @@ class CelaService {
   static async listarPaginado(page = 1, limit = 5, search = '', pavilhao = '', ocupacao = '') {
     const skip = (page - 1) * limit;
     let query = {};
+
     if (search) {
       query.$or = [
         { codigo: { $regex: new RegExp(search, 'i') } },
         { pavilhao: { $regex: new RegExp(search, 'i') } }
       ];
     }
+
     if (pavilhao) {
       query.pavilhao = pavilhao;
     }
-    // Buscar todas as celas para filtrar por ocupação depois do populate
+
     let celas = await CelaModel.find(query)
       .populate({ path: 'ocupantes', select: 'nome idade estadoCivil' });
+
     if (ocupacao === 'disponivel') {
       celas = celas.filter(cela => cela.ocupantes.length < cela.capacidade);
     } else if (ocupacao === 'cheia') {

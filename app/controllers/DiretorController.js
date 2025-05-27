@@ -7,7 +7,7 @@ class DiretorController {
   static async dashboard(req, res) {
     try {
       const { pavilhao } = req.query;
-  
+
       const totalDetentos = await DetentoModel.countDocuments();
       const totalCelas = await CelaModel.countDocuments();
       const totalCelasOcupadas = await CelaModel.countDocuments({ 'ocupantes.0': { $exists: true } });
@@ -34,7 +34,6 @@ class DiretorController {
 
       console.log('Total de Celas Ocupadas:', totalCelasOcupadas);
 
-      // Renderizar a view do dashboard com os dados
       res.render('diretor/dashboard', {
         title: 'Dashboard do Diretor',
         user: req.usuario,
@@ -48,6 +47,7 @@ class DiretorController {
         celasPorPavilhao,
         celasFiltradas,
         pavilhaoSelecionado: pavilhao || null,
+        currentPage: 'diretor-dashboard'
       });
     } catch (error) {
       console.error('Erro ao carregar o dashboard:', error.message);

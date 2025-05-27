@@ -1,0 +1,23 @@
+.profile-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .profile-image:hover {
+    transform: scale(1.1);
+  }
+
+  .card-profile {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .action-buttons .btn {
+    margin-right: 10px;
+  }

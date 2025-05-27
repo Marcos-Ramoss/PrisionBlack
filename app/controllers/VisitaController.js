@@ -47,7 +47,8 @@ class VisitaController {
         limit,
         search,
         tipo,
-        data
+        data,
+        currentPage: 'visitas'
       });
     } catch (error) {
       res.status(500).send(error.message);
@@ -59,23 +60,27 @@ class VisitaController {
       if (req.method === 'GET') {
         // Renderiza o formulário de cadastro com a lista de detentos
         const detentos = await DetentoService.listar();
-        res.render('visitas/cadastro', { detentos, user: req.session.user });
+        res.render('visitas/cadastro', { 
+          detentos, 
+          user: req.session.user,
+          currentPage: 'visitas'
+        });
       } else if (req.method === 'POST') {
-        const {
-          detentoId,
-          tipoVisita,
-          nomeFamiliar,
-          relacao,
-          nomeAdvogado,
-          numeroOAB,
+        const { 
+          detentoId, 
+          tipoVisita, 
+          nomeFamiliar, 
+          relacao, 
+          nomeAdvogado, 
+          numeroOAB, 
           dataVisita,
           horaVisita,
-          observacoes
+          observacoes 
         } = req.body;
-
+        
         // Usar o timezone correto para a data da visita
         const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
-
+        
         if (tipoVisita === 'familiar') {
           // Cadastra visita familiar
           await VisitaFamiliarService.cadastrar({
@@ -97,7 +102,7 @@ class VisitaController {
             observacoes
           });
         }
-
+        
         res.redirect('/visitas/lista');
       }
     } catch (error) {
@@ -117,16 +122,22 @@ class VisitaController {
         } else if (tipo === 'advogado') {
           visita = await VisitaAdvogadoService.buscarPorId(id);
         }
-
+        
         if (!visita) return res.status(404).send('Visita não encontrada.');
-
+        
         const detentos = await DetentoService.listar();
-        res.render('visitas/editar', { visita, tipo, detentos, user: req.session.user });
+        res.render('visitas/editar', { 
+          visita, 
+          tipo, 
+          detentos, 
+          user: req.session.user,
+          currentPage: 'visitas'
+        });
       } else if (req.method === 'POST') {
         // Campos comuns
         const { detentoId, dataVisita, horaVisita, observacoes } = req.body;
         const dataVisitaAmazonas = moment.tz(dataVisita, 'America/Manaus').toDate();
-
+        
         if (tipo === 'familiar') {
           // Atualiza visita familiar
           const { nomeFamiliar, relacao } = req.body;
@@ -150,7 +161,7 @@ class VisitaController {
             observacoes
           });
         }
-
+        
         res.redirect('/visitas/lista');
       }
     } catch (error) {
@@ -161,13 +172,13 @@ class VisitaController {
   static async excluir(req, res) {
     try {
       const { id, tipo } = req.params;
-
+      
       if (tipo === 'familiar') {
         await VisitaFamiliarService.excluir(id);
       } else if (tipo === 'advogado') {
         await VisitaAdvogadoService.excluir(id);
       }
-
+      
       res.redirect('/visitas/lista');
     } catch (error) {
       res.status(500).send(error.message);

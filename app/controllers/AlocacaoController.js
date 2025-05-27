@@ -5,7 +5,7 @@ const Cela = require('../models/CelaModel');
 
 
 class AlocacaoController {
-  // Exibir página de detalhes de alocação
+
   async detalhes(req, res) {
     try {
       const detentos = await Detento.find().populate('cela');
@@ -15,6 +15,7 @@ class AlocacaoController {
         detentos,
         celas,
         user: req.session.user,
+        currentPage: 'celas'
       });
     } catch (error) {
       console.error('Erro ao carregar dados de alocação:', error);
@@ -27,10 +28,8 @@ class AlocacaoController {
     try {
       const { celaId, detentoId } = req.body;
 
-      // Chama o serviço para alocar o detento
       const resultado = await AlocacaoService.alocarDetento(celaId, detentoId, req.session.user);
 
-      // Retorna resposta JSON
       res.json({ 
         success: true, 
         message: resultado.mensagem 
@@ -48,11 +47,9 @@ class AlocacaoController {
   async remover(req, res) {
     try {
       const { celaId, detentoId } = req.params;
-
-      // Chama o serviço para remover o detento
+   
       const resultado = await AlocacaoService.removerDetento(celaId, detentoId);
 
-      // Retorna resposta JSON
       res.json({ 
         success: true, 
         message: resultado.mensagem 

@@ -5,7 +5,7 @@ const DetentoSchema = new mongoose.Schema({
   idade: { type: Number, required: true },
   filiacao: { type: String, required: true },
   estadoCivil: { type: String, required: true },
-  foto: { type: String }, // Caminho para a imagem
+  foto: { type: String }, 
   reincidencia: { type: Boolean, default: false },
   crimes: [{ type: String }],
   cela: { type: mongoose.Schema.Types.ObjectId, ref: 'Cela' },
@@ -14,7 +14,6 @@ const DetentoSchema = new mongoose.Schema({
   visitasFamiliares: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaFamiliar' }],
   visitasAdvogados: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VisitaAdvogado' }],
   saida: { type: Date },
-  // Campos para rastreamento de registro
   registradoPor: { type: String, default: 'Sistema' },
   usuarioCadastro: { type: String, default: 'Sistema' }, 
   dataRegistro: { type: Date, default: Date.now },

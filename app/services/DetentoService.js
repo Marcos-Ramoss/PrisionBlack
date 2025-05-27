@@ -8,7 +8,6 @@ class DetentoService {
     try {
       const { nome, idade, filiacao, estadoCivil, foto, reincidencia, crimes, cela, registradoPor, usuarioCadastro, comAlocacaoInicial } = dados;
 
-      // Se uma cela foi selecionada, verifica se ela existe e tem capacidade
       if (cela) {
         const celaExistente = await CelaModel.findById(cela);
         if (!celaExistente) {
@@ -19,7 +18,6 @@ class DetentoService {
         }
       }
 
-      // Preparar entrada do histórico de alocação se for cadastrado diretamente na cela
       let historicoAlocacao = [];
       if (cela && comAlocacaoInicial) {
         const celaExistente = await CelaModel.findById(cela);
@@ -39,17 +37,14 @@ class DetentoService {
         reincidencia,
         crimes,
         cela,
-        // Adicionar campos de registro
         registradoPor: registradoPor || usuarioCadastro || 'Sistema',
         usuarioCadastro: usuarioCadastro || registradoPor || 'Sistema',
         dataRegistro: new Date(),
-        // Adicionar histórico de alocação se aplicável
         historicoAlocacao: historicoAlocacao
       });
 
       const detentoSalvo = await novoDetento.save();
 
-      // Se uma cela foi selecionada, adiciona o detento à cela
       if (cela) {
         const celaAtualizada = await CelaModel.findById(cela);
         celaAtualizada.ocupantes.push(detentoSalvo._id);
@@ -58,11 +53,9 @@ class DetentoService {
 
       return detentoSalvo;
     } catch (error) {
-      // Se houver erro de validação do Mongoose
       if (error.name === 'ValidationError') {
         throw new Error('Dados inválidos: ' + Object.values(error.errors).map(err => err.message).join(', '));
       }
-      // Se houver erro de duplicidade
       if (error.code === 11000) {
         throw new Error('Detento já cadastrado com este nome');
       }
@@ -88,26 +81,22 @@ class DetentoService {
     return await DetentoModel.findByIdAndUpdate(id, dados, { new: true });
   }
 
-  
+
   static async excluir(id) {
-    // Buscar o detento para obter a cela associada
     const detento = await DetentoModel.findById(id);
     if (!detento) {
       throw new Error('Detento não encontrado.');
     }
 
-    // Remover o detento da lista de ocupantes da cela
     if (detento.cela) {
       await CelaModel.findByIdAndUpdate(detento.cela, {
         $pull: { ocupantes: detento._id }
       });
     }
 
-    // Excluir visitas associadas
     await VisitaFamiliarModel.deleteMany({ detento: id });
     await VisitaAdvogadoModel.deleteMany({ detento: id });
 
-    // Excluir o detento
     return await DetentoModel.findByIdAndDelete(id);
   }
 

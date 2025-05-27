@@ -1,0 +1,12 @@
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .btn-danger {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .btn-danger:hover {
+    transform: scale(1.05);
+  }
