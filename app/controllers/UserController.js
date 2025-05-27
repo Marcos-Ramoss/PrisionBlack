@@ -9,7 +9,6 @@ class UserController {
         user: req.usuario
       });
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error.message);
       req.flash('error', error.message);
       res.redirect('/admin/gerenciar-usuarios');
     }
@@ -38,16 +37,12 @@ class UserController {
   static async excluirUsuario(req, res) {
     try {
       const { id } = req.params;
-      console.log('Tentando excluir usuário com ID:', id);
-      console.log('Usuário que está tentando excluir:', req.usuario);
       
       await UserService.excluirUsuario(id, req.usuario);
-      console.log('Usuário excluído com sucesso');
       
       req.flash('success', 'Usuário excluído com sucesso.');
       res.redirect('/admin/gerenciar-usuarios');
     } catch (error) {
-      console.error('Erro detalhado ao excluir usuário:', error);
       req.flash('error', error.message);
       res.redirect('/admin/gerenciar-usuarios');
     }

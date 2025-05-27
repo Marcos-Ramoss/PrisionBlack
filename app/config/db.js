@@ -5,7 +5,6 @@ const connect = async () => {
   try {
     console.log('Iniciando conexão com o MongoDB...');
     const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/prison-management';
-    console.log('URI do banco de dados:', dbUri);
 
     await mongoose.connect(dbUri, {
       useNewUrlParser: true,

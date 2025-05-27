@@ -25,14 +25,12 @@ class DiretorController {
       }
 
       const celasOcupadas = await CelaModel.find({ 'ocupantes.0': { $exists: true } });
-      console.log('Detalhes das Celas Ocupadas:', celasOcupadas);
 
       // Verificar se a requisição é via fetch (AJAX)
       if (req.headers.accept && req.headers.accept.includes('application/json')) {
         return res.json({ celasFiltradas });
       }
 
-      console.log('Total de Celas Ocupadas:', totalCelasOcupadas);
 
       res.render('diretor/dashboard', {
         title: 'Dashboard do Diretor',
