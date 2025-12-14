@@ -82,6 +82,8 @@ app.use('/alocacao', authenticate, alocacaoRoutes);
 app.use('/admin', authenticate, adminRoutes);
 app.use('/usuarios', authenticate, userRoutes);
 
+const errorHandler = require('./app/middlewares/errorHandler');
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

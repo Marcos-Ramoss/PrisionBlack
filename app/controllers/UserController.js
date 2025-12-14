@@ -1,52 +1,52 @@
 const UserService = require('../services/UserService');
+const UsuarioDTO = require('../dtos/UsuarioDTO');
 
 class UserController {
-  static async listarUsuarios(req, res) {
+  static async listarUsuarios(req, res, next) {
     try {
       const usuarios = await UserService.listarUsuarios();
-      res.render('admin/gerenciar-usuarios', { 
+      res.render('admin/gerenciar-usuarios', {
         usuarios,
         user: req.usuario
       });
-    } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/admin/gerenciar-usuarios');
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async cadastrarUsuario(req, res) {
+  static async cadastrarUsuario(req, res, next) {
     try {
-      const { nome, email, senha, nivelAcesso } = req.body;
-      
-      await UserService.criarUsuario({
-        nome,
-        email,
-        senha,
-        nivelAcesso
-      }, req.usuario);
+      const usuarioDTO = UserController.criarDTODoRequest(req);
+      await UserService.criarUsuario(usuarioDTO, req.usuario);
 
       req.flash('success', 'Usuário cadastrado com sucesso.');
       res.redirect('/admin/gerenciar-usuarios');
-    } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error.message);
-      req.flash('error', error.message);
-      res.redirect('/admin/gerenciar-usuarios');
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async excluirUsuario(req, res) {
+  static criarDTODoRequest(req) {
+    const { nome, email, senha, nivelAcesso } = req.body;
+    return new UsuarioDTO({
+      nome,
+      email,
+      senha,
+      nivelAcesso
+    });
+  }
+
+  static async excluirUsuario(req, res, next) {
     try {
       const { id } = req.params;
-      
       await UserService.excluirUsuario(id, req.usuario);
-      
+
       req.flash('success', 'Usuário excluído com sucesso.');
       res.redirect('/admin/gerenciar-usuarios');
-    } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/admin/gerenciar-usuarios');
+    } catch (erro) {
+      next(erro);
     }
   }
 }
 
-module.exports = UserController; 
+module.exports = UserController;

@@ -1,75 +1,98 @@
 const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
+const UsuarioMapper = require('../mappers/UsuarioMapper');
+const RecursoNaoEncontradoExcecao = require('../exceptions/RecursoNaoEncontradoExcecao');
+const RegraNegocioExcecao = require('../exceptions/RegraNegocioExcecao');
+const AcessoNegadoExcecao = require('../exceptions/AcessoNegadoExcecao');
 
 class UserService {
   static async listarUsuarios() {
-    return await UserModel.find({}, '-senha');
+    const entidades = await UserModel.find({}, '-senha');
+    return UsuarioMapper.paraListaDTO(entidades);
   }
 
-  static async criarUsuario(dados, usuarioLogado) {
-    const { nome, email, senha, nivelAcesso } = dados;
-
-    if (usuarioLogado.nivelAcesso === 'ADMIN') {
-      if (nivelAcesso !== 'DIRETOR' && nivelAcesso !== 'INSPETOR') {
-        throw new Error('Admin só pode cadastrar diretores e inspetores.');
-      }
-    } else if (usuarioLogado.nivelAcesso === 'DIRETOR') {
-      if (nivelAcesso !== 'INSPETOR') {
-        throw new Error('Diretor só pode cadastrar inspetores.');
-      }
-    } else {
-      throw new Error('Usuário sem permissão para cadastrar.');
-    }
-
-    const emailExiste = await UserModel.findOne({ email });
-    if (emailExiste) {
-      throw new Error('Email já cadastrado.');
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const senhaHash = await bcrypt.hash(senha, salt);
-
-    const novoUsuario = new UserModel({
-      nome,
-      email,
+  static async criarUsuario(usuarioDTO, usuarioLogado) {
+    UserService.validarPermissoesCriacao(usuarioDTO.nivelAcesso, usuarioLogado);
+    await UserService.validarEmailUnico(usuarioDTO.email);
+    
+    const senhaHash = await UserService.criptografarSenha(usuarioDTO.senha);
+    const dadosEntidade = UsuarioMapper.paraEntidade({
+      ...usuarioDTO,
       senha: senhaHash,
-      nivelAcesso,
       criadoPor: usuarioLogado._id
     });
 
-    await novoUsuario.save();
-    return novoUsuario;
+    const novoUsuario = new UserModel(dadosEntidade);
+    const usuarioSalvo = await novoUsuario.save();
+    
+    return UsuarioMapper.paraDTO(usuarioSalvo);
+  }
+
+  static validarPermissoesCriacao(nivelAcesso, usuarioLogado) {
+    if (usuarioLogado.nivelAcesso === 'ADMIN') {
+      if (nivelAcesso !== 'DIRETOR' && nivelAcesso !== 'INSPETOR') {
+        throw new AcessoNegadoExcecao('Admin só pode cadastrar diretores e inspetores');
+      }
+    } else if (usuarioLogado.nivelAcesso === 'DIRETOR') {
+      if (nivelAcesso !== 'INSPETOR') {
+        throw new AcessoNegadoExcecao('Diretor só pode cadastrar inspetores');
+      }
+    } else {
+      throw new AcessoNegadoExcecao('Usuário sem permissão para cadastrar');
+    }
+  }
+
+  static async validarEmailUnico(email) {
+    const emailExiste = await UserModel.findOne({ email });
+    if (emailExiste) {
+      throw new RegraNegocioExcecao('Email já cadastrado');
+    }
+  }
+
+  static async criptografarSenha(senha) {
+    const salt = await bcrypt.genSalt(10);
+    return await bcrypt.hash(senha, salt);
   }
 
   static async excluirUsuario(id, usuarioLogado) {
+    const usuarioParaExcluir = await UserService.buscarUsuarioPorId(id);
+    UserService.validarExclusaoProprioUsuario(usuarioParaExcluir, usuarioLogado);
+    UserService.validarPermissoesExclusao(usuarioParaExcluir, usuarioLogado);
+    
+    await UserModel.findByIdAndDelete(id);
+  }
 
-    const usuarioParaExcluir = await UserModel.findById(id);
-
-    if (!usuarioParaExcluir) {
-      throw new Error('Usuário não encontrado.');
+  static async buscarUsuarioPorId(id) {
+    const usuario = await UserModel.findById(id);
+    if (!usuario) {
+      throw new RecursoNaoEncontradoExcecao('Usuário não encontrado');
     }
+    return usuario;
+  }
 
-    // Não permitir excluir o próprio usuário
+  static validarExclusaoProprioUsuario(usuarioParaExcluir, usuarioLogado) {
     if (usuarioParaExcluir._id.toString() === usuarioLogado._id.toString()) {
-      throw new Error('Você não pode excluir seu próprio usuário.');
+      throw new RegraNegocioExcecao('Você não pode excluir seu próprio usuário');
     }
+  }
 
-    // Validações de permissão
+  static validarPermissoesExclusao(usuarioParaExcluir, usuarioLogado) {
     if (usuarioLogado.nivelAcesso === 'ADMIN') {
-      if (usuarioParaExcluir.nivelAcesso !== 'DIRETOR' && usuarioParaExcluir.nivelAcesso !== 'INSPETOR') {
-        throw new Error('Admin só pode excluir diretores e inspetores.');
+      if (usuarioParaExcluir.nivelAcesso !== 'DIRETOR' && 
+          usuarioParaExcluir.nivelAcesso !== 'INSPETOR') {
+        throw new AcessoNegadoExcecao('Admin só pode excluir diretores e inspetores');
       }
     } else if (usuarioLogado.nivelAcesso === 'DIRETOR') {
-      if (usuarioParaExcluir.nivelAcesso !== 'INSPETOR' ||
-        usuarioParaExcluir.criadoPor.toString() !== usuarioLogado._id.toString()) {
-        throw new Error('Diretor só pode excluir inspetores que ele criou.');
+      const podeExcluir = usuarioParaExcluir.nivelAcesso === 'INSPETOR' &&
+        usuarioParaExcluir.criadoPor?.toString() === usuarioLogado._id.toString();
+      
+      if (!podeExcluir) {
+        throw new AcessoNegadoExcecao('Diretor só pode excluir inspetores que ele criou');
       }
     } else {
-      throw new Error('Usuário sem permissão para excluir.');
+      throw new AcessoNegadoExcecao('Usuário sem permissão para excluir');
     }
-
-    const resultado = await UserModel.findByIdAndDelete(id);
   }
 }
 
-module.exports = UserService; 
+module.exports = UserService;

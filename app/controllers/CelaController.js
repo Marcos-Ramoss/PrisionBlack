@@ -1,95 +1,117 @@
 const CelaService = require('../services/CelaService');
 const DetentoService = require('../services/DetentoService');
+const CelaDTO = require('../dtos/CelaDTO');
 
 class CelaController {
-  static async listar(req, res) {
+  static async listar(req, res, next) {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 5;
-      const search = req.query.search || '';
-      const pavilhao = req.query.pavilhao || '';
-      const ocupacao = req.query.ocupacao || '';
-      const { celas, total, totalPages } = await CelaService.listarPaginado(page, limit, search, pavilhao, ocupacao);
+      const { page, limit, search, pavilhao, ocupacao } = CelaController.extrairParametrosListagem(req);
+      const resultado = await CelaService.listarPaginado(
+        page, limit, search, pavilhao, ocupacao
+      );
+      
       res.render('celas/lista', {
-        celas,
+        celas: resultado.celas,
         user: req.session.user,
-        page,
-        totalPages,
-        total,
+        page: resultado.page,
+        totalPages: resultado.totalPages,
+        total: resultado.total,
         limit,
         search,
         pavilhao,
         ocupacao,
         currentPage: 'celas'
       });
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async cadastrar(req, res) {
+  static extrairParametrosListagem(req) {
+    return {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 5,
+      search: req.query.search || '',
+      pavilhao: req.query.pavilhao || '',
+      ocupacao: req.query.ocupacao || ''
+    };
+  }
+
+  static async cadastrar(req, res, next) {
     try {
-      const { codigo, pavilhao, capacidade } = req.body;
-      const novaCela = await CelaService.cadastrar({ codigo, pavilhao, capacidade });
+      const celaDTO = CelaController.criarDTODoRequest(req);
+      const novaCela = await CelaService.cadastrar(celaDTO);
+      
       return res.status(201).json({
         success: true,
         message: 'Cela cadastrada com sucesso!',
-        data: novaCela,
+        data: novaCela
       });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async alocar(req, res) {
+  static criarDTODoRequest(req) {
+    const { codigo, pavilhao, capacidade } = req.body;
+    return new CelaDTO({
+      codigo,
+      pavilhao,
+      capacidade: parseInt(capacidade)
+    });
+  }
+
+  static async alocar(req, res, next) {
     try {
       const { celaId, detentoId } = req.body;
-      const celaAtualizada = await CelaService.alocar(celaId, detentoId);
+      await CelaService.alocar(celaId, detentoId);
       res.redirect('/celas/lista');
-    } catch (error) {
-      res.status(400).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async editar(req, res) {
+  static async editar(req, res, next) {
     try {
-      const { id } = req.params;
-
       if (req.method === 'GET') {
-        // Renderiza o formulário de edição com os dados da cela
-        const cela = await CelaService.buscarPorId(id);
-        if (!cela) return res.status(404).send('Cela não encontrada.');
-        res.render('celas/editar', {
-          cela,
-          user: req.session.user,
-          currentPage: 'celas'
-        });
-      } else if (req.method === 'POST') {
-        // Atualiza a cela com os novos dados
-        const { codigo, pavilhao, capacidade } = req.body;
-        const dadosAtualizados = { codigo, pavilhao, capacidade };
-        const celaAtualizada = await CelaService.editar(id, dadosAtualizados);
-        if (!celaAtualizada) return res.status(404).send('Cela não encontrada.');
-        res.redirect('/celas/lista');
+        return await CelaController.exibirFormularioEdicao(req, res);
       }
-    } catch (error) {
-      res.status(500).send(error.message);
+      
+      if (req.method === 'POST') {
+        return await CelaController.processarEdicao(req, res);
+      }
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async excluir(req, res) {
+  static async exibirFormularioEdicao(req, res) {
+    const { id } = req.params;
+    const cela = await CelaService.buscarPorId(id);
+    
+    res.render('celas/editar', {
+      cela,
+      user: req.session.user,
+      currentPage: 'celas'
+    });
+  }
+
+  static async processarEdicao(req, res) {
+    const { id } = req.params;
+    const celaDTO = CelaController.criarDTODoRequest(req);
+    await CelaService.editar(id, celaDTO);
+    res.redirect('/celas/lista');
+  }
+
+  static async excluir(req, res, next) {
     try {
       const { id } = req.params;
       await CelaService.excluir(id);
-
       res.redirect('/celas/lista');
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
-
 }
+
 module.exports = CelaController;

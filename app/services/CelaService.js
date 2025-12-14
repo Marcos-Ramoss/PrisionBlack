@@ -1,89 +1,169 @@
 const CelaModel = require('../models/CelaModel');
 const DetentoModel = require('../models/DetentoModel');
-const LogService = require('./LogService');
+const CelaMapper = require('../mappers/CelaMapper');
+const RecursoNaoEncontradoExcecao = require('../exceptions/RecursoNaoEncontradoExcecao');
+const RegraNegocioExcecao = require('../exceptions/RegraNegocioExcecao');
+const ValidacaoExcecao = require('../exceptions/ValidacaoExcecao');
 
 class CelaService {
   static async listar() {
-    return await CelaModel.find().populate({
-      path: 'ocupantes',
-      select: 'nome idade estadoCivil'
-    });
-  }
-
-  static async listar() {
-    return await CelaModel.find().populate('ocupantes');
+    const entidades = await CelaModel.find().populate('ocupantes');
+    return CelaMapper.paraListaDTO(entidades);
   }
 
   static async buscarPorId(id) {
-    return await CelaModel.findById(id).populate({
+    const entidade = await CelaModel.findById(id).populate({
       path: 'ocupantes',
       select: 'nome idade estadoCivil'
     });
+    
+    if (!entidade) {
+      throw new RecursoNaoEncontradoExcecao('Cela não encontrada');
+    }
+    
+    return CelaMapper.paraDTO(entidade);
   }
 
-  static async cadastrar(dados) {
-    const { codigo, pavilhao, capacidade } = dados;
+  static async cadastrar(celaDTO) {
+    celaDTO.codigo = CelaService.normalizarCodigoCela(celaDTO.codigo, celaDTO.pavilhao);
+    await CelaService.validarCodigoUnico(celaDTO.codigo);
+    
+    const dadosEntidade = CelaMapper.paraEntidade(celaDTO);
+    const novaCela = new CelaModel(dadosEntidade);
+    const celaSalva = await novaCela.save();
+    
+    return CelaMapper.paraDTO(celaSalva);
+  }
 
-    const celaExistente = await CelaModel.findOne({ codigo });
-    if (celaExistente) {
-      throw new Error('cela já cadastrada');
+  static normalizarCodigoCela(codigo, pavilhao) {
+    if (!codigo) {
+      throw new ValidacaoExcecao('Código da cela é obrigatório');
     }
 
-    const novaCela = new CelaModel({ codigo, pavilhao, capacidade, ocupantes: [] });
-    return await novaCela.save();
+    codigo = codigo.trim().toUpperCase();
+    
+    if (!codigo.includes('-')) {
+      codigo = `${pavilhao}-${codigo.replace(/[^0-9]/g, '')}`;
+    }
+    
+    const pattern = /^[A-Z]-\d{1,3}$/;
+    if (!pattern.test(codigo)) {
+      throw new ValidacaoExcecao('Código da cela deve seguir o padrão: Pavilhão-Número (Ex: A-101, B-205)');
+    }
+    
+    return codigo;
+  }
+
+  static async validarCodigoUnico(codigo) {
+    const celaExistente = await CelaModel.findOne({ codigo });
+    if (celaExistente) {
+      throw new RegraNegocioExcecao('Cela já cadastrada');
+    }
   }
 
   static async validarDetentos(detentos) {
-    try {
-      const celasComDetentos = await CelaModel.find({ ocupantes: { $in: detentos } });
+    const celasComDetentos = await CelaModel.find({
+      ocupantes: { $in: detentos }
+    });
 
-      if (celasComDetentos.length > 0) {
-        const detentosJaCadastrados = celasComDetentos.flatMap(detentos => CelaModel.ocupantes);
-        return detentosJaCadastrados;
-      }
-
-      return null;
-    } catch (error) {
-      throw new Error('Erro ao validar detentos: ' + error.message);
+    if (celasComDetentos.length > 0) {
+      const detentosJaCadastrados = celasComDetentos.flatMap(
+        cela => cela.ocupantes
+      );
+      return detentosJaCadastrados;
     }
+
+    return null;
   }
 
   static async alocar(celaId, detentoId) {
-    const cela = await CelaModel.findById(celaId);
-    if (!cela) throw new Error('Cela não encontrada.');
+    const cela = await CelaService.buscarCelaPorId(celaId);
+    const detento = await CelaService.buscarDetentoPorId(detentoId);
+    
+    CelaService.validarCapacidadeCela(cela);
+    
+    await CelaService.adicionarDetentoNaCela(cela, detento);
+    await CelaService.atualizarCelaDoDetento(detento, cela);
+    
+    return CelaMapper.paraDTO(cela);
+  }
 
-    const detento = await DetentoModel.findById(detentoId);
-    if (!detento) throw new Error('Detento não encontrado.');
-
-    if (cela.ocupantes.length >= cela.capacidade) {
-      throw new Error('A cela está cheia.');
+  static async buscarCelaPorId(id) {
+    const cela = await CelaModel.findById(id);
+    if (!cela) {
+      throw new RecursoNaoEncontradoExcecao('Cela não encontrada');
     }
-
-    cela.ocupantes.push(detento._id);
-    await cela.save();
-
-    detento.cela = cela._id;
-    await detento.save();
-
     return cela;
   }
 
-  static async editar(id, dadosAtualizados) {
-    return await CelaModel.findByIdAndUpdate(id, dadosAtualizados, { new: true });
+  static async buscarDetentoPorId(id) {
+    const detento = await DetentoModel.findById(id);
+    if (!detento) {
+      throw new RecursoNaoEncontradoExcecao('Detento não encontrado');
+    }
+    return detento;
+  }
+
+  static validarCapacidadeCela(cela) {
+    if (cela.ocupantes.length >= cela.capacidade) {
+      throw new RegraNegocioExcecao('A cela está cheia');
+    }
+  }
+
+  static async adicionarDetentoNaCela(cela, detento) {
+    cela.ocupantes.push(detento._id);
+    await cela.save();
+  }
+
+  static async atualizarCelaDoDetento(detento, cela) {
+    detento.cela = cela._id;
+    await detento.save();
+  }
+
+  static async editar(id, celaDTO) {
+    celaDTO.codigo = CelaService.normalizarCodigoCela(celaDTO.codigo, celaDTO.pavilhao);
+    
+    const dadosEntidade = CelaMapper.paraEntidade(celaDTO);
+    const entidadeAtualizada = await CelaModel.findByIdAndUpdate(
+      id,
+      dadosEntidade,
+      { new: true }
+    );
+    
+    if (!entidadeAtualizada) {
+      throw new RecursoNaoEncontradoExcecao('Cela não encontrada');
+    }
+    
+    return CelaMapper.paraDTO(entidadeAtualizada);
   }
 
   static async excluir(id) {
-    return await CelaModel.findByIdAndDelete(id);
+    const cela = await CelaModel.findById(id);
+    if (!cela) {
+      throw new RecursoNaoEncontradoExcecao('Cela não encontrada');
+    }
+    
+    if (cela.ocupantes.length > 0) {
+      throw new RegraNegocioExcecao('Não é possível excluir cela com ocupantes');
+    }
+    
+    await CelaModel.findByIdAndDelete(id);
   }
 
-  static async listarPaginado(page = 1, limit = 5, search = '', pavilhao = '', ocupacao = '') {
-    const skip = (page - 1) * limit;
-    let query = {};
+  static async listarPaginado(pagina = 1, limite = 5, busca = '', pavilhao = '', ocupacao = '') {
+    const query = CelaService.construirQueryFiltros(busca, pavilhao);
+    const celas = await CelaService.buscarCelasComFiltros(query, ocupacao);
+    
+    return CelaService.paginarResultados(celas, pagina, limite);
+  }
 
-    if (search) {
+  static construirQueryFiltros(busca, pavilhao) {
+    const query = {};
+
+    if (busca) {
       query.$or = [
-        { codigo: { $regex: new RegExp(search, 'i') } },
-        { pavilhao: { $regex: new RegExp(search, 'i') } }
+        { codigo: { $regex: new RegExp(busca, 'i') } },
+        { pavilhao: { $regex: new RegExp(busca, 'i') } }
       ];
     }
 
@@ -91,21 +171,34 @@ class CelaService {
       query.pavilhao = pavilhao;
     }
 
-    let celas = await CelaModel.find(query)
-      .populate({ path: 'ocupantes', select: 'nome idade estadoCivil' });
+    return query;
+  }
+
+  static async buscarCelasComFiltros(query, ocupacao) {
+    let celas = await CelaModel.find(query).populate({
+      path: 'ocupantes',
+      select: 'nome idade estadoCivil'
+    });
 
     if (ocupacao === 'disponivel') {
       celas = celas.filter(cela => cela.ocupantes.length < cela.capacidade);
     } else if (ocupacao === 'cheia') {
       celas = celas.filter(cela => cela.ocupantes.length >= cela.capacidade);
     }
+
+    return celas;
+  }
+
+  static paginarResultados(celas, pagina, limite) {
     const total = celas.length;
-    const totalPages = Math.ceil(total / limit);
-    const paginatedCelas = celas.slice(skip, skip + limit);
+    const totalPages = Math.ceil(total / limite);
+    const skip = (pagina - 1) * limite;
+    const celasPaginadas = celas.slice(skip, skip + limite);
+    
     return {
-      celas: paginatedCelas,
+      celas: CelaMapper.paraListaDTO(celasPaginadas),
       total,
-      page,
+      page: pagina, // Compatibilidade com views
       totalPages
     };
   }

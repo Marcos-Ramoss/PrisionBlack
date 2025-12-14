@@ -35,19 +35,22 @@
               <label for="nome" class="form-label">
                 <i class="fa-solid fa-user me-2"></i> Nome
               </label>
-              <input type="text" class="form-control form-control-sm" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite um nome válido (3 a 50 caracteres) somente letras" value="<%= detento.nome %>">
+              <input type="text" class="form-control form-control-sm" id="nome" name="nome" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" placeholder="Ex: João Silva" title="Digite um nome válido (3 a 50 caracteres) somente letras" value="<%= detento.nome %>">
+              <small class="text-muted">Apenas letras e espaços (3 a 50 caracteres)</small>
             </div>
 
             <!-- Idade -->
             <div class="col-md-6 mb-3">
               <label for="idade" class="form-label"><i class="fa-solid fa-calendar-days me-2"></i> Idade</label>
-              <input type="number" class="form-control form-control-sm" id="idade" name="idade" required min="18" max="120" title="A idade deve estar entre 18 e 120 anos" value="<%= detento.idade %>">
+              <input type="number" class="form-control form-control-sm" id="idade" name="idade" required min="18" max="120" placeholder="Ex: 25" title="A idade deve estar entre 18 e 120 anos" value="<%= detento.idade %>">
+              <small class="text-muted">Entre 18 e 120 anos</small>
             </div>
 
             <!-- Filiação -->
             <div class="col-md-6 mb-3">
               <label for="filiacao" class="form-label"><i class="fa-solid fa-users me-2"></i> Filiação</label>
-              <input type="text" class="form-control form-control-sm" id="filiacao" name="filiacao" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma filiação válida (3 a 50 caracteres) somente letras" value="<%= detento.filiacao %>">
+              <input type="text" class="form-control form-control-sm" id="filiacao" name="filiacao" required pattern="^[A-Za-zÀ-ú\s,:-]{3,100}$" placeholder="Ex: Pai: José Silva, Mãe: Maria Silva" title="Digite a filiação (Ex: Pai: Nome, Mãe: Nome)" value="<%= detento.filiacao %>">
+              <small class="text-muted">Ex: Pai: Nome, Mãe: Nome</small>
             </div>
 
             <!-- Estado Civil -->
@@ -85,7 +88,8 @@
             <!-- Crimes -->
             <div class="col-md-12 mb-3">
               <label for="crimes" class="form-label"><i class="fa-solid fa-gavel me-2"></i> Crimes Cometidos</label>
-              <textarea class="form-control form-control-sm" id="crimes" name="crimes" rows="3" placeholder="Descreva os crimes cometidos" required minlength="10" maxlength="500" title="Descreva os crimes com pelo menos 10 caracteres e no máximo 500"><%= detento.crimes && detento.crimes.length ? detento.crimes.join(', ') : '' %></textarea>
+              <textarea class="form-control form-control-sm" id="crimes" name="crimes" rows="3" placeholder="Ex: Roubo, Tráfico de drogas, Homicídio" required minlength="10" maxlength="500" title="Descreva os crimes separados por vírgula (mínimo 10 caracteres)"><%= detento.crimes && detento.crimes.length ? detento.crimes.join(', ') : '' %></textarea>
+              <small class="text-muted">Separe os crimes por vírgula (mínimo 10 caracteres)</small>
             </div>
 
             <!-- Cela -->

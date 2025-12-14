@@ -1,15 +1,12 @@
 const AlocacaoService = require('../services/AlocacaoService');
-const Detento = require('../models/DetentoModel');
-const Cela = require('../models/CelaModel');
-
-
+const DetentoService = require('../services/DetentoService');
+const CelaService = require('../services/CelaService');
 
 class AlocacaoController {
-
-  async detalhes(req, res) {
+  async detalhes(req, res, next) {
     try {
-      const detentos = await Detento.find().populate('cela');
-      const celas = await Cela.find();
+      const detentos = await DetentoService.listar();
+      const celas = await CelaService.listar();
 
       res.render('alocacao/detalhes', {
         detentos,
@@ -17,49 +14,40 @@ class AlocacaoController {
         user: req.session.user,
         currentPage: 'celas'
       });
-    } catch (error) {
-      console.error('Erro ao carregar dados de alocação:', error);
-      res.status(500).send('Erro ao carregar dados de alocação');
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  // Rota para alocar um detento em uma cela
-  async alocar(req, res) {
+  async alocar(req, res, next) {
     try {
       const { celaId, detentoId } = req.body;
+      const resultado = await AlocacaoService.alocarDetento(
+        celaId,
+        detentoId,
+        req.session.user
+      );
 
-      const resultado = await AlocacaoService.alocarDetento(celaId, detentoId, req.session.user);
-
-      res.json({ 
-        success: true, 
-        message: resultado.mensagem 
+      res.json({
+        success: true,
+        message: resultado.mensagem
       });
-    } catch (error) {
-      console.error('Erro ao alocar detento:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error.message 
-      });
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  // Rota para remover um detento de uma cela
-  async remover(req, res) {
+  async remover(req, res, next) {
     try {
       const { celaId, detentoId } = req.params;
-   
       const resultado = await AlocacaoService.removerDetento(celaId, detentoId);
 
-      res.json({ 
-        success: true, 
-        message: resultado.mensagem 
+      res.json({
+        success: true,
+        message: resultado.mensagem
       });
-    } catch (error) {
-      console.error('Erro ao remover detento:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error.message 
-      });
+    } catch (erro) {
+      next(erro);
     }
   }
 }

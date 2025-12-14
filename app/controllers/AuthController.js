@@ -1,109 +1,129 @@
 const AuthService = require('../services/AuthService');
-const { authenticate, authorize } = require('../middlewares/authMiddleware');
 const UserModel = require('../models/UserModel');
+const UsuarioMapper = require('../mappers/UsuarioMapper');
+const UsuarioDTO = require('../dtos/UsuarioDTO');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-
+const ValidacaoExcecao = require('../exceptions/ValidacaoExcecao');
+const RegraNegocioExcecao = require('../exceptions/RegraNegocioExcecao');
+const AcessoNegadoExcecao = require('../exceptions/AcessoNegadoExcecao');
 
 class AuthController {
-
-  static async registrar(req, res) {
+  static async registrar(req, res, next) {
     try {
       const { nome, email, senha, codigoAdmin } = req.body;
-      if (!nome || !email || !senha || !codigoAdmin) {
-        req.flash('error', 'Todos os campos são obrigatórios.');
-        return res.redirect('/');
-      }
+      
+      AuthController.validarCamposObrigatorios(nome, email, senha, codigoAdmin);
+      AuthController.validarCodigoAdmin(codigoAdmin);
+      await AuthController.validarEmailExistente(email);
 
-      if (codigoAdmin !== process.env.ADMIN_CODE) {
-        req.flash('error', 'Código de administrador inválido.');
-        return res.redirect('/');
-      }
-
-      const emailExistente = await UserModel.findOne({ email });
-      if (emailExistente) {
-        req.flash('error', 'Este email já está cadastrado no sistema.');
-        return res.redirect('/');
-      }
-
-      const novoUsuario = await AuthService.criarUsuario({
+      const usuarioDTO = new UsuarioDTO({
         nome,
         email,
-        senha,
         nivelAcesso: 'ADMIN',
         criadoPor: null
       });
 
-      req.flash('success', 'Administrador cadastrado com sucesso! Faça login para continuar.');
+      const novoUsuario = await AuthService.criarUsuario({
+        ...usuarioDTO,
+        senha
+      });
 
+      req.flash('success', 'Administrador cadastrado com sucesso! Faça login para continuar.');
       await new Promise(resolve => setTimeout(resolve, 100));
 
       return res.redirect('/');
-    } catch (error) {
-      req.flash('error', error.message || 'Erro ao registrar administrador. Tente novamente.');
-      return res.redirect('/');
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async login(req, res) {
+  static validarCamposObrigatorios(nome, email, senha, codigoAdmin) {
+    if (!nome || !email || !senha || !codigoAdmin) {
+      throw new ValidacaoExcecao('Todos os campos são obrigatórios');
+    }
+  }
+
+  static validarCodigoAdmin(codigoAdmin) {
+    if (codigoAdmin !== process.env.ADMIN_CODE) {
+      throw new AcessoNegadoExcecao('Código de administrador inválido');
+    }
+  }
+
+  static async validarEmailExistente(email) {
+    const emailExistente = await UserModel.findOne({ email });
+    if (emailExistente) {
+      throw new RegraNegocioExcecao('Este email já está cadastrado no sistema');
+    }
+  }
+
+  static async login(req, res, next) {
     try {
       if (req.session.user) {
         return res.redirect('/home');
       }
 
       const { email, senha } = req.body;
+      const usuario = await AuthController.buscarUsuarioPorEmail(email);
+      await AuthController.validarSenha(senha, usuario.senha);
 
-      const usuario = await UserModel.findOne({ email });
-      if (!usuario) {
-        req.flash('error', 'Email ou senha incorretos.');
-        return res.redirect('/');
-      }
-
-      const senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-      if (!senhaValida) {
-        req.flash('error', 'Email ou senha incorretos.');
-        return res.redirect('/');
-      }
-
-      const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, {
-        expiresIn: '1h',
-      });
-
-      req.session.user = {
-        id: usuario._id,
-        nome: usuario.nome,
-        email: usuario.email,
-        nivelAcesso: usuario.nivelAcesso,
-      };
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 3600000, // 1 hora
-      });
+      const token = AuthController.gerarToken(usuario);
+      AuthController.configurarSessao(req, usuario);
+      AuthController.configurarCookie(res, token);
 
       req.flash('success', 'Login realizado com sucesso!');
-      if (usuario.nivelAcesso === 'ADMIN') {
-        return res.redirect('/admin/dashboard');
-      }
-      if (usuario.nivelAcesso === 'DIRETOR') {
-        return res.redirect('/admin/diretor/dashboard');
-
-      } else {
-        return res.redirect('/home');
-      }
-
-
-
-    } catch (error) {
-      req.flash('error', 'Erro ao realizar login. Tente novamente.');
-      res.redirect('/');
+      return AuthController.redirecionarPorNivelAcesso(res, usuario.nivelAcesso);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async logout(req, res) {
+  static async buscarUsuarioPorEmail(email) {
+    const usuario = await UserModel.findOne({ email });
+    if (!usuario) {
+      throw new AcessoNegadoExcecao('Email ou senha incorretos');
+    }
+    return usuario;
+  }
+
+  static async validarSenha(senha, senhaHash) {
+    const senhaValida = await bcrypt.compare(senha, senhaHash);
+    if (!senhaValida) {
+      throw new AcessoNegadoExcecao('Email ou senha incorretos');
+    }
+  }
+
+  static gerarToken(usuario) {
+    return jwt.sign(
+      { id: usuario._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+  }
+
+  static configurarSessao(req, usuario) {
+    req.session.user = UsuarioMapper.paraLoginDTO(usuario);
+  }
+
+  static configurarCookie(res, token) {
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3600000
+    });
+  }
+
+  static redirecionarPorNivelAcesso(res, nivelAcesso) {
+    if (nivelAcesso === 'ADMIN') {
+      return res.redirect('/admin/dashboard');
+    }
+    if (nivelAcesso === 'DIRETOR') {
+      return res.redirect('/admin/diretor/dashboard');
+    }
+    return res.redirect('/home');
+  }
+
+  static async logout(req, res, next) {
     try {
       res.clearCookie('token');
 
@@ -118,11 +138,10 @@ class AuthController {
       });
 
       res.redirect('/');
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+    } catch (erro) {
+      next(erro);
     }
   }
-
 }
 
 module.exports = AuthController;

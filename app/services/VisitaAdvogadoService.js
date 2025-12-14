@@ -1,53 +1,137 @@
 const VisitaAdvogadoModel = require('../models/VisitaAdvogadoModel');
 const DetentoModel = require('../models/DetentoModel');
+const VisitaAdvogadoMapper = require('../mappers/VisitaAdvogadoMapper');
+const RecursoNaoEncontradoExcecao = require('../exceptions/RecursoNaoEncontradoExcecao');
+const ValidacaoExcecao = require('../exceptions/ValidacaoExcecao');
 
 class VisitaAdvogadoService {
-    static async listar() {
-        return await VisitaAdvogadoModel.find().populate('detento');
-    }
+  static async listar() {
+    const entidades = await VisitaAdvogadoModel.find().populate('detento');
+    return VisitaAdvogadoMapper.paraListaDTO(entidades);
+  }
 
-    static async buscarPorId(id) {
-        return await VisitaAdvogadoModel.findById(id).populate('detento');
+  static async buscarPorId(id) {
+    const entidade = await VisitaAdvogadoModel.findById(id).populate('detento');
+    
+    if (!entidade) {
+      throw new RecursoNaoEncontradoExcecao('Visita de advogado não encontrada');
     }
+    
+    return VisitaAdvogadoMapper.paraDTO(entidade);
+  }
 
-    static async cadastrar(dados) {
-        const novaVisita = new VisitaAdvogadoModel(dados);
-        return await novaVisita.save();
-    }
+  static async cadastrar(visitaAdvogadoDTO) {
+    visitaAdvogadoDTO.nomeAdvogado = VisitaAdvogadoService.normalizarNome(visitaAdvogadoDTO.nomeAdvogado);
+    visitaAdvogadoDTO.numeroOAB = VisitaAdvogadoService.normalizarOAB(visitaAdvogadoDTO.numeroOAB);
+    
+    await VisitaAdvogadoService.validarDetentoExiste(visitaAdvogadoDTO.detentoId);
+    
+    const dadosEntidade = VisitaAdvogadoMapper.paraEntidade(visitaAdvogadoDTO);
+    const novaVisita = new VisitaAdvogadoModel(dadosEntidade);
+    const visitaSalva = await novaVisita.save();
+    
+    return VisitaAdvogadoMapper.paraDTO(visitaSalva);
+  }
 
-    static async editar(id, dadosAtualizados) {
-        return await VisitaAdvogadoModel.findByIdAndUpdate(id, dadosAtualizados, { new: true });
-    }
+  static normalizarNome(nome) {
+    if (!nome) return nome;
+    return nome.trim()
+      .split(/\s+/)
+      .map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase())
+      .join(' ');
+  }
 
-    static async excluir(id) {
-        return await VisitaAdvogadoModel.findByIdAndDelete(id);
+  static normalizarOAB(numeroOAB) {
+    if (!numeroOAB) return numeroOAB;
+    const apenasNumeros = numeroOAB.replace(/\D/g, '');
+    if (apenasNumeros.length !== 6) {
+      throw new ValidacaoExcecao('Número OAB deve ter exatamente 6 dígitos');
     }
+    return apenasNumeros;
+  }
 
-    static async listarPaginado(page = 1, limit = 5, search = '') {
-        const skip = (page - 1) * limit;
-        let query = {};
-        if (search) {
-            query = {
-                $or: [
-                    { nomeAdvogado: { $regex: new RegExp(search, 'i') } },
-                    { numeroOAB: { $regex: new RegExp(search, 'i') } }
-                ]
-            };
-        }
-        const [visitas, total] = await Promise.all([
-            VisitaAdvogadoModel.find(query)
-                .populate('detento')
-                .skip(skip)
-                .limit(limit),
-            VisitaAdvogadoModel.countDocuments(query)
-        ]);
-        return {
-            visitas,
-            total,
-            page,
-            totalPages: Math.ceil(total / limit)
-        };
+  static async validarDetentoExiste(detentoId) {
+    if (!detentoId) {
+      throw new ValidacaoExcecao('Detento é obrigatório');
     }
+    
+    const detento = await DetentoModel.findById(detentoId);
+    if (!detento) {
+      throw new RecursoNaoEncontradoExcecao('Detento não encontrado');
+    }
+  }
+
+  static async editar(id, visitaAdvogadoDTO) {
+    if (visitaAdvogadoDTO.nomeAdvogado) {
+      visitaAdvogadoDTO.nomeAdvogado = VisitaAdvogadoService.normalizarNome(visitaAdvogadoDTO.nomeAdvogado);
+    }
+    if (visitaAdvogadoDTO.numeroOAB) {
+      visitaAdvogadoDTO.numeroOAB = VisitaAdvogadoService.normalizarOAB(visitaAdvogadoDTO.numeroOAB);
+    }
+    
+    await VisitaAdvogadoService.validarDetentoExiste(visitaAdvogadoDTO.detentoId);
+    
+    const dadosEntidade = VisitaAdvogadoMapper.paraEntidade(visitaAdvogadoDTO);
+    const entidadeAtualizada = await VisitaAdvogadoModel.findByIdAndUpdate(
+      id,
+      dadosEntidade,
+      { new: true }
+    ).populate('detento');
+    
+    if (!entidadeAtualizada) {
+      throw new RecursoNaoEncontradoExcecao('Visita de advogado não encontrada');
+    }
+    
+    return VisitaAdvogadoMapper.paraDTO(entidadeAtualizada);
+  }
+
+  static async excluir(id) {
+    const visita = await VisitaAdvogadoModel.findById(id);
+    if (!visita) {
+      throw new RecursoNaoEncontradoExcecao('Visita de advogado não encontrada');
+    }
+    
+    await VisitaAdvogadoModel.findByIdAndDelete(id);
+  }
+
+  static async listarPaginado(pagina = 1, limite = 5, busca = '') {
+    const query = VisitaAdvogadoService.construirQueryFiltros(busca);
+    const [visitas, total] = await VisitaAdvogadoService.buscarVisitasPaginadas(query, pagina, limite);
+    
+    return VisitaAdvogadoService.formatarResultadoPaginado(visitas, total, pagina, limite);
+  }
+
+  static construirQueryFiltros(busca) {
+    if (!busca) return {};
+
+    return {
+      $or: [
+        { nomeAdvogado: { $regex: new RegExp(busca, 'i') } },
+        { numeroOAB: { $regex: new RegExp(busca, 'i') } }
+      ]
+    };
+  }
+
+  static async buscarVisitasPaginadas(query, pagina, limite) {
+    const skip = (pagina - 1) * limite;
+    
+    return await Promise.all([
+      VisitaAdvogadoModel.find(query)
+        .populate('detento')
+        .skip(skip)
+        .limit(limite),
+      VisitaAdvogadoModel.countDocuments(query)
+    ]);
+  }
+
+  static formatarResultadoPaginado(visitas, total, pagina, limite) {
+    return {
+      visitas: VisitaAdvogadoMapper.paraListaDTO(visitas),
+      total,
+      page: pagina,
+      totalPages: Math.ceil(total / limite)
+    };
+  }
 }
 
 module.exports = VisitaAdvogadoService;

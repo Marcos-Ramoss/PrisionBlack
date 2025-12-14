@@ -1,159 +1,169 @@
 const DetentoService = require('../services/DetentoService');
 const CelaService = require('../services/CelaService');
+const DetentoDTO = require('../dtos/DetentoDTO');
 const multerConfig = require('../config/multerConfig');
-const { authenticate, authorize } = require('../middlewares/authMiddleware');
-
 
 class DetentoController {
-  static async cadastrar(req, res) {
+  static async cadastrar(req, res, next) {
     try {
       if (req.method === 'GET') {
-        const celas = await CelaService.listar();
-        res.render('detentos/cadastro', {
-          celas,
-          user: req.session.user,
-          error: null,
-          currentPage: 'detentos'
-        });
-      } else if (req.method === 'POST') {
-        const { nome, idade, filiacao, estadoCivil, reincidencia, crimes, cela } = req.body;
-        const foto = req.file ? req.file.filename : null;
-
-        const usuarioAtual = req.session.user ? req.session.user.nome : 'Sistema';
-
-        const novoDetento = await DetentoService.cadastrar({
-          nome,
-          idade,
-          filiacao,
-          estadoCivil,
-          foto,
-          reincidencia: reincidencia === 'true',
-          crimes: crimes.split(',').map((crime) => crime.trim()),
-          cela: cela || null,
-          // Adicionar informações sobre quem registrou
-          registradoPor: usuarioAtual,
-          usuarioCadastro: usuarioAtual,
-          // Se tem cela, adicionar ao histórico de alocação
-          comAlocacaoInicial: !!cela
-        });
-
-        res.redirect('/detentos/lista');
+        return await DetentoController.exibirFormularioCadastro(req, res);
       }
-    } catch (error) {
-      const celas = await CelaService.listar();
-      res.render('detentos/cadastro', {
-        celas,
-        user: req.session.user,
-        error: error.message,
-        currentPage: 'detentos'
-      });
+      
+      if (req.method === 'POST') {
+        return await DetentoController.processarCadastro(req, res);
+      }
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async listar(req, res) {
+  static async exibirFormularioCadastro(req, res) {
+    const celas = await CelaService.listar();
+    res.render('detentos/cadastro', {
+      celas,
+      user: req.session.user,
+      error: null,
+      currentPage: 'detentos'
+    });
+  }
+
+  static async processarCadastro(req, res) {
+    const detentoDTO = DetentoController.criarDTODoRequest(req);
+    await DetentoService.cadastrar(detentoDTO);
+    res.redirect('/detentos/lista');
+  }
+
+  static criarDTODoRequest(req) {
+    const { nome, idade, filiacao, estadoCivil, reincidencia, crimes, cela } = req.body;
+    const foto = req.file ? req.file.filename : null;
+    const usuarioAtual = req.session.user ? req.session.user.nome : 'Sistema';
+
+    return new DetentoDTO({
+      nome,
+      idade: parseInt(idade),
+      filiacao,
+      estadoCivil,
+      foto,
+      reincidencia: reincidencia === 'true',
+      crimes: crimes ? crimes.split(',').map(crime => crime.trim()) : [],
+      celaId: cela || null,
+      registradoPor: usuarioAtual,
+      usuarioCadastro: usuarioAtual,
+      comAlocacaoInicial: !!cela
+    });
+  }
+
+  static async listar(req, res, next) {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 5;
-      const search = req.query.search || '';
-      const pavilhao = req.query.pavilhao || '';
-      const reincidencia = req.query.reincidencia || '';
-      const { detentos, total, totalPages } = await DetentoService.listarPaginado(page, limit, search, pavilhao, reincidencia);
+      const { page, limit, search, pavilhao, reincidencia } = DetentoController.extrairParametrosListagem(req);
+      const resultado = await DetentoService.listarPaginado(
+        page, limit, search, pavilhao, reincidencia
+      );
+      
       res.render('detentos/lista', {
-        detentos,
+        detentos: resultado.detentos,
         user: req.session.user,
-        page,
-        totalPages,
-        total,
+        page: resultado.page,
+        totalPages: resultado.totalPages,
+        total: resultado.total,
         limit,
         search,
         pavilhao,
         reincidencia,
         currentPage: 'detentos'
       });
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async detalhes(req, res) {
+  static extrairParametrosListagem(req) {
+    return {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 5,
+      search: req.query.search || '',
+      pavilhao: req.query.pavilhao || '',
+      reincidencia: req.query.reincidencia || ''
+    };
+  }
+
+  static async detalhes(req, res, next) {
     try {
       const { id } = req.params;
       const detento = await DetentoService.buscarPorId(id);
-      if (!detento) return res.status(404).send('Detento não encontrado.');
+      
       res.render('detentos/detalhes', {
         detento,
         user: req.session.user,
         currentPage: 'detentos'
       });
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async editar(req, res) {
+  static async editar(req, res, next) {
     try {
       const { id } = req.params;
       const detento = await DetentoService.buscarPorId(id);
-      if (!detento) return res.status(404).send('Detento não encontrado.');
-
+      
       res.render('detentos/editar', {
         detento,
         user: req.session.user,
         currentPage: 'detentos'
       });
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async atualizar(req, res) {
+  static async atualizar(req, res, next) {
     try {
       const { id } = req.params;
-      const { nome, idade, filiacao, estadoCivil, reincidencia, crimes } = req.body;
-
-      const foto = req.file ? req.file.filename : undefined;
-
-      const dadosAtualizados = {
-        nome,
-        idade,
-        filiacao,
-        estadoCivil,
-        foto: foto || undefined,
-        reincidencia: reincidencia === 'true',
-        crimes: crimes.split(',').map((crime) => crime.trim())
-      };
-
-      const detentoAtualizado = await DetentoService.atualizar(id, dadosAtualizados);
-      if (!detentoAtualizado) return res.status(404).send('Detento não encontrado.');
-
+      const detentoDTO = DetentoController.criarDTOAtualizacao(req);
+      await DetentoService.atualizar(id, detentoDTO);
       res.redirect('/detentos/lista');
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async excluir(req, res) {
+  static criarDTOAtualizacao(req) {
+    const { nome, idade, filiacao, estadoCivil, reincidencia, crimes } = req.body;
+    const foto = req.file ? req.file.filename : undefined;
+
+    return new DetentoDTO({
+      nome,
+      idade: parseInt(idade),
+      filiacao,
+      estadoCivil,
+      foto,
+      reincidencia: reincidencia === 'true',
+      crimes: crimes ? crimes.split(',').map(crime => crime.trim()) : []
+    });
+  }
+
+  static async excluir(req, res, next) {
     try {
       const { id } = req.params;
-
       await DetentoService.excluir(id);
       res.redirect('/detentos/lista');
-    } catch (error) {
-      res.status(500).send(error.message);
+    } catch (erro) {
+      next(erro);
     }
   }
 
-  static async pesquisar(req, res) {
+  static async pesquisar(req, res, next) {
     try {
       const { nome } = req.query;
       const detentos = await DetentoService.pesquisarPorNome(nome);
-
       res.json(detentos);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    } catch (erro) {
+      next(erro);
     }
   }
-
 }
 
 module.exports = DetentoController;
+

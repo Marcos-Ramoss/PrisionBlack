@@ -1,55 +1,51 @@
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/UserModel');
+const UsuarioMapper = require('../mappers/UsuarioMapper');
+const ValidacaoExcecao = require('../exceptions/ValidacaoExcecao');
+const RegraNegocioExcecao = require('../exceptions/RegraNegocioExcecao');
 
 class AuthService {
-  static validateUserData(data) {
-    const { nome, email, senha, nivelAcesso } = data;
+  static validarDadosUsuario(dados) {
+    const { nome, email, senha, nivelAcesso } = dados;
 
     if (!nome || !email || !senha || !nivelAcesso) {
-      throw new Error(
-        'Todos os campos são obrigatórios: nome, email, senha e nível de acesso.'
+      throw new ValidacaoExcecao(
+        'Todos os campos são obrigatórios: nome, email, senha e nível de acesso'
       );
     }
 
     if (!['ADMIN', 'DIRETOR', 'INSPETOR'].includes(nivelAcesso)) {
-      throw new Error(
-        'Nível de acesso inválido. Escolha entre ADMIN, DIRETOR ou INSPETOR.'
+      throw new ValidacaoExcecao(
+        'Nível de acesso inválido. Escolha entre ADMIN, DIRETOR ou INSPETOR'
       );
     }
   }
 
-  static async criarUsuario(data) {
-    try {
-      this.validateUserData(data);
+  static async criarUsuario(dados) {
+    AuthService.validarDadosUsuario(dados);
+    await AuthService.validarEmailUnico(dados.email);
 
-      const { nome, email, senha, nivelAcesso, criadoPor } = data;
+    const senhaHash = await AuthService.criptografarSenha(dados.senha);
+    const dadosEntidade = UsuarioMapper.paraEntidade({
+      ...dados,
+      senha: senhaHash
+    });
 
-      const usuarioExistente = await Usuario.findOne({ email });
-      if (usuarioExistente) {
-        throw new Error('Este email já está cadastrado.');
-      }
+    const novoUsuario = new Usuario(dadosEntidade);
+    const usuarioSalvo = await novoUsuario.save();
 
+    return UsuarioMapper.paraDTO(usuarioSalvo);
+  }
 
-      const senhaHash = await bcrypt.hash(senha, 10);
-
-      const novoUsuario = new Usuario({
-        nome,
-        email,
-        senha: senhaHash,
-        nivelAcesso,
-        criadoPor: criadoPor || null
-      });
-
-      const usuarioSalvo = await novoUsuario.save();
-
-
-      return usuarioSalvo;
-    } catch (error) {
-      if (error.name === 'ValidationError') {
-        throw new Error(`Erro de validação: ${Object.values(error.errors).map(err => err.message).join(', ')}`);
-      }
-      throw error;
+  static async validarEmailUnico(email) {
+    const usuarioExistente = await Usuario.findOne({ email });
+    if (usuarioExistente) {
+      throw new RegraNegocioExcecao('Este email já está cadastrado');
     }
+  }
+
+  static async criptografarSenha(senha) {
+    return await bcrypt.hash(senha, 10);
   }
 }
 

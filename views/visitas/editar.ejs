@@ -51,28 +51,32 @@
             <div class="col-md-6 mb-3">
               <label for="nomeFamiliar" class="form-label"><i class="fa-solid fa-user-group me-2"></i> Nome do
                 Familiar</label>
-              <input type="text" class="form-control form-control-sm" id="nomeFamiliar" name="nomeFamiliar" value="<%= visita.nomeFamiliar %>" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite um nome válido (3 a 50 caracteres) somente letras">
+              <input type="text" class="form-control form-control-sm" id="nomeFamiliar" name="nomeFamiliar" value="<%= visita.nomeFamiliar %>" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" placeholder="Ex: Maria Silva" title="Digite um nome válido (3 a 50 caracteres) somente letras">
+              <small class="text-muted">Apenas letras e espaços (3 a 50 caracteres)</small>
             </div>
 
             <!-- Relação -->
             <div class="col-md-6 mb-3">
               <label for="relacao" class="form-label"><i class="fa-solid fa-link me-2"></i> Relação com o
                 Detento</label>
-              <input type="text" class="form-control form-control-sm" id="relacao" name="relacao" value="<%= visita.relacao %>" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite uma relação válida (3 a 50 caracteres) somente letras">
+              <input type="text" class="form-control form-control-sm" id="relacao" name="relacao" value="<%= visita.relacao %>" required pattern="^[A-Za-zÀ-ú\s]{3,50}$" placeholder="Ex: Mãe, Pai, Irmão" title="Digite uma relação válida (3 a 50 caracteres) somente letras">
+              <small class="text-muted">Ex: Mãe, Pai, Irmão, Esposa</small>
             </div>
             <% } else { %>
             <!-- Nome do Advogado -->
             <div class="col-md-6 mb-3">
               <label for="nomeAdvogado" class="form-label"><i class="fa-solid fa-briefcase me-2"></i> Nome do
                 Advogado</label>
-              <input type="text" class="form-control form-control-sm" id="nomeAdvogado" name="nomeAdvogado" value="<%= visita.nomeAdvogado %>" pattern="^[A-Za-zÀ-ú\s]{3,50}$" title="Digite somente letras que constam no Alfabeto" required>
+              <input type="text" class="form-control form-control-sm" id="nomeAdvogado" name="nomeAdvogado" value="<%= visita.nomeAdvogado %>" pattern="^[A-Za-zÀ-ú\s]{3,50}$" placeholder="Ex: João Advogado" title="Digite somente letras que constam no Alfabeto" required>
+              <small class="text-muted">Apenas letras e espaços (3 a 50 caracteres)</small>
             </div>
 
             <!-- Número da OAB -->
             <div class="col-md-6 mb-3">
               <label for="numeroOAB" class="form-label"><i class="fa-solid fa-id-card me-2"></i> Número da
                 OAB</label>
-              <input type="text" class="form-control form-control-sm" id="numeroOAB" name="numeroOAB" value="<%= visita.numeroOAB %>" pattern="^[0-9]+$" minlength="6" maxlength="6" title="Digite um número de OAB válido (6 numeros)" required>
+              <input type="text" class="form-control form-control-sm" id="numeroOAB" name="numeroOAB" value="<%= visita.numeroOAB %>" pattern="^\d{6}$" minlength="6" maxlength="6" placeholder="Ex: 123456" title="Digite um número de OAB válido (6 dígitos)" required>
+              <small class="text-muted">Exatamente 6 dígitos numéricos</small>
             </div>
             <% } %>
 
@@ -93,7 +97,8 @@
             <div class="col-md-12 mb-3">
               <label for="observacoes" class="form-label"><i class="fa-solid fa-comment me-2"></i>
                 Observações</label>
-              <textarea class="form-control form-control-sm" id="observacoes" name="observacoes" rows="3" required><%= visita.observacoes || '' %></textarea>
+              <textarea class="form-control form-control-sm" id="observacoes" name="observacoes" rows="3" required minlength="5" maxlength="500" placeholder="Ex: Visita para tratar de questões jurídicas"><%= visita.observacoes || '' %></textarea>
+              <small class="text-muted">Descreva o motivo da visita (mínimo 5 caracteres)</small>
             </div>
           </div>
 
